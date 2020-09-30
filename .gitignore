@@ -1,0 +1,4 @@
+#Ignore virtual environment, build and templates folder
+tutorialenv/
+docs/build/
+docs/source/_templates/ 
