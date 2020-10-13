@@ -1,8 +1,8 @@
-.. _ngs-features:
+.. _ngs-comparison:
 
-**********************
-Resistome and virulome
-**********************
+********************
+Comparative genomics
+********************
 
 xxxx
 

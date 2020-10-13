@@ -4,16 +4,176 @@
 Before we begin
 ***************
 
-xxxx
 
-
-Bash
+BASH
 ####
 
-xxxx
+Before you start with the tutorial, you will find here some basic Bash Shell commands that will help you to manage directories and files.
+
+.. note::
+   Shell is an interface that accepts commands and delivers them to the operating system to perform.
+   UNIX-based operating systems (Linux, macOS, and others) can have different Shell types (e.g., Bash, zsh).
+
+This small intro will focus on Bash Shell. However, if you have the latest MacOS Catalina, zsh will be an alternative to the Bash Shell.
 
 
-Conda
-#####
+Exploring the Terminal
+**********************
 
-xxxx
+First, you need to look for your Terminal, the program that allows you to interact with the Shell.
+
+Open the Terminal as explained below:
+
+* If you're on a Mac, you'll find the Terminal under Applications -> Utilities. The easiest way is to press 'command + space' which will bring up Spotlight, and then you can write Terminal.
+* If you're on a Linux then you will probably find it in Applications -> System or Applications -> Utilities.
+
+Yet, if you have a Windows-based system, you will need to install a Shell and a Terminal. You can install `Windows Subsystem for Linux (WSL) <https://docs.microsoft.com/en-us/windows/wsl/about>`_ or `Git Bash <https://git-scm.com/download/win>`_.
+
+Whenever you open a Terminal, you will see your last login credentials and a Shell prompt.
+The appearance might vary a little, but usually, you will see the username@machinename followed by a ``$`` sign.
+
+.. figure:: ./Images/Terminal.png
+	 :figclass: align-left
+
+*Figure 2. This is an example of a macOS Terminal.*
+
+
+Basic Bash Commands
+*******************
+
+Try to run in the Terminal some of the basic Bash commands and look at the output. Below you can see handy comments for users that were added after the hash ``#`` mark and are ignored by Bash.
+
+**A. List (ls) commands**
+
+.. code-block:: bash
+
+  # Print a list of files and subdirectories within directories
+  $ ls
+
+  # Print the contents of a specific directory
+  # In this case, it prints the Desktop content
+  $ ls Desktop/
+
+  # List all the hidden files in a directory
+  $ ls -a
+
+  # Print a more detailed list of files
+  $ ls -l
+
+  # Regardless of what directory you are into it will always list your home directory
+  $ ls ~
+
+**B. Change Directory (cd) commands**
+
+.. code-block:: bash
+
+  # Navigate between directories on your computer
+  # In this case, it will go to Documents directory
+  $ cd Documents/
+
+  # Display the current directory
+  $ cd .
+
+  # Go back to the directory above
+  $ cd ..
+
+  # Go back to the home directory
+  $ cd ~
+
+  # Go to the root of the file system
+  $ cd /
+
+.. seealso::
+   You can also use a semicolon ``;`` character to write two commands on the same line.
+
+   If you have a very long command you can run separate code chunks onto separate lines by using the ``\`` character to make it more readable.
+
+**C. Organizing files and directories**
+
+.. code-block:: bash
+
+    # Create a new directory (mkdir)
+    # In this case, it creates a directory called genomics
+    $ mkdir genomics
+
+    # Moves one or more files from one directory to another (mv)
+    # You need to specify the <source_file> and the <destination> directory
+    $ mv <source_file> <destination>
+
+    # Used to create empty new files (touch)
+    # In this case, it creates two files named virus.txt and bacteria.txt
+    $ touch virus.txt bacteria.txt
+
+    # Delete a file (rm)
+    # In this case, it will remove the previous file called virus.txt
+    $ rm virus.txt
+
+    # Delete directories and every file inside it (rm -r)
+    # In this case, we removed the previous created genomics directory
+    $ rm -r genomics
+
+    # Remove empty directories (rmdir)
+    # In this case, we removed the previous created genomics directory
+    % rmdir genomics
+
+    # Copy files to another directory (cp)
+    # You need to specify the <source_file> to be copied and the <destination> directory
+    $ cp <source_file> <destination>
+
+    # Copy a directory and its contents to another directory (cp -r)
+    # In this case, it moves the directory genomics to a new created omics directory
+    $ cp -r genomics omics
+
+.. note::
+   In most of these previous examples, you shouldn't forget to write in the command line what is the file or directory that you want to move, remove, create, or copy.
+
+
+**D. Viewing and exploring file content**
+
+.. code-block:: bash
+
+   # Display the first 10 lines of the previous bacteria.txt file (head)
+   $ head bacteria.txt
+
+   # Display the last 100 lines of the previous bacteria.txt file (tail)
+   # To increase the number of lines viewed from 10 to 100 add the –100 argument to the command
+   $ tail -100 bacteria.txt
+
+   # Concatenate or join two or more files into a single one (cat)
+   $ cat bacteria.txt virus.txt > bacteria_virus.txt
+
+   # Search for patterns in a file (grep)
+   # Extract the lines that match the ‘>’ symbol in this case the headers
+   $ grep ‘>’ NC_002695.2.fasta
+
+   # Search for a nucliotide sequence and print 1 line before and after any match
+   $ grep -B 1 -A 1 'GAGGTTGTTGAAATCGA' NC_002695.2.fasta
+
+
+**E. Other usefull commands**
+
+.. code-block:: bash
+
+   # Print the current working directory
+   $ pwd
+
+   # Clear the terminal screen
+   $ clear
+
+   # Download files from the internet using a link (wget)
+   # You need to specify the <link_source> to the file
+   $ wget <link_source>
+
+
+Further Reading
+***************
+
+This small tutorial is only a little start to basic Bash commands; however you will see in the future that they will bring you a lot of advantages and benefits.
+If you want to dig a little bit more about specific or advanced Bash commands, I leave here some available online resources and books:
+
+* `Bash Scripting Tutorial for Beginners <https://linuxhint.com/bash_scripting_tutorial_beginners/>`_
+* `The Linux Command Line <http://linuxcommand.org/tlcl.php>`_
+* `Beginner's Guide to the Bash Terminal <https://www.youtube.com/watch?v=oxuRxtrO2Ag>`_
+* `bash Cookbook <https://www.amazon.com/bash-Cookbook-Solutions-Examples-Users/dp/1491975334/>`_
+* `Learning the bash Shell <https://www.amazon.com/Learning-bash-Shell-Programming-Nutshell-ebook/dp/B0043GXMSY/>`_
+* `The Biostar Handbook: 2nd Edition <https://www.biostarhandbook.com/index.html>`_

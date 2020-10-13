@@ -17,3 +17,6 @@ Learning objectives
 ###################
 
 xxxx
+
+.. todo::
+   1. Run kraken2, braken and krona also in your assembled genomes.

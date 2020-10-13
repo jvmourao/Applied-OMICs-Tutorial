@@ -17,3 +17,16 @@ Learning objectives
 ###################
 
 xxxx
+
+
+SNP-based phylogeny
+###################
+
+xxxx
+
+
+Other approaches
+################
+
+cgMLST
+wgMLST

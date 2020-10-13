@@ -21,8 +21,11 @@ project = 'Applied OMICs Tutorial'
 copyright = '2020, Joana Mourão'
 author = 'Joana Mourão'
 
+# The short X.Y version.
+version = "1.0"
+
 # The full version, including alpha/beta/rc tags
-release = '1.0'
+release = '2020.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -31,16 +34,27 @@ release = '1.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.todo",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
+# source_suffix = ['.rst', '.md']
+source_suffix = ".rst"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "sphinx"
+
+# If true, `todo` and `todoList` produce output, else they produce nothing.
+todo_include_todos = True
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -55,3 +69,43 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Add any paths that contain custom themes here, relative to this directory.
+# html_theme_path = []
+# rtd
+html_context = {
+    "display_github": True,
+    "github_user": "jvmourao",
+    "github_repo": "Applied-OMICs-Tutorial",
+    "github_version": "master/docs/source/",
+}
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+#
+html_logo = "./Images/Logo.png"
+
+# -- Options for Texinfo output -------------------------------------------
+
+# Grouping the document tree into Texinfo files. List of tuples
+# (source start file, target name, title, author,
+#  dir menu entry, description, category)
+
+rst_epilog = """
+.. |anaconda| replace:: `Anaconda <https://docs.anaconda.com/anaconda/install/>`__
+.. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
+.. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`__
+.. |bracken| replace:: `Bracken <https://ccb.jhu.edu/software/bracken/>`__
+.. |conda| replace:: `conda <https://conda.io/projects/conda/en/latest/index.html>`__
+.. |fastqc| replace:: `FastQC <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__
+.. |multiqc| replace:: `MultiQC <https://multiqc.info/>`__
+.. |kraken| replace:: `Kraken2 <https://github.com/DerrickWood/kraken2/blob/master/docs/MANUAL.markdown>`__
+.. |krona| replace:: `Krona <https://github.com/marbl/Krona/wiki>`__
+.. |miniconda| replace:: `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`__
+.. |ncbi| replace:: `NCBI <https://www.ncbi.nlm.nih.gov/>`__
+.. |phred| replace:: `Phred <https://en.wikipedia.org/wiki/Phred_quality_score>`__
+.. |prokka| replace:: `Prokka <https://github.com/tseemann/prokka>`__
+.. |quast| replace:: `Quast <http://quast.bioinf.spbau.ru/>`__
+.. |spades| replace:: `SPAdes <http://bioinf.spbau.ru/spades>`__
+.. |sra| replace:: `SRA <https://www.ncbi.nlm.nih.gov/sra>`__
+"""
