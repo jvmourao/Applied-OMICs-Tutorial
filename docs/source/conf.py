@@ -93,6 +93,7 @@ html_logo = "./Images/Logo.png"
 
 rst_epilog = """
 .. |anaconda| replace:: `Anaconda <https://docs.anaconda.com/anaconda/install/>`__
+.. |bandage| replace:: `Bandage <https://rrwick.github.io/Bandage/>`__
 .. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
 .. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`__
 .. |bracken| replace:: `Bracken <https://ccb.jhu.edu/software/bracken/>`__
@@ -106,6 +107,7 @@ rst_epilog = """
 .. |phred| replace:: `Phred <https://en.wikipedia.org/wiki/Phred_quality_score>`__
 .. |prokka| replace:: `Prokka <https://github.com/tseemann/prokka>`__
 .. |quast| replace:: `Quast <http://quast.bioinf.spbau.ru/>`__
-.. |spades| replace:: `SPAdes <http://bioinf.spbau.ru/spades>`__
+.. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/spades_3.14.1/README.md>`__
 .. |sra| replace:: `SRA <https://www.ncbi.nlm.nih.gov/sra>`__
+.. |unicycler| replace:: `Unicycler <https://github.com/rrwick/Unicycler>`__
 """

@@ -8,13 +8,13 @@ Taxonomy
 Introduction
 ############
 
-1. Taxonomy has the objective of
+1. Taxonomy has the objective of naming, describing and classifying organisms based on shared characteristics [ALBERT2019]_.
 
-2. XXXX
+2. To simplify the process of comparison, we usually use the `NCBI taxonomy <https://www.ncbi.nlm.nih.gov/taxonomy>`_.
 
-3. XXXX
+3. In this section, we will use |kraken| for taxonomic classification of our sequenced samples and input these results to |bracken| for estimation of species-level or genus-level abundances.
 
-Kraken2, Bracken, Krona
+4. Finally, we will use |krona| to generate interactive plots of the previous taxonomic labels.
 
 
 Learning objectives
@@ -27,8 +27,8 @@ After completing this Tutorial, you will be able to:
 * Visualize and interpret taxonomic classification in samples.
 
 
-Taxonomic assignment
-####################
+Taxonomy assignment
+###################
 
 
 Kraken2 and Bracken

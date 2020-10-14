@@ -412,13 +412,13 @@ List of QC tools
 
 .. seealso::
 
-   * The tools used in this Tutorial section are not the only one available for the purpose of quality control.
+   * The tools used in this Tutorial section are not the only ones available for the purpose of quality control.
 
-   * Other tools can also be used to perform this task (**some examples are provided in the table below**).
+   * Other tools can also be used to perform this task (**some examples are provided in table below**).
 
 .. csv-table::
    Table with other available Software installed by conda.
-   :header: "Package name", "Version", "Objective"
+   :header: "Package name", "Version", "Main objective"
    :widths: 20, 20, 40
 
    "`BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`_", "38.87", "Quality control tools (contains BBMap, BBDuk)"
