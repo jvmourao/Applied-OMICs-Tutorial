@@ -128,7 +128,7 @@ Usage
    :widths: 20, 60
 
    "``--centre [X]``", "Sequencing centre ID (default '')"
-   "``--compliant``", "xxx"
+   "``--compliant``", "Force Genbank/ENA/DDJB compliance: --addgenes --mincontiglen 200 --centre XXX (default OFF)"
    "``--locustag [X]``", "Locus tag prefix [auto] (default '')"
    "``--prefix [X]``", "Filename output prefix [auto] (default '')"
    "``--outdir [X]``", "Output folder [auto] (default '')"
