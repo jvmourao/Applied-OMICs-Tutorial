@@ -22,7 +22,7 @@ Introduction
 Learning objectives
 ###################
 
-After completing this Tutorial, you will be able to:
+After finishing this Tutorial section, you will be able to:
 
 * Calculate the sequencing coverage.
 * Generate a full combined quality report.
@@ -154,7 +154,7 @@ Usage
     # Open FastQC html report
     $ open filename_fastqc.html
 
-**3. Parameters**
+**3. Additional options**
 
 .. code-block:: bash
 
@@ -237,7 +237,7 @@ Usage
     # Open MultiQC html report
     $ open multiqc_report.html
 
-**3. Parameters**
+**3. Additional options**
 
 .. code-block:: bash
 
@@ -355,7 +355,7 @@ Usage
 .. note::
    After performing quality control in your raw sequence reads, move the new files to the directory ``~/tutorial/qc_improvement/``.
 
-**3. Parameters**
+**3. Additional options**
 
 .. code-block:: bash
 

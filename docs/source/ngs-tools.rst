@@ -181,6 +181,7 @@ Here is a list of all packages that you will install throughout the Tutorial.
    "bbtools", "37.62", "Quality control", "qc"
    "kraken2", "2.0.9beta", "Taxonomy", "qc"
    "krona", "2.7.1", "Taxonomy", "qc"
+   "bracken", "2.6.0", "Taxonomy", "qc"
    "spades", "3.14.1", "De novo genome assembly", "assembly"
    "unicycler", "0.4.8", "De novo genome assembly", "assembly"
    "quast", "5.0.2", "De novo genome assembly", "qc"

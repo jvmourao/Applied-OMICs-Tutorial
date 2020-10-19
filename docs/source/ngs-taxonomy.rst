@@ -20,7 +20,7 @@ Introduction
 Learning objectives
 ###################
 
-After completing this Tutorial, you will be able to:
+After finishing this Tutorial section, you will be able to:
 
 * Perform a complete taxonomic classification of raw sequence data.
 * Estimate the abundance of species or genera using the taxonomy labels.
@@ -193,7 +193,7 @@ From left to the right you can identify 7 columns representing:
    6. Total Reads after Abundance Reestimation.
    7. Fraction of Total Reads.
 
-**3. Parameters**
+**3. Additional options**
 
 .. code-block:: bash
 

@@ -11,7 +11,7 @@ Introduction
 Bioinformaticians can work with different bacterial **multi-omics data** (e.g., genomics, proteomics, transcriptomics, metabolomics).
 
 .. note::
-   Multi-omics data can be originated from your own project or can be acquired through different databases/repositories. There are a panoply of available **databases/repositories** that are of utmost importance to store, maintain and share these data [ZHULIN2015]_.
+   Multi-omics data can be originated from your own project or can be acquired through different databases or repositories. They are of utmost importance to store, maintain and share data [ZHULIN2015]_.
 
 For the purpose of this Tutorial, you will explore some of these databases and acquire **two types of data**:
 
@@ -22,7 +22,7 @@ For the purpose of this Tutorial, you will explore some of these databases and a
 Learning objectives
 ###################
 
-After completing this Tutorial, you will be able to:
+After finishing this Tutorial section, you will be able to:
 
 * Known how to acquire raw sequence reads from different sequencing platforms.
 * Known how to acquire complete or partial bacterial genomes.
@@ -40,38 +40,36 @@ The |sra| is a public repository that stores raw sequence data from next-generat
 
 .. code-block:: bash
 
-    # Create a new conda environment named "data"
-    $ conda create -n data
+   # Create two new directories to store your data
+   $ mkdir tutorial
+   $ cd ~/tutorial
+   $ mkdir raw_data
 
-    # Activate your "data" environment
-    $ conda activate data
+   # Create a new conda environment named "data"
+   $ conda create -n data
 
-    # Install SRA Tools through conda
-    $ conda install -c bioconda sra-tools
+   # Activate your "data" environment
+   $ conda activate data
 
-    # Allow downloading raw sequence reads data from SRA using prefetch command
-    $ prefetch SRR7184397 SRR6052929 SRR7477814 SRR7477813
+   # Install SRA Tools through conda
+   $ conda install -c bioconda sra-tools
 
-    # Convert SRA raw sequence reads data into fastq format using fastq-dump command
-    $ fastq-dump --split-files path/*.sra
+   # Allow downloading raw sequence reads data from SRA using prefetch command
+   $ prefetch SRR7184397 SRR6052929 SRR7477814 SRR7477813
 
-    # You can zip the files to take up less space in your computer
-    $ gzip path/*.fastq
+   # Convert SRA raw sequence reads data into fastq format using fastq-dump command
+   $ fastq-dump --split-files SRR7184397 SRR6052929 SRR7477814 SRR7477813
+
+   # Move the previous acquired raw sequence reads to your new directory
+   $ mv ~/reads ~/tutorial/raw_data
+
+   # You can compress the files to take up less space in your computer
+   $ gzip ~/tutorial/raw_data/*.fastq
 
 .. figure:: ./Images/Data_acquisition.png
    :figclass: align-left
 
 *Figure 5. Acquisition of raw sequence reads using SRA Toolkit in a macOS.*
-
-.. code-block:: bash
-
-    # Create two new directories to store your data
-    $ mkdir tutorial
-    $ cd ~/tutorial
-    $ mkdir raw_data
-
-    # Move the previous acquired raw sequence reads to your new directory
-    $ mv ~/reads ~/raw_data
 
 
 Acquire bacterial genome sequences from NCBI
@@ -99,7 +97,7 @@ Let's try both ways to acquire the data:
 
 .. code-block:: bash
 
-   # Retrieve the E. coli reference genome using the accession number
+   # Retrieve the E. coli reference genome using the accession number in fasta format
    $ ncbi-acc-download --format fasta NC_002695.2
 
    # Retrieve the E. coli reference genome using the assembly accession in fasta format
@@ -108,8 +106,11 @@ Let's try both ways to acquire the data:
    # Retrieve the E. coli reference genome using the assembly accession in GenBank format
    $ ncbi-genome-download -s refseq -F genbank -A GCF_000008865.2 bacteria
 
-   # Move the acquired reference genome to the directory raw_data
-   $ mv path/reads path/raw_data
+   # Move the acquired reference genomes to the directory raw_data
+   $ mv ~/genomes ~/tutorial/raw_data
+
+   # Uncompress the GCF_000008865.2_ASM886v2_genomic files
+   $ gunzip ~/tutorial/raw_data/GCF_000008865.2_ASM886v2_genomic.*.gz
 
 .. note::
    For more information about the full usage of each one of the tools you can go to the official page of `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ or type in the Terminal ``ncbi-genome-download --help`` or ``ncbi-genome-download --help``.
@@ -118,7 +119,7 @@ Let's try both ways to acquire the data:
 Understanding the file content
 ##############################
 
-At the end of this section, you will have a directory with **8 files** with three different file extensions (.fastq, .fasta and .gbff), that will be used along with the Tutorial.
+At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbff), that will be used along with the Tutorial.
 
 ::
 
@@ -145,11 +146,11 @@ In the folder structure above:
 * ``/*.gbff`` is the complete genome of the reference strain in **GenBank** flat file format. A GenBank format can be represented by file extensions such as ``.gbk``, ``.gb`` or ``.genbank``.
 
 .. note::
-   To avoid recognition problems it's recommended to put all Fasta files with the same file extension. To do this type in the Terminal ``mv path/NC_002695.2.fa path/NC_002695.2.fasta`` and ``mv GCF_000008865.2_ASM886v2_genomic.fna GCF_000008865.2_ASM886v2_genomic.fasta``.
+   To avoid recognition problems it's recommended to put all Fasta files with the same file extension. To do this type in the Terminal ``mv ~/tutorial/raw_data/*.fa ~/tutorial/raw_data/*.fasta`` and ``mv ~/tutorial/raw_data/*.fna ~/tutorial/raw_data/*.fasta``.
 
    Also let's convert ``/*.gbff`` to ``/*.gbk`` since some packages and tools are not able to recognize ``/*.gbff`` extension.
 
-   First install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv /*.gbff /#1.gbk``.
+   First install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv ~/tutorial/raw_data/*.gbff ~/tutorial/raw_data/*.gbk``.
 
 
 Compressed formats
@@ -169,7 +170,7 @@ Fasta files
 
 * Fasta format files can store nucleotide or amino acid sequences and the information about their origin.
 
-* A fasta file can contain multiple sequence each starting by ``>`` and the respective header.
+* A fasta file can contain multiple sequences each starting by ``>`` and the respective header.
 
 .. csv-table:: A Fasta format file description
    :header: "Line", "Description"
@@ -190,7 +191,7 @@ Fastq files
 
 * Fastq are standard output files used by most sequencers.
 
-* They contain sequence information, as previously observed with *Fasta* files, but also its associated *quality* scores.
+* They contain sequence information, as previously observed with **Fasta** files, but also its associated **quality scores**.
 
 * Fastq files have four lines for each entry.
 

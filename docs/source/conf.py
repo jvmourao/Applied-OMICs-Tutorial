@@ -92,13 +92,16 @@ html_logo = "./Images/Logo.png"
 #  dir menu entry, description, category)
 
 rst_epilog = """
+.. |abricate| replace:: `ABRicate <https://github.com/tseemann/abricate>`__
 .. |anaconda| replace:: `Anaconda <https://docs.anaconda.com/anaconda/install/>`__
 .. |bandage| replace:: `Bandage <https://rrwick.github.io/Bandage/>`__
 .. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
 .. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`__
 .. |bracken| replace:: `Bracken <https://ccb.jhu.edu/software/bracken/>`__
+.. |busco| replace:: `BUSCO <https://busco.ezlab.org/>`__
 .. |conda| replace:: `conda <https://conda.io/projects/conda/en/latest/index.html>`__
 .. |fastqc| replace:: `FastQC <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__
+.. |go| replace:: `GO <http://geneontology.org/>`__
 .. |multiqc| replace:: `MultiQC <https://multiqc.info/>`__
 .. |kraken| replace:: `Kraken2 <https://github.com/DerrickWood/kraken2/blob/master/docs/MANUAL.markdown>`__
 .. |krona| replace:: `Krona <https://github.com/marbl/Krona/wiki>`__
@@ -106,7 +109,8 @@ rst_epilog = """
 .. |ncbi| replace:: `NCBI <https://www.ncbi.nlm.nih.gov/>`__
 .. |phred| replace:: `Phred <https://en.wikipedia.org/wiki/Phred_quality_score>`__
 .. |prokka| replace:: `Prokka <https://github.com/tseemann/prokka>`__
-.. |quast| replace:: `Quast <http://quast.bioinf.spbau.ru/>`__
+.. |quast| replace:: `Quast <http://quast.sourceforge.net/quast>`__
+.. |rast| replace:: `RAST <https://rast.nmpdr.org/>`__
 .. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/spades_3.14.1/README.md>`__
 .. |sra| replace:: `SRA <https://www.ncbi.nlm.nih.gov/sra>`__
 .. |unicycler| replace:: `Unicycler <https://github.com/rrwick/Unicycler>`__
