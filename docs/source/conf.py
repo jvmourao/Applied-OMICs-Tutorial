@@ -86,6 +86,11 @@ html_context = {
 # Output file base name for HTML help builder.
 htmlhelp_basename = "AppliedOMICsDoc"
 
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+#
+html_logo = "./Images/Logo.png"
+
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_engine = 'pdflatex'
@@ -108,6 +113,11 @@ latex_elements = {
     #
     #'figure_align': 'htbp',
 }
+
+# The name of an image file (relative to this directory) to place at the top of
+# the title page.
+#
+latex_logo = "./Images/Logo.png"
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
