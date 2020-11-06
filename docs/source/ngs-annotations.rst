@@ -12,7 +12,7 @@ Introduction
 
 2. Genome annotation is the process that allows us to **identify** features of interest in those contigs and to **label** them with useful information.
 
-3. In this section, you will use |prokka| for whole-genome annotation, |abricate| for a more specific one and `IGV <http://software.broadinstitute.org/software/igv/>`_ for its interactive visualization. At the end we will evaluate assembly completeness using |busco|.
+3. In this section, you will use |prokka| for whole-genome annotation, |abricate| for a more specific one and `IGV <http://software.broadinstitute.org/software/igv/>`_ for its interactive visualization. In the end, you will evaluate assembly completeness using |busco|.
 
 4. When it comes to annotation process there are two key concepts, **Sequence Ontology** and **Gene Ontology**, that you should understand before you move forward.
 
@@ -20,15 +20,14 @@ Introduction
 Sequence Ontology (SO)
 **********************
 
-* SO is a **structured controlled vocabulary** of sequence features that are part of the genomic annotation.
+* SO is a **structured controlled vocabulary** of terms and the relationships between them useful to describe features of a genomic annotation [EILBECK2005]_.
 
-* This vocabulary definition is vital for the exchange, analysis and management of genomic data [EILBECK2005]_.
+* This vocabulary definition is vital for the exchange, analysis and management of genomic data.
 
-* You will see for example SO terms used in **GenBank annotation files** (e.g., CDS, ORF, tRNA_gene).
+* If you open a **GenBank annotation file**, you will see several demonstrations of SO terms (e.g., the term `CDS <http://sequenceontology.org/browser/current_svn/term/SO:0000316>`_ is defined as a contiguous sequence which begins with, and includes, a start codon and ends with, and includes a stop codon).
 
 .. seealso::
-
-   To understand the **definition of all terms** used you can go to the `Sequence Ontology Browser <http://www.sequenceontology.org/browser/obob.cgi>`_ and search for it.
+   To understand the **definition of all SO terms** available you can go to the `Sequence Ontology Browser <http://www.sequenceontology.org/browser/obob.cgi>`_ and search for each one.
 
 
 Gene Ontology (GO)
@@ -36,9 +35,9 @@ Gene Ontology (GO)
 
 * |go| is a controlled vocabulary that correlates each gene to one or more functions [ALBERT2019]_.
 
-* The |go| ontology structure can be represented as a graph where nodes are the GO terms and the edges are the associations between these terms.
+* The |go| structure can be represented as a graph where nodes are the GO terms, and the edges are the associations between these terms.
 
-* Each child node is more “specific” than its parent, and function is “inherited” down the line
+* Each child node is more “specific” than its parent, and function is “inherited” down the line.
 
 * |go| has three structured, independent sub-ontologies that describe our knowledge of the gene products:
 
@@ -47,7 +46,6 @@ Gene Ontology (GO)
   3. **Biological Process** - The larger processes accomplished by multiple molecular activities.
 
 .. seealso::
-
    You can search for GO terms or Gene products in `The Gene Ontology Resource <http://geneontology.org/>`_ official webpage.
 
 
@@ -57,9 +55,9 @@ Learning objectives
 After finishing this Tutorial section, you will be able to:
 
 * Make gene predictions of assembled genomes.
-* Evaluate the presence of specific genes conferring adaptative features.
+* Evaluate the presence of specific genes conferring adaptive features.
 * Evaluate assembly completeness through the search of orthologues presence or absence.
-* Use specific Software to visualize and edit genome annotations.
+* Use specific software to visualize and edit genome annotations.
 
 
 Whole-genome annotation
@@ -71,11 +69,11 @@ Prokka
 
 * |prokka| - Prokaryotic Annotation - is a software tool that finds and annotate bacterial, archaeal and viral features from genome sequences quickly and produce standards-compliant output files (e.g., GenBank, EMBL and GFF formats) [SEEMANN2014]_.
 
-* The annotation process of protein coding genes by |prokka| relies on several external feature prediction tools and has two main steps:
+* The annotation process of protein-coding genes by |prokka| relies on several external feature prediction tools and has two main steps:
 
   1. First, it uses Prodigal to identify the coordinates of candidate genes on the assembled genome.
 
-  2. Second, the putative gene product is predicted by similarity against a large database of known sequences.
+  2. Second, the putative gene product is predicted by similarity against an extensive database of known sequences.
 
 * You will use |prokka| to annotate all your bacterial assemblies from |spades| and |unicycler|.
 
@@ -86,13 +84,14 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named annotation
-   $ conda create -n annotation python=3
+   $ conda create -n annotation python=3.7
 
    # Activate the new environment
    $ conda activate annotation
 
-   # Install Prokka
-   $ conda install prokka
+   # Install and update to the latest version of Prokka
+   $ conda install -c conda-forge -c bioconda -c defaults prokka
+   $ conda update prokka
 
    # Check Prokka installation
    $ prokka --version
@@ -116,9 +115,10 @@ Usage
    $ mkdir annotation
    $ cd ~/tutorial/annotation/
    $ mkdir prokka abricate
+   $ cd
 
    # Run Prokka in your assembled genomes (FASTA format)
-   $ prokka --centre strainA --compliant --locustag mystrain --prefix mygenome --outdir mydir ~/tutorial/assembly/*.fasta
+   $ prokka --centre strainA --compliant --locustag strainA --prefix mygenome --outdir mydir ~/tutorial/assembly/*.fasta
 
    # Move your result files to the Prokka directory
    $ mv <path_results_prokka> ~/tutorial/annotation/prokka/
@@ -132,21 +132,18 @@ Usage
    "``--locustag [X]``", "Locus tag prefix [auto] (default '')"
    "``--prefix [X]``", "Filename output prefix [auto] (default '')"
    "``--outdir [X]``", "Output folder [auto] (default '')"
-   "``--isolate``", "Improves the assembly quality and running time"
 
 .. attention::
-
    When running |prokka| the header ID in your ``.fasta`` file must be **less than 38 characters** to avoid conflicts with GenBank annotations. To withdraw this issue use the ``--centre [X]`` and ``--compliant`` options.
 
 .. seealso::
-
    `RAST <https://rast.nmpdr.org/>`_ web tool is an excellent alternative if you want a more **detailed annotation** and **pathway analysis** of your genome that is not provided with |prokka|. However, you need to upload the assemblies one by one, and usually, it can take a **few hours** to run a genome.
 
 **3. Additional options**
 
 .. code-block:: bash
 
-   # To see a full list of available options in SPAdes
+   # To see a full list of available options in Prokka
    $ prokka --help
 
 
@@ -157,7 +154,7 @@ Specific annotations
 ABRicate
 ********
 
-* If you prefer to look for specific adaptative features in your genome, you can use |abricate|.
+* If you prefer to look for genes encoding for specific adaptive features in your genome, you can use |abricate|.
 
 * This tool allows the mass screening of contigs for antimicrobial resistance or virulence genes.
 
@@ -169,7 +166,7 @@ ABRicate
   4. `Resfinder <https://cge.cbs.dtu.dk/services/ResFinder/>`_ - identification of acquired antimicrobial resistance genes [ZANKARI2012]_.
   5. `MEGARes <https://megares.meglab.org/>`_ - identification of antimicrobial resistance genes from metagenomic datasets [DOSTER2020]_.
   6. `EcOH <https://github.com/katholt/srst2/tree/master/data>`_ - accurate serotype of *E. coli* isolates from raw WGS data [INGLE2016]_.
-  7. `PlasmidFinder <https://cge.cbs.dtu.dk/services/PlasmidFinder/>`_ - in silico detection of whole-plasmid sequence data [CARATTOLI2014]_.
+  7. `PlasmidFinder <https://cge.cbs.dtu.dk/services/PlasmidFinder/>`_ - *in-silico* detection of whole-plasmid sequence data [CARATTOLI2014]_.
   8. `Ecoli_VF <https://github.com/phac-nml/ecoli_vf>`_ - database of *E. coli* virulence factors from VFDB plus additional factors from the literature.
   9. `VFDB <http://www.mgc.ac.cn/VFs/>`_ - Virulence Factor DataBase [CHEN2016]_.
 
@@ -185,10 +182,14 @@ Installation
    $ conda activate annotation
 
    # Install ABRicate
-   $ conda install abricate
+   $ conda install -c conda-forge -c bioconda -c defaults abricate
 
    # Check ABRicate installation
    $ abricate --version
+   $ abricate --check
+
+   # See the list of installed databases in ABRicate
+   $ abricate --list
 
 
 Usage
@@ -212,19 +213,29 @@ Usage
    # General ABRicate usage
    $ abricate [options] <contigs.{fasta,gbk,embl}[.gz] ...> > out.tab
 
-   # Run ABRicate in your assembled genomes (FASTA format)
-   $ abricate --db argannot --quiet --csv ~/tutorial/assembly/*.fasta > strainA.csv
+   # Run ABRicate database ResFinder in your assembled genomes (FASTA format)
+   $ abricate --db resfinder --quiet ~/tutorial/assembly/*.fasta > resfinder_ann.tab
+
+   # Run ABRicate database PlasmidFinder in your assembled genomes (FASTA format)
+   $ abricate --db plasmidfinder --quiet ~/tutorial/assembly/*.fasta > plasmidfinder_ann.tab
+
+   # Run ABRicate database Ecoli_VF in your assembled genomes (FASTA format)
+   $ abricate --db ecoli_vf --quiet ~/tutorial/assembly/*.fasta > ecoli_vf_ann.tab
+
+   # Generate a summary report for each analysis
+   $ abricate --summary resfinder_ann.tab > resfinder_ann_summary.tab
+   $ abricate --summary plasmidfinder_ann.tab > plasmidfinder_ann_summary.tab
+   $ abricate --summary ecoli_vf_ann.tab > ecoli_vf_summary.tab
 
    # Move your result files to the ABRicate directory
    $ mv <path_results_abricate> ~/tutorial/annotation/abricate/
 
-.. csv-table:: Parameters explanation when using Prokka
+.. csv-table:: Parameters explanation when using ABRicate
    :header: "Parameter", "Description"
    :widths: 20, 60
 
    "``--db [X]``", "Database to use (default 'ncbi')"
    "``--quiet``", "Quiet mode, no stderr output"
-   "``--csv``", "Output CSV instead of TSV"
 
 **3. Additional options**
 
@@ -233,18 +244,12 @@ Usage
    # To see a full list of available options in ABRicate
    $ abricate --help
 
-   # Check the list of installed databases in ABRicate
-   $ abricate --list
-
 .. todo::
-
    1. Run |prokka| and |abricate| in your assembled draft genomes using the ``.fasta`` files.
    2. Did your isolates carry putative antimicrobial resistance or virulence genes? Which ones are present?
    3. How many coding sequences (CDS) were predicted?
-   4. Visualize your genome annotations using Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ explained in the section below.
 
 .. seealso::
-
    * Although you use draft assembled genomes for this specific annotation process, it is also viable to use the initial **raw sequence reads** using for example `ARIBA <https://github.com/sanger-pathogens/ariba>`_.
 
    * Yet, it is essential to highlight that assembled sequences facilitate an understanding of the genetic context of the resistance mechanism by assessing, for example, gene synteny, mutations on regulatory regions or co-localization with other genes [KWONG2017]_.
@@ -259,7 +264,9 @@ IGV
 
 * The Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ is a freely-available and interactive high-performance desktop tool for visualization of diverse genomic data [THORVALDSDOTTIR2013]_.
 
-* There are a panaply of other desktop application for visulaization of genomic data that you can also explore such as `Geneious <https://www.geneious.com/>`_, `UGENE <http://ugene.net/>`_, `Tablet <https://ics.hutton.ac.uk/tablet/>`_, or `Artemis <https://sanger-pathogens.github.io/Artemis/>`_.
+* In this section we will use IGV to explore our previous genome annotations.
+
+* There are a panoply of other desktop applications for visualization of genomic data that you can also explore such as `Geneious <https://www.geneious.com/>`_, `UGENE <http://ugene.net/>`_, `Tablet <https://ics.hutton.ac.uk/tablet/>`_, or `Artemis <https://sanger-pathogens.github.io/Artemis/>`_.
 
 
 Installation
@@ -278,7 +285,7 @@ Installation
 Usage
 .....
 
-1. Open IGV in your computer.
+1. Open IGV in your computer by running ``igv.sh`` (Linux and macOS) or ``igv-launcher.bat`` (Windows).
 
 2. Go to ``Genomes`` -> ``Load Genome from File``.
 
@@ -297,8 +304,10 @@ Usage
 9. What is the correct reading frame for this gene?
 
 .. seealso::
-
    For detailed information about IGV please see the full `manual <http://software.broadinstitute.org/software/igv/UserGuide>`_.
+
+.. todo::
+   4. Visualize your genome annotations using Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ explained in the section below.
 
 
 Assembly completeness
@@ -308,7 +317,7 @@ Assembly completeness
 Busco
 *****
 
-* In the previous section you performed a *de novo* assembled and evaluated its completeness and quality using |quast|. However, most of these quality metrics, although informative, can also be misleading.
+* In the previous section you performed a *de novo* assembled and evaluated its quality using |quast|. However, most of these quality metrics, although informative, can also be misleading.
 
 * In this section you will use |busco| - Benchmarking Universal Single-Copy Orthologs - to assess the completeness of genomes, using their **gene content** as a complementary method to other technical metrics [SEPPEY2019]_.
 
@@ -321,16 +330,23 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named busco
-   $ conda create -n busco python=3
+   $ conda create -n busco python=3.7
 
    # Activate the busco environment
    $ conda activate busco
 
-   # Install BUSCO
-   $ conda install busco
+   # Install BUSCO and Augustus
+   $ conda install -c bioconda -c conda-forge busco=4.1.4 augustus=3.3.3
 
    # Check BUSCO installation
    $ busco --version
+   $ augustus --version
+
+   # See a list of all available datasets in BUSCO
+   $ busco --list-datasets # When running an analysis BUSCO will download the dataset
+
+   # Place the configuration file BUSCO in a location where you have “write” privileges
+   $ cp -r ~/miniconda3/envs/busco/config/ .
 
 
 Usage
@@ -340,7 +356,7 @@ Usage
 
 ``Input``: Accepts a genome assembly, an annotated gene set, or a transcriptome assembly.
 
-``Output``: Several files are produced, although particular attention should be paid to ``short_summary.txt`` (a short summary of BUSCO report), ``full_table.tsv``(list of all BUSCO genes), and ``missing_buscos_list.tsv`` (list of missing BUSCO gene).
+``Output``: Several files are produced, although particular attention should be paid to ``short_summary.txt`` (a short summary of BUSCO report), ``full_table.tsv`` (list of all BUSCO genes), and ``missing_buscos_list.tsv`` (list of missing BUSCO gene).
 
 **2. Basic commands**
 
@@ -386,9 +402,8 @@ Usage
    $ busco --help
 
 .. todo::
-
-   1. How many marker genes have BUSCO found? How many are absent?
-   2. Do you think that your results are good in terms of genome annotation completeness? Why?
+   5. How many marker genes have BUSCO found? How many are absent?
+   6. Do you think that your results are good in terms of genome annotation completeness? Why?
 
 
 Folder structure
@@ -401,9 +416,9 @@ At the end of this section, you will have the following folder structure.
     tutorial
     ├── raw_data
     │   ├── files_fastq.gz
-    │   ├── files.fa
-    │   ├── files.fna
-    │   ├── files.gbff
+    │   ├── files.fasta
+    │   ├── files.gbk
+    │   ├── files.gff
     ├── qc_visualization
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
@@ -436,10 +451,13 @@ At the end of this section, you will have the following folder structure.
     │   │   ├── assembly_spades_untrimmed.log
     │   ├── unicycler
     │   │   ├── assembly_unicycler.fasta
+    │   │   ├── assembly_unicycler.gfa
+    │   │   ├── assembly_unicycler.log
     │   ├── bandage
-    │   │   ├── graphs.svg
+    │   │   ├── graphs.png
     │   ├── quast
-    │   │   ├── report.html
+    │   │   ├── report_without_reference.html
+    │   │   ├── report_with_reference.html
     ├── annotation
     │   ├── prokka
     │   │   │   ├── annotations.gff

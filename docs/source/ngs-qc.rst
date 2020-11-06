@@ -16,7 +16,7 @@ Introduction
 
 4. After that, we will **trim** and **filter** low quality or uninformative reads/bases through |bbduk|.
 
-5. You will be working only with the paired-end data acquired through the **Illumina HiSeq 2500** Plattform [GREIG2019]_.
+5. You will be working only with the paired-end raw data acquired through the **Illumina HiSeq 2500** Plattform [GREIG2019]_.
 
 
 Learning objectives
@@ -66,10 +66,10 @@ Coverage
 
    G: is the haploid genome length in bp
 
-Let's try to do some basic analysis and calculate the coverage using the **paired-end Illumina reads**.
+Let's try to do some basic analysis and calculate the coverage using the **paired-end Illumina raw reads** (files SRR6052929 and SRR7184397).
 
 .. todo::
-   1. Open the file with the command line to get an idea about the structure.
+   1. Open the file with the command line or with the text editor to get an idea about the structure.
    2. What is the unique identifier of the FastQC files?
    3. How many raw sequence reads are in the files?
    4. Calculate the coverage, assuming a genome size of ~5.5 MB.
@@ -95,7 +95,7 @@ FastQC
   3. Export the results to an **HTML** based reports.
 
 .. note::
-   Don't forget that fastq errors are not accurate measures, hence use them as a **warning** for further analysis.
+   Don't forget that fastq errors are not accurate measures, hence use them as **warnings** for further analysis.
 
 
 Installation
@@ -104,13 +104,13 @@ Installation
 .. code-block:: bash
 
     # Create a new conda environment named qc
-    $ conda create -n qc python=3
+    $ conda create -n qc python=3.7
 
     # Activate the new environment
     $ conda activate qc
 
     # Install FastQC as a command-line utility
-    $ conda install fastqc
+    $ conda install -c bioconda fastqc
 
     # Check if FastQC is installed
     $ fastqc --version
@@ -121,25 +121,27 @@ Usage
 
 **1. Input/Output files**
 
-``Input``: Accept compress or uncompress files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the paired-end Illumina raw reads.
+``Input``: Accept compress or uncompress Illumina files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the paired-end Illumina raw reads.
 
-``Output``: Two files are produced, a ``.zip`` archive containing all the plots, and a ``.html`` report. You open the HTML files with your web browser.
+``Output``: Two files are produced, a ``.zip`` archive containing all the plots, and a ``.html`` report. You can open the HTML files with your web browser.
 
 **2. Basic commands**
 
 .. code-block:: bash
 
     # Let's first create three new directories to keep your reports
+    $ cd tutorial/
     $ mkdir qc_visualization
-    $ cd ~/tutorial/qc_visualization/
+    $ cd qc_visualization/
     $ mkdir trimmed untrimmed
+    $ cd
 
     # Run FastQC on a single file
-    # Don't forget to specify the directory where the fastq.gz files are located
+    # Specify the directory where your Illumina fastq.gz files are located
     $ fastqc ~/tutorial/raw_data/untrimmed.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
 
     # Or run FastQC on multiple files
-    # Don't forget to specify the directory where the fastq.gz files are located
+    # Specify the directory where your Illumina fastq.gz files are located
     $ fastqc ~/tutorial/raw_data/*.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
 
 .. note::
@@ -151,8 +153,13 @@ Usage
     $ cd ~/tutorial/qc_visualization/untrimmed/
     $ ls
 
-    # Open FastQC html report
+    # Open FastQC html report on Linux
+    $ firefox filename_fastqc.html
+    $ cd
+
+    # Or open FastQC html report on macOS
     $ open filename_fastqc.html
+    $ cd
 
 **3. Additional options**
 
@@ -162,12 +169,12 @@ Usage
     $ fastqc --help
 
 .. todo::
-   1. Run |fastqc| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
-   2. Explore the Fastqc `website <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>`_ and try to interpret your results according to the various quality modules.
-      Pay special attention to the **per-base sequence quality** and **sequence length distribution**.
-   3. Do your sequences have any kind of adapters?
-   4. Do you think these Illumina sequencing runs gave good quality sequences?
-   5. Based on the FastQC report, do you think your data will need further trimming and filtering? Why?
+   5. Run |fastqc| on all the downloaded paired-end Illumina raw reads and save a copy of the report in your computer.
+   6. Explore the Fastqc `website <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/3%20Analysis%20Modules/>`_ and try to interpret your results according to the various quality modules.
+      Pay special attention to the **Basic Statistics**, **Per base Sequence Quality** and **Sequence Length Distribution**.
+   7. Do your sequences have any kind of adapters?
+   8. Do you think these Illumina sequencing runs gave good quality sequences? Why?
+   9. Based on the FastQC report, do you think your data will need further trimming and filtering? Why?
 
 .. figure:: ./Images/Fastqc_report.png
    :figclass: align-left
@@ -178,7 +185,7 @@ Usage
 MultiQC
 *******
 
-The |multiqc| tool is designed to combine different reports, such as the ones produced by |fastqc| into a single one, thus allowing multiple comparisons at the same time.
+The |multiqc| tool is designed to combine different quality reports, such as the ones produced by |fastqc| into a single one, thus allowing multiple comparisons at the same time.
 
 
 Installation
@@ -187,7 +194,7 @@ Installation
 .. code-block:: bash
 
     # Create a new conda environment named multiqc
-    $ conda create -n multiqc python=3
+    $ conda create -n multiqc python=3.7
 
     # Activate the new environment
     $ conda activate multiqc
@@ -200,8 +207,7 @@ Installation
     $ multiqc --version
 
 .. warning::
-
-   After installing MultiQC if you experience some problems with Numpy installation, run these commands in your activated environment multiqc.
+   After installing MultiQC if you experience some problems with Numpy installation, run these commands in your multiqc activated environment.
 
    1. ``pip uninstall -y numpy``
    2. ``pip uninstall -y setuptools``
@@ -223,8 +229,8 @@ Usage
 .. code-block:: bash
 
     # Run MultiQC to combine the reports of all FastQC runs
-    # Don't forget to specify the directory where the FastQC reports are located
-    $ multiqc ~/*fastqc* -o ~/tutorial/qc_visualization/untrimmed/
+    # Specify the directory where your FastQC reports are located
+    $ multiqc ~/tutorial/qc_visualization/untrimmed/*fastqc* -o ~/tutorial/qc_visualization/untrimmed/
 
 .. note::
    The parameter ``-o`` will create all output files in the specified output directory.
@@ -234,8 +240,13 @@ Usage
     # Navigate to the directory containing the .html file
     $ cd ~/tutorial/qc_visualization/untrimmed/
 
-    # Open MultiQC html report
+    # Open MultiQC html report in Linux
+    $ firefox multiqc_report.html
+    $ cd
+
+    # Or open MultiQC html report in macOS
     $ open multiqc_report.html
+    $ cd
 
 **3. Additional options**
 
@@ -245,8 +256,8 @@ Usage
    $ multiqc --help
 
 .. todo::
-   1. Run |multiqc| on all the reports generated by FastQC.
-   2. What are the paired-end Illumina raw reads that present the best quality? Why?
+   10. Run |multiqc| on all the reports generated by FastQC.
+   11. What are the paired-end Illumina raw reads that present the best quality? Why?
 
 .. figure:: ./Images/Multiqc_report.png
    :figclass: align-left
@@ -264,14 +275,13 @@ Quality control
 3. You must remember that by performing QC we can also introduce **errors** (we want the same data but with better quality); thus, we should not perform QC if the quality appears to be satisfactory.
 
 .. attention::
-
-   Only perform QC if your data really need it.
+   Only perform QC if your data need it. Whether you should quality-trim, and what the threshold should be, depends on your **data quality** and their **intended use**. Often a threshold of **~10** is pretty good for most of the cases.
 
 
 BBDuk
 *****
 
-For QC we will use a tool called |bbduk| to trim adapters and filter other low-quality data. |bbduk| can run in trimming mode or filtering mode.
+If your data needs QC you can use |bbduk| to trim adapters and filter other low-quality data. |bbduk| can run in trimming mode or filtering mode.
 
 
 Installation
@@ -283,9 +293,11 @@ Installation
 .. code-block:: bash
 
     # Let's first create a new directories to keep the clean raw sequence reads
+    $ cd ~/tutorial/
     $ mkdir qc_improvement
+    $ cd
 
-    # Download the latest version of BBTools from Sourceforge
+    # Download the latest version of BBTools from Sourceforge to your computer
     $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.87.tar.gz
 
     # Go to the parent directory where you have BBTools file
@@ -295,7 +307,8 @@ Installation
     $ tar -xvzf BBMap_(version).tar.gz
 
     # To test the installation run stats.sh against the PhiX reference genome
-    $ (installation directory)/stats.sh in=(installation directory)/resources/phix174_ill.ref.fa.gz
+    # At the end you should see some statistics in your shell
+    $ ~/bbmap/stats.sh in=(installation directory)/resources/phix174_ill.ref.fa.gz
 
 
 Usage
@@ -315,16 +328,16 @@ Usage
 .. code-block:: bash
 
     # Trim adapters when present in the raw sequence reads
-    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fq in2=read2.fq out1=clean1.fq out2=clean2.fq ref=adapters.fasta ktrim=r k=23 mink=11 hdist=1 tpe tbo
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq ref=adapters.fasta ktrim=r k=23 mink=11 hdist=1 tpe tbo
 
-    # Trim sequences based on a Phred score
-    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fq in2=read2.fq out1=clean1.fq out2=clean2.fq qtrim=rl trimq=10
+    # Trim sequences based on a Phred score (you can also try trimq=20)
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq qtrim=rl trimq=10
 
-    # Filter raw sequence data based on an average quality
-    $ ~/bbmap/bbduk.sh in1=read1.fq in2=read2.fq out1=clean1.fq out2=clean2.fq maq=10
+    # Filter raw sequence data based on an average quality values (you can also try maq=20)
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq maq=10
 
     # Filter raw sequence data based on Kmer
-    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fq in2=read2.fq out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fq outm2=matched2.fq ref=contamination.fasta k=31 hdist=1 stats=statistics.txt
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fastq outm2=matched2.fastq ref=contamination.fasta k=31 hdist=1 stats=statistics.txt
 
     # Evaluate all raw reads lenght and display basic statistics
     $ ~/bbmap/readlength.sh in=reads.fastq.gz out=histogram.txt
@@ -337,7 +350,7 @@ Usage
    "``ktrim=r``", "Once a reference kmer is matched in a read, that kmer and all the bases to the right will be trimmed (3' adapters)"
    "``ktrim=l``", "Once a reference kmer is matched in a read, that kmer and all the bases to the left will be trimmed (5' adapters)"
    "``ktrim=N``", "Rather than trimming, it masks all bases covered by reference kmers to *N*"
-   "``k``", "Kmer size to use that can have a length between 1-31. Usually the longer a kmer, the greater the specificity"
+   "``k``", "Kmer size to use. It can have a length between 1-31. Usually the longer a kmer, the greater the specificity"
    "``maq``", "Discard reads with average quality below a specified value (e.g., maq=10, means average quality BELOW 10)"
    "``mink``", "Allows to use shorter kmers at the ends of the read (e.g., k=11 for the last 11 bases)"
    "``out``", "Catch reads that don't match a reference kmers"
@@ -353,7 +366,7 @@ Usage
    "``-Xmx1g``", "It forces BBDuk to use 1 GB of memory"
 
 .. note::
-   After performing quality control in your raw sequence reads, move the new files to the directory ``~/tutorial/qc_improvement/``.
+   After performing quality control in your raw sequence reads, move the clean files to the directory ``~/tutorial/qc_improvement/``.
 
 **3. Additional options**
 
@@ -363,29 +376,27 @@ Usage
    $ ~/bbmap/bbduk.sh --help
 
 .. todo::
-   1. Run |bbduk| on all the downloaded raw paired-end Illumina reads.
-   2. Run |fastqc| in the trimmed files.
-   3. Aggregate all the reports of trimmed and untrimmed files with |multiqc|.
-   4. Did you noticed any kind of improvement in quality after the trimming and filtering process? Which parameters are now better?
-   5. Move all the quality visualization files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualization/trimmed``.
+   12. Run |bbduk| on all the downloaded raw paired-end Illumina reads if needed.
+   13. Run |fastqc| in the trimmed files.
+   14. Aggregate all the reports of trimmed and untrimmed files with |multiqc|.
+   15. Did you noticed any kind of improvement in quality after the trimming and filtering process? Which parameters are now better?
+   16. Move all the quality visualization files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualization/trimmed``.
 
+.. hint::
+   If you want to use less disk space in your computer, you can compress all the previous ``.fastq`` files by using the ``gzip`` command.
 
 Folder structure
 ################
 
 At the end of this section, you will have the following folder structure.
 
-.. hint::
-   If you want to use less disk space in your computer, you can compress all the previous ``.fastq`` files by using the ``gzip`` command.
-
 ::
 
     tutorial
     ├── raw_data
     │   ├── files_fastq.gz
-    │   ├── files.fa
-    │   ├── files.fna
-    │   ├── files.gbff
+    │   ├── files.fasta
+    │   ├── files.gbk
     ├── qc_visualization
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html

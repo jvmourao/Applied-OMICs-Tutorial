@@ -34,7 +34,7 @@ If you are not used to using the terminal you can find a small tutorial in the :
 
 .. toctree::
    :numbered:
-   :maxdepth: 4
+   :maxdepth: 8
    :caption: Advanced
 
    ngs-tools
@@ -43,8 +43,6 @@ If you are not used to using the terminal you can find a small tutorial in the :
    ngs-taxonomy
    ngs-assembly
    ngs-annotations
-   ngs-comparison
-   ngs-phylogeny
 
 .. toctree::
    :maxdepth: 4

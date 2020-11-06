@@ -12,7 +12,7 @@ Introduction
 
 2. For that we use *de novo* assembly tools that overlap sequence **raw reads** into larger contiguous sequences, or **contigs**, that in most cases have a lot of gaps.
 
-3. Most tools then attempt to join, order and orientate contigs based on read pairs and on assembly graphs (when applied) to produce the genomic **scaffolds**.
+3. Some tools attempt to join, order and orientate contigs based on read pairs and on assembly graphs (when applied) to produce the genomic **scaffolds**.
 
 4. The most broadly accepted data file format for an assembly is ``FASTA``.
 
@@ -36,12 +36,12 @@ Short-read assembly
 SPAdes
 ******
 
-* |spades| - SPAdes – St. Petersburg genome assembler – is an assembly toolkit containing various **assembly pipelines** [BANKEVICH2012]_.
+* |spades| - St. Petersburg genome assembler – is an assembly toolkit containing various **assembly pipelines** [BANKEVICH2012]_.
 
-* Besides the typical |spades| module for short-read genome assembly using de Bruijn graphs other additional pipelines are also available such as:
+* Besides the typical |spades| module for short- and long-read genome assembly using de Bruijn graphs other additional pipelines are also available such as:
 
-  1. ``metaSPAdes`` for **metagenomic** data sets [NURK2017]_.
-  2. ``plasmidSPAdes`` for extracting and assembling **plasmids** from metagenomic data sets [ANTIPOV2016]_.
+  1. ``metaSPAdes`` for assembly of **metagenomic** data sets [NURK2017]_.
+  2. ``plasmidSPAdes`` for extracting and assembling **plasmids** from whole-genome sequencing data [ANTIPOV2016]_.
   3. ``metaplasmidSPAdes`` – a pipeline for extracting and assembling **plasmids from metagenomic** data sets [ANTIPOV2019]_.
   4. ``rnaSPAdes`` – a de novo transcriptome assembler from **RNA-Seq** data [BUSHMANOVA2019]_.
   5. ``truSPAdes`` – a module for **TruSeq** barcode assembly [BANKEVICH2016]_.
@@ -52,26 +52,27 @@ Installation
 ............
 
 .. note::
-
-   Since |spades| is a dependency o |unicycler| we only need to install the last one to have access to both tools.
+   Since |spades| is a dependency of |unicycler| we only need to install the last one to have access to both tools.
 
 .. code-block:: bash
 
    # Create a new environment named assembly
-   $ conda create -n assembly python=3
+   $ conda create -n assembly python=3.7
 
    # Activate the new environment
    $ conda activate assembly
 
    # Install Unicycler and its dependencies (including SPAdes)
-   $ conda install unicycler
+   $ conda install -c bioconda unicycler
+
+   # Update SPAdes to the last version
+   $ conda update spades
 
    # Check SPAdes installation
    $ spades.py --version
    $ spades.py --test
 
 .. note::
-
    If the installation is successful, you will find the following information at the end of the Bash shell ``TEST PASSED CORRECTLY``.
 
 Usage
@@ -84,7 +85,6 @@ Usage
 ``Output``: Several files are produced by |spades|. However, particular attention will be given to ``contigs.fasta`` (contains resulting contigs in FASTA format), ``scaffolds.fasta`` (contains resulting scaffolds in FASTA format), ``assembly_graph.gfa`` (contains SPAdes assembly graph and scaffolds paths in `GFA v1 <https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md>`_ format), and ``spades.log`` (SPAdes log).
 
 .. note::
-
    In most cases, you will use ``contigs.fasta`` file for your further analysis, since ``scaffolds.fasta`` will add NNNNNNNs to your file every time that two or more smaller contigs are supposed to be connected, but it cannot fill in the small gap between them.
 
 **2. Basic commands**
@@ -96,6 +96,7 @@ Usage
    $ mkdir assembly
    $ cd ~/tutorial/assembly/
    $ mkdir spades unicycler
+   $ cd
 
    # Run SPAdes in your trimmed and untrimmed paired-end Illumina reads
    $ spades.py -1 strainA_R1_paired_trimmed.fastq.gz -2 strainA_R2_paired_trimmed.fastq.gz --careful -k 21,33,55,77 -t 8 -o strainA_SPAdes
@@ -117,7 +118,6 @@ Usage
    "``--isolate``", "Improves the assembly quality and running time"
 
 .. attention::
-
    If you have high-coverage data for bacterial isolate, |spades| developers highly recommend to use the ``--isolate`` option that is not compatible with ``--careful`` option; thus, you must disable the last one.
 
 **3. Additional options**
@@ -126,6 +126,9 @@ Usage
 
    # To see a full list of available options in SPAdes
    $ spades.py --help
+
+.. todo::
+   1. Run |spades| assembler in your trimmed and untrimmed paired-end Illumina reads.
 
 
 Hybrid assembly
@@ -137,9 +140,9 @@ Unicycler
 
 * |unicycler| is mainly used for **hybrid assembly** of bacterial genomes [WICK2017]_.
 
-* For this, it uses both **short- Illumina reads** and **long reads** (e.g., PacBio, Nanopore).
+* For this, it uses both **short-reads** from Illumina and **long-reads** from PacBio or Oxford Nanopore technologies.
 
-* Additionally, it can also assemble Illumina-only reads, although in this case, it will function as a **SPAdes-optimiser** (it will take more time to run that |spades|; however it will offer some optimization benefits).
+* Additionally, it can also assemble Illumina-only reads, although in this case, it will only function as a **SPAdes-optimiser** (it will take more time to run that |spades|; however it will offer some optimisation benefits).
 
 * |unicycler| can also assembly long-read-only sets (PacBio or Nanopore), although in this case a new tool named `Trycycler <https://github.com/rrwick/Trycycler/wiki>`_ from the same developers of |unicycler| should be used instead.
 
@@ -148,13 +151,13 @@ Installation
 ............
 
 .. note::
-
    We already installed |unicycler| and |spades| in the previous section.
 
 .. code-block:: bash
 
   # Check Unicycler installation
 
+  $ conda activate assembly
   $ unicycler --version
 
 
@@ -171,10 +174,10 @@ Usage
 
 .. code-block:: bash
 
-   # Run SPAdes in your trimmed paired-end Illumina and Nanopore raw reads
+   # Run Unicycler in your untrimmed paired-end Illumina and Nanopore raw reads
    $ unicycler -1 short_reads_1.fastq.gz -2 short_reads_2.fastq.gz -l long_reads.fastq.gz --mode normal -o output_dir -t 8
 
-   # Move your result files to the spades directory
+   # Move your result files to the Unicycler directory
    $ mv <path_results_unicycler> ~/tutorial/assembly/unicycler/
 
 .. csv-table:: Parameters explanation when using Unicycler
@@ -200,6 +203,9 @@ Usage
    # To see a full list of available options in Unicycler
    $ unicycler --help
 
+.. todo::
+   2. Run |unicycler| for a hybrid assembly using the short-read paired-end Illumina and the long-read Nanopore.
+
 
 Assembly visualization
 ######################
@@ -210,15 +216,32 @@ Bandage
 
 * |bandage| - Bioinformatics Application for Navigating De novo Assembly Graphs Easily - is a useful Software for **visualising assembly graphs** and the hidden connections between nodes [WICK2015]_.
 
-* You can easily interact with graphs using the zoom, pan and rotate options, customise the visualisation (e.g., label and colour nodes), search for sequences, extract sequences, and more.
+* You can easily interact with graphs using the zoom, pan and rotate options, customise the visualization (e.g., label and colour nodes), search for sequences, extract sequences, and more.
 
 
 Installation
 ............
 
-1. Download the 64-bit binary executables for Mac, Linux or Windows using the link provided `here <https://github.com/rrwick/Bandage/releases/>`_.
+1. Download the 64-bit binary executables for **Mac** or **Windows** using the link and instructions provided `here <https://github.com/rrwick/Bandage/releases/>`_.
 
-2. Unzip the content on your computer.
+2. For installation on **macOS** and **Windows** you just need to unzip the content on your computer.
+
+3. For Linux you can install it through conda:
+
+.. code-block:: bash
+
+   # Activate your qc environment
+   $ conda activate qc
+
+   # Install Bandage
+   $ conda install -c conda-forge qt=5.12.9 # Install first the last version of QT
+   $ conda install -c bioconda bandage
+
+   # See all Bandage options available
+   $ Bandage --help
+
+   # Launch the Bandage GUI
+   $ Bandage
 
 
 Usage
@@ -229,16 +252,16 @@ Usage
    # Let's first create a new directory to store your graphs
    $ cd ~/tutorial/assembly/
    $ mkdir bandage
+   $ cd
 
-1. Open |bandage| in your computer.
+1. Open |bandage| in your computer. If you are in Linux just run ``$ Bandage`` (it will open Bandage GUI).
 
 2. Go to ``File`` -> ``Load graph``.
 
 3. Choose a graph to load from your computer.
 
 .. hint::
-
-   The graphs were generated by |spades| and |unicycler| in the previous steps and had a ``.gfa`` file extension.
+   The graphs were generated by |spades| and |unicycler| in the previous steps and had a **Graphical Fragment Assembly** - ``.gfa`` file extension.
 
 4. After the graph is loaded, click ``Draw graph`` button to draw the graph to the screen.
 
@@ -248,26 +271,25 @@ Usage
 
 7. Use the mouse to zoom, pan and rotate the graphs.
 
-8. On the left panel, check the boxes ``Lenght``, ``Name``, and ``Text outline`` located on **Node Labels** section, to see information about contigs.
+8. On the left panel, check the boxes ``Lenght``, ``Name``, and ``Text outline`` located on **Node Labels** section, to see information about contigs. However, if you have a lot of contigs by doing this, your graph will be overwhelmed with information.
 
-9. Save all the graphs as images using ``File`` -> ``Save image``.
+9. Save all the graphs as ``.png`` images using ``File`` -> ``Save image (entire screen)``.
 
 10. Move all your imagens to the bandage directory: ``mv <path_images> ~/tutorial/assembly/bandage/``.
 
 .. seealso::
-
    For detailed information about |bandage| please see the full `manual <https://github.com/rrwick/Bandage/wiki/Getting-started>`_.
 
 .. figure:: ./Images/Bandage_graph.png
    :figclass: align-left
 
-*Figure 16. Visualization of a graph in Bandage using paired-end Illumina and Nanopore raw reads.*
+*Figure 16. Visualization of a assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
 
 
 Assembly quality control
 ########################
 
-* Quality control metrics of a genome assembly evaluate both the completeness (e.g., size) and contiguity of an assembly.
+* Quality control metrics of a genome assembly evaluates both the completeness (e.g., genome size) and contiguity of an assembly.
 
 * Assembly size is usually given by statistics including maximum length, average length, combined total length, and N50.
 
@@ -277,9 +299,9 @@ Assembly quality control
 QUAST
 *****
 
-* |quast| (QUality ASsessment Tool), is a **quality assessment** tool that evaluates and compare genome assemblies by computing various metrics [GUREVICH2013]_.
+* |quast|  - **QUality ASsessment Tool** - is a tool that evaluates and compare genome assemblies by computing various metrics [GUREVICH2013]_.
 
-* This tool can be used in single or multiple assemblies from different platforms to compare them and decide what the best one for your further analysis is.
+* This tool can be used in single or multiple assemblies from different platforms to compare them and decide what is the best one for your further analysis.
 
 * The |quast| Software can be used as a command-line tool or `web interface <http://cab.cc.spbu.ru/quast/>`_.
 
@@ -293,7 +315,7 @@ Installation
    $ conda activate qc
 
    # Install QUAST
-   $ conda install -quast
+   $ conda install -c bioconda quast
 
    # Check QUAST installation
    $ quast --version
@@ -315,6 +337,7 @@ Usage
    # Let's first create new directories to store your reports
    $ cd ~/tutorial/assembly/
    $ mkdir quast
+   $ cd
 
    # General QUAST command
    $ quast.py [parameters] <fasta_file(s)>
@@ -323,18 +346,18 @@ Usage
    $ quast -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
 
    # Run QUAST in your assembly FASTA files but also providing a reference genome
-   $ quast -R ~/tutorial/raw_data/reference.fasta -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
+   $ quast -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
 
    # Move your report files to the QUAST directory
-   $ mv <path_results_spades> ~/tutorial/assembly/quast/
+   $ mv <path_results_quast> ~/tutorial/assembly/quast/
 
 .. csv-table:: Parameters explanation when using QUAST
    :header: "Parameter", "Description"
    :widths: 20, 60
 
    "``-o <output_dir>``", "Specify the output directory"
-   "``-R <filename>``", "File with reference genome. Most metrics can't be evaluated without reference"
-   "``-G <filename>``", "File with genes annotations for given species"
+   "``-r <filename>``", "File with reference genome. Most metrics can't be evaluated without reference"
+   "``-g <filename>``", "File with genes annotations for given species (GFF, BED, NCBI or TXT)"
    "``<fasta_file(s)>``", "Full path for the assembly FASTA files"
 
 .. figure:: ./Images/Quast_report.png
@@ -343,7 +366,6 @@ Usage
 *Figure 17. Example of a QUAST HTML quality report of hybrid assemblies.*
 
 .. seealso::
-
    Some of the most important metrics that you should pay attention in |quast| **final report** include:
 
    1. ``# contigs``: is the total **number of contigs** in the assembly.
@@ -370,16 +392,11 @@ Usage
    $ quast --help
 
 .. todo::
-
-   1. Run |spades| assembler in your trimmed and untrimmed paired-end Illumina reads.
-   2. Run |unicycler| for a hybrid assembly using the short-read paired-end Illumina and the long-read Nanopore.
    3. Assess the quality of both |spades| and |unicycler| assemblies using |quast|.
    4. How many contigs in total did the assemblies produced?
    5. What is the N50 of the assemblies? What does this mean?
    6. Did you noticed any difference in the assembly using trimmed and untrimmed reads? What is the main difference in terms of quality parameters?
    7. Compare |spades| and |unicycler| assemblies. What are the main differences? Did you notice any kind of improvement in genome assembly?
-   8. Run |kraken|, |bracken| and |krona| also in your assembled genomes.
-   9. Is there any contaminations in your assembled genomes? What kind of contamination?
 
 
 Folder structure
@@ -392,9 +409,9 @@ At the end of this section, you will have the following folder structure.
     tutorial
     ├── raw_data
     │   ├── files_fastq.gz
-    │   ├── files.fa
-    │   ├── files.fna
-    │   ├── files.gbff
+    │   ├── files.fasta
+    │   ├── files.gbk
+    │   ├── files.gff
     ├── qc_visualization
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
@@ -427,10 +444,13 @@ At the end of this section, you will have the following folder structure.
     │   │   ├── assembly_spades_untrimmed.log
     │   ├── unicycler
     │   │   ├── assembly_unicycler.fasta
+    │   │   ├── assembly_unicycler.gfa
+    │   │   ├── assembly_unicycler.log
     │   ├── bandage
-    │   │   ├── graphs.svg
+    │   │   ├── graphs.png
     │   ├── quast
-    │   │   ├── report.html
+    │   │   ├── report_without_reference.html
+    │   │   ├── report_with_reference.html
 
 
 References
@@ -453,7 +473,6 @@ List of Assembly tools
 ######################
 
 .. seealso::
-
    * The tools used in this Tutorial section are not the only ones available for the purpose of *de novo* genome assembly.
 
    * Other tools can also be used to perform this task (**some examples are provided in table below**).

@@ -171,7 +171,7 @@ Further Reading
 This small tutorial is only a little start to basic Bash commands; however you will see in the future that they will bring you a lot of advantages and benefits.
 If you want to dig a little bit more about specific or advanced Bash commands, I leave here some available online resources and books:
 
-* `Bash Scripting Tutorial for Beginners <https://linuxhint.com/bash_scripting_tutorial_beginners/>`_
+* `UNIX Tutorial for Beginners <http://www.ee.surrey.ac.uk/Teaching/Unix/>`_
 * `The Linux Command Line <http://linuxcommand.org/tlcl.php>`_
 * `Beginner's Guide to the Bash Terminal <https://www.youtube.com/watch?v=oxuRxtrO2Ag>`_
 * `bash Cookbook <https://www.amazon.com/bash-Cookbook-Solutions-Examples-Users/dp/1491975334/>`_

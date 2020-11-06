@@ -4,7 +4,15 @@
 Tools installation
 ******************
 
-Before you start this Tutorial you need to have installed |conda| in your UNIX-based or Windows operating system.
+* Before you start this Tutorial, you need to have installed |conda| in your UNIX-based or Windows operating system.
+
+* |conda| is an open-source package management system and environment management system that runs on Windows, macOS, and Linux, that can:
+
+  * Quickly install, runs and update packages and their dependencies.
+
+  * Easily create, save, load, and switch between environments on your local computer.
+
+* |conda| was created for Python programs, but it can package and distribute software for any language.
 
 To check if you already have |conda| installed open the Terminal and type:
 
@@ -170,24 +178,25 @@ Here is a list of all packages that you will install throughout the Tutorial.
 
 .. csv-table::
    Table with a full list of packages and tools needed for this Tutorial.
-   :header: "Package name", "Version", "Tutorial section", "Environment name"
-   :widths: 20, 20, 20, 20
+   :header: "Package name", "Version", "Tutorial section", "Environment", "Conda command"
+   :widths: 20, 10, 20, 10, 20
 
-   "sra-tools", "2.8.0", "Data acquisition", "data"
-   "ncbi-genome-download", "0.2.10", "Data acquisition", "data"
-   "ncbi-acc-download", "0.2.6", "Data acquisition", "data"
-   "fastqc", "0.11.8", "Quality control", "qc"
-   "multiqc", "1.6", "Quality control", "multiqc"
-   "bbtools", "37.62", "Quality control", "qc"
-   "kraken2", "2.0.9beta", "Taxonomy", "qc"
-   "krona", "2.7.1", "Taxonomy", "qc"
-   "bracken", "2.6.0", "Taxonomy", "qc"
-   "spades", "3.14.1", "De novo genome assembly", "assembly"
-   "unicycler", "0.4.8", "De novo genome assembly", "assembly"
-   "quast", "5.0.2", "De novo genome assembly", "qc"
-   "abricate", "0.8.13", "Genome annotation", "annotation"
-   "prokka", "1.13.4", "Genome annotation", "annotation"
-   "busco", "4.1.2", "Genome annotation", "annotation"
+   "sra-tools", "2.8.0", "Data acquisition", "data", "``conda install -c bioconda sra-tools``"
+   "ncbi-genome-download", "0.3.0", "Data acquisition", "data", "``conda install -c bioconda ncbi-genome-download``"
+   "ncbi-acc-download", "0.2.6", "Data acquisition", "data", "``conda install -c bioconda ncbi-acc-download``"
+   "fastqc", "0.11.9", "Quality control", "qc", "``conda install -c bioconda fastqc``"
+   "multiqc", "1.9", "Quality control", "multiqc", "``pip install multiqc``"
+   "bbtools", "37.62", "Quality control", "home directory", "Install in your home directory"
+   "kraken2", "2.1.0", "Taxonomy", "qc", "This package will be installed with Bracken"
+   "bracken", "2.6.0", "Taxonomy", "qc", "``conda install -c bioconda bracken=2.6.0``"
+   "krona", "2.7.1", "Taxonomy", "qc", "``conda install -c bioconda krona``"
+   "spades", "3.14.1", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
+   "unicycler", "0.4.8", "De novo genome assembly", "assembly", "``conda install -c bioconda unicycler``"
+   "bandage", "0.8.1", "De novo genome assembly", "qc", "``conda install qt=5.12.9 bandage``"
+   "quast", "5.0.2", "De novo genome assembly", "qc", "``conda install -c bioconda quast``"
+   "prokka", "1.14.6", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults prokka``"
+   "abricate", "1.0.1", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
+   "busco", "4.1.2", "Genome annotation", "busco", "``conda install -c bioconda busco``"
 
 
 Conda cheat sheet

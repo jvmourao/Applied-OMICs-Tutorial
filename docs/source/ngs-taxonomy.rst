@@ -38,9 +38,9 @@ Kraken2 and Bracken
 
 * Contrary, |bracken| is a related tool that uses the taxonomy labels in |kraken| report to additionally estimates relative abundances of species or genera [LU2017]_.
 
-* The use of |bracken| is optional although when combined with Kraken classification, it will produce more accurate species- and genus-level abundance estimates.
+* The use of |bracken| is not mandatory although when combined with Kraken classification, it will provide more accurate species- and genus-level abundance estimations.
 
-* Besides installing |kraken| and |bracken| you will need to download or create a **database** that will be used by both tools. To create a custom database, you will need a lot of disk space (at least 100 GB) in your computer.
+* Besides installing |kraken| and |bracken|, you need to download or create a **database** that will be used by both tools. To create a custom database, you will need a lot of disk space (at least 100 GB) in your computer.
 
 * So, for the purpose of this Tutorial, we will use an already pre-build standard `MiniKraken <https://benlangmead.github.io/aws-indexes/k2>`_ database that is already prepared to be used also by |bracken|. The **MiniKraken** v1 was built from RefSeq bacteria, archaea, and viral sequences.
 
@@ -58,15 +58,15 @@ Installation
 ............
 
 .. note::
-   Since that one of the main dependencies of |bracken| is |kraken| we only need to install the first one, thus avoiding dependency conflicts.
+   One of the main dependencies of |bracken| is |kraken|, so you just need to install the first, thus avoiding dependency conflicts.
 
 .. code-block:: bash
 
     # Activate the qc environment
     $ conda activate qc
 
-    # Install Bracken and Kraken2
-    $ conda install bracken
+    # Install Bracken (make sure you install version 2.6.0)
+    $ conda install -c bioconda bracken=2.6.0
 
     # Check if all the packages are installed
     $ kraken2 --version
@@ -82,7 +82,7 @@ Usage
 
 ``Output_kraken2``: A standard tab-delimited file is produced containing the classification for each sequence. You can also obtain additional output files such a |kraken| sample report (change the output into different formats) using the ``--report`` option or the classified sequences in a single file using the ``--classified-out`` flag.
 
-``Input_bracken``: It will need to use the |kraken| report file created using ``--report FILENAME``.
+``Input_bracken``: It will use the |kraken| report file created using ``--report FILENAME``.
 
 ``Output_braken``: A tab-delimited file containing the relative abundances of species or genera.
 
@@ -95,15 +95,17 @@ Usage
     $ mkdir taxonomy
     $ cd ~/tutorial/taxonomy/
     $ mkdir kraken_bracken krona
+    $ cd
 
     # Download the MiniKraken v1 database
     $ wget https://genome-idx.s3.amazonaws.com/kraken/minikraken2_v1_8GB_201904.tgz
 
     # Extract the archive content to your computer
-    $ tar -xvzf ~/minikraken2_v2_8GB_201904_UPDATE.tgz
+    $ tar -xvzf ~/minikraken2_v1_8GB_201904_UPDATE.tgz
+    $ rm minikraken2_v1_8GB_201904_UPDATE.tgz
 
     # Run Kraken2 in your paired-end sequence reads
-    $ kraken2 --db ~/minikraken2_v2_8GB_201904_UPDATE --threads 8 --report strainA.kreport --gzip-compressed --paired --classified-out cseqs#.fastq seqs_1.fastq.gz seqs_2.fastq.gz --output strainA.kraken
+    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_1.fastq.gz ~/tutorial/raw_data/seqs_2.fastq.gz --output strainA.kraken
 
     # Move your result files to the directory kraken_bracken
     $ mv <path_results_kraken2> ~/tutorial/taxonomy/kraken_bracken/
@@ -112,8 +114,8 @@ Usage
    :header: "Parameter", "Description"
    :widths: 20, 60
 
-   "``--db NAME``", "Full path of the Kraken2 database (default: none)"
    "``--threads NUM``", "Number of threads (default: 1)"
+   "``--db NAME``", "Full path of the Kraken2 database (default: none)"
    "``--report FILENAME``", "Print a report with aggregate counts/clade to file"
    "``--gzip-compressed``", "Input files are compressed with gzip"
    "``--paired``", "The filenames provided have paired-end reads"
@@ -122,12 +124,17 @@ Usage
    "``seqs_1.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 1"
    "``seqs_2.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 2"
 
+.. error::
+   After running Kraken2 if you see this error ``Segmentation fault: 11``, probably you will not have the final report file (created using ``--report FILENAME``) needed to run |bracken|.
+   If this happens, please download the final Kraken2 reports :download:`https://drive.google.com/drive/folders/11pa-h7ukHsZwgperJIAmjF7c5-XjlelO?usp=sharing`.
+   This is an issue that happens mostly in macOS systems and it now being currently corrected by |kraken| developers.
+
+If you open the **standard Kraken2 output file** with a text editor you will see that each line represents a classified sequence.
+
 .. figure:: ./Images/Kraken_standard.png
    :figclass: align-left
 
 *Figure 11. Example of a standard Kraken2 output format file.*
-
-If you open the ``standard Kraken2 output file`` with a text editor you will see that each line represents a classified sequence.
 
 You will see 5 columns in this report that represents from left to right:
 
@@ -137,12 +144,12 @@ You will see 5 columns in this report that represents from left to right:
    4. The **sequence length** in bp. In the case of paired read data, this will be a string containing the lengths of the two sequences in bp, separated by a pipe character, e.g. "98|94".
    5. A space-delimited list indicating the **lowest common ancestor** (in the taxonomic tree) mapping to each k-mer in the sequence(s) (e.g., ``562:13``, means that the first 13 k-mers were mapped to taxonomy ID #562).
 
+If you open the **sample report output file** with a text editor you will see that each line represents a taxon.
+
 .. figure:: ./Images/Kraken_sample.png
    :figclass: align-left
 
 *Figure 12. Example of a sample report output format file.*
-
-If you open the ``sample report output file`` with a text editor you will see that each line represents a taxon.
 
 From left to the right you can identify 6 columns representing:
 
@@ -153,16 +160,10 @@ From left to the right you can identify 6 columns representing:
    5. `NCBI Taxonomy <https://www.ncbi.nlm.nih.gov/taxonomy>`_ **ID** number.
    6. Indented **scientific name**.
 
-.. error::
-
-   After running Kraken2 if you see this error ``Segmentation fault: 11``, probably you will not have the final report file (created using ``--report FILENAME``) needed to run |bracken|.
-   If this happens, please download the final Kraken2 reports :download:`/path/to/file`.
-   This is an issue that happens mostly in macOS systems and it now being currently corrected by |kraken| developers.
-
 .. code-block:: bash
 
     # Now let's run Bracken using the previous sample report from Kraken2
-    $ bracken -d ~/minikraken2_v2_8GB_201904_UPDATE -i strainA.kreport -l S -o strainA.bracken
+    $ bracken -d ~/minikraken2_v1_8GB/ -i ~/tutorial/taxonomy/kraken_bracken/strainA.kreport -l S -o strainA.bracken
 
     # Move your result files to the directory kraken_bracken
     $ mv <path_results_bracken> ~/tutorial/taxonomy/kraken_bracken/
@@ -173,15 +174,15 @@ From left to the right you can identify 6 columns representing:
 
    "``-d NAME``", "Full path of the Kraken2 database"
    "``-i INPUT``", "Kraken REPORT file to use for abundance estimation"
-   "``-o OUTPUT``", "File name for Bracken default output"
    "``-l LEVEL``", "Level to estimate abundance at [options: D,P,C,O,F,G,S] (default: S)"
+   "``-o OUTPUT``", "File name for Bracken default output"
+
+If you open the **Bracken output file** with a text editor you will see that each line represents a species.
 
 .. figure:: ./Images/Bracken_result.png
    :figclass: align-left
 
 *Figure 13. Example of a Bracken output file.*
-
-If you open the ``Bracken output file`` with a text editor you will see that each line represents a species.
 
 From left to the right you can identify 7 columns representing:
 
@@ -202,6 +203,9 @@ From left to the right you can identify 7 columns representing:
 
     # To see a full list of available options in Bracken
     $ bracken --help
+
+.. todo::
+   1. Run |kraken| and |bracken| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
 
 
 Taxonomy visualization
@@ -227,7 +231,7 @@ Installation
     $ conda activate qc
 
     # Install Krona
-    $ conda install krona
+    $ conda install -c bioconda krona
 
     # Delete a symbolic link that is not correct
     $ rm -rf ~/miniconda3/envs/qc/opt/krona/taxonomy
@@ -242,10 +246,7 @@ Installation
     $ ktUpdateTaxonomy.sh ~/krona/taxonomy
 
     # Extract the file contents to your computer
-    $ gzip -d taxonomy.tab.gz
-
-    # Move the unzipped file to the taxonomy directory we specified in the previous step.
-    $ mv taxonomy.tab ~/krona/taxonomy
+    $ gzip -d ~/krona/taxonomy/taxonomy.tab.gz
 
 
 Usage
@@ -253,7 +254,7 @@ Usage
 
 **1. Input/Output files**
 
-``Input``: |krona| accepts created Excel Templates or Kraken output files (e.g., ``strainA.kraken``).
+``Input``: |krona| accepts created Excel Templates or Kraken output files (e.g., ``strainA.kraken2``).
 
 ``Output``: It will create interactive ``.html`` charts.
 
@@ -262,7 +263,7 @@ Usage
 .. code-block:: bash
 
     # Run Krona using the Kraken2 output
-    $ ktImportTaxonomy -q 2 -t 3 strainA.kraken -o strainA_krona.html
+    $ ktImportTaxonomy -q 2 -t 3 ~/tutorial/taxonomy/kraken_bracken/strainA.kraken -o ~/tutorial/taxonomy/krona/strainA_krona.html
 
 .. csv-table:: Parameters explanation when using Krona
    :header: "Parameter", "Description"
@@ -274,12 +275,10 @@ Usage
 
 .. code-block:: bash
 
-    # Move your result files to the directory kraken_bracken
-    $ mv <path_results_krona> ~/tutorial/taxonomy/krona/
-
     # Open the HTML files produced by Krona
     $ cd ~/tutorial/taxonomy/krona/
-    $ open strainA.krona.html
+    $ firefox strainA.krona.html # In Linux
+    $ open strainA.krona.html # In macOS
 
 .. figure:: ./Images/Krona_result.png
    :figclass: align-left
@@ -287,8 +286,7 @@ Usage
 *Figure 14. Example of a Krona HTML report on a macOS.*
 
 .. todo::
-   1. Run |kraken| and |bracken| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
-   2. Visualize the results using |krona| and save the final charts to your computer.
+   2. Visualize the |kraken| results using |krona| and save the final charts to your computer.
    3. What is the primary taxonomy ID present in your samples? And the genus?
    4. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
 
@@ -303,9 +301,8 @@ At the end of this section, you will have the following folder structure.
     tutorial
     ├── raw_data
     │   ├── files_fastq.gz
-    │   ├── files.fa
-    │   ├── files.fna
-    │   ├── files.gbff
+    │   ├── files.fasta
+    │   ├── files.gbk
     ├── qc_visualization
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
@@ -323,7 +320,7 @@ At the end of this section, you will have the following folder structure.
     │   ├── kraken_bracken
     │   │   ├── files_cseqs_1.fastq
     │   │   ├── files_cseqs_2.fastq
-    │   │   ├── output.kraken
+    │   │   ├── output.kraken2
     │   │   ├── report.kreport
     │   │   ├── output.bracken
     │   ├── krona

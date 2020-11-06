@@ -26,7 +26,7 @@ After finishing this Tutorial section, you will be able to:
 
 * Known how to acquire raw sequence reads from different sequencing platforms.
 * Known how to acquire complete or partial bacterial genomes.
-* Understand the type of data you are acquiring and the information that they contain (Fasta and Fastq files).
+* Understand the type of data you are acquiring and the information that they contain.
 
 
 Acquire raw sequence reads from SRA
@@ -34,9 +34,11 @@ Acquire raw sequence reads from SRA
 
 The |sra| is a public repository that stores raw sequence data from next-generation sequencing technologies including **Illumina, Ion torrent, Oxford, and PacBio**.
 
-1. You will start by acquiring Oxford Nanopore reads a set of paired-end Illumina reads from Shiga toxin-producing *Escherichia coli* (STEC) O157:H7 [GREIG2019]_. These data will be used throughout all the Tutorial steps.
+1. You will start by acquiring Oxford Nanopore reads and a set of paired-end Illumina reads from two Shiga toxin-producing *Escherichia coli* (STEC) O157:H7 isolates [GREIG2019]_. These data will be used throughout all the Tutorial steps.
 
-2. To acquire this data, you first need to install the `SRA Toolkit <https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc>`_ on our computer. The easiest way is installing SRA Tools (containing SRA Toolkit and SDK from NCBI) through |conda|. For that open the Terminal and follow these steps (the provided example is for a **Linux-based system**).
+2. You can further name these two isolates, **strainA** (accession: SRR6052929-Illumina, SRR7477813-Nanopore) and **strainB** (accession: SRR7184397-Illumina, SRR7477814-Nanopore).
+
+3. To acquire this data, you first need to install the `SRA Toolkit <https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc>`_ on our computer. The easiest way is installing SRA Tools (containing SRA Toolkit and SDK from NCBI) through |conda|. For that open the Terminal and follow these steps (the provided example is for a **Linux-based system**).
 
 .. code-block:: bash
 
@@ -46,7 +48,7 @@ The |sra| is a public repository that stores raw sequence data from next-generat
    $ mkdir raw_data
 
    # Create a new conda environment named "data"
-   $ conda create -n data
+   $ conda create -n data python=3.7
 
    # Activate your "data" environment
    $ conda activate data
@@ -89,7 +91,7 @@ For this, you will use the NCBI Genome Downloading Scripts developed and impleme
     $ conda activate data
 
     # Install both ncbi-genome-download and ncbi-acc-download
-    $ conda install ncbi-genome-download ncbi-acc-download
+    $ conda install -c bioconda ncbi-genome-download ncbi-acc-download
 
 3. For the purpose of this tutorial you will compare the previous whole-genome assembly of *Escherichia coli* (STEC) O157:H7 with the closely related *E. coli* O157:H7 str. SAKAI reference genome already deposited in NCBI (accession number **NC002695.1** and assembly accession **GCF_000008865.2**).
 
@@ -119,7 +121,15 @@ Let's try both ways to acquire the data:
 Understanding the file content
 ##############################
 
-At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbff), that will be used along with the Tutorial.
+.. note::
+
+   * To avoid recognition problems it's recommended to put all Fasta files with the same file extension. To do this type in the Terminal ``mv ~/tutorial/raw_data/*.fa ~/tutorial/raw_data/*.fasta`` and ``mv ~/tutorial/raw_data/*.fna ~/tutorial/raw_data/*.fasta``.
+
+   * Also let's convert ``/*.gbff`` to ``/*.gbk`` since some packages and tools are not able to recognize ``/*.gbff`` extension.
+
+   * To do this, first install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv ~/tutorial/raw_data/*.gbff ~/tutorial/raw_data/*.gbk``.
+
+At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbk), that will be used along with the Tutorial.
 
 ::
 
@@ -131,9 +141,9 @@ At the end of this section, you will have a directory with **9 files** with thre
     │   ├── SRR7184397_2.fastq.gz
     │   ├── SRR7477813_1.fastq.gz
     │   ├── SRR7477814_1.fastq.gz
-    │   ├── NC_002695.2.fa
-    │   ├── GCF_000008865.2_ASM886v2_genomic.fna
-    │   ├── GCF_000008865.2_ASM886v2_genomic.gbff
+    │   ├── NC_002695.2.fasta
+    │   ├── GCF_000008865.2_ASM886v2_genomic.fasta
+    │   ├── GCF_000008865.2_ASM886v2_genomic.gbk
 
 In the folder structure above:
 
@@ -141,16 +151,9 @@ In the folder structure above:
 
 * ``/*.fastq.gz`` are the compressed fastq files containing the **raw** sequence reads.
 
-* ``/*.fa`` and ``/*.fna`` is the complete genome of the reference strain in **Fasta** format. A Fasta format can be represented by file extensions such as ``.fa``, ``.fna`` or ``.fasta``.
+* ``/*.fasta`` is the complete genome of the reference strain in **Fasta** format. A Fasta format can be represented by file extensions such as ``.fa``, ``.fna`` or ``.fasta``.
 
-* ``/*.gbff`` is the complete genome of the reference strain in **GenBank** flat file format. A GenBank format can be represented by file extensions such as ``.gbk``, ``.gb`` or ``.genbank``.
-
-.. note::
-   To avoid recognition problems it's recommended to put all Fasta files with the same file extension. To do this type in the Terminal ``mv ~/tutorial/raw_data/*.fa ~/tutorial/raw_data/*.fasta`` and ``mv ~/tutorial/raw_data/*.fna ~/tutorial/raw_data/*.fasta``.
-
-   Also let's convert ``/*.gbff`` to ``/*.gbk`` since some packages and tools are not able to recognize ``/*.gbff`` extension.
-
-   First install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv ~/tutorial/raw_data/*.gbff ~/tutorial/raw_data/*.gbk``.
+* ``/*.gbk`` is the complete genome of the reference strain in **GenBank** flat-file format. A GenBank format can be represented by file extensions such as ``.gbk``, ``.gb`` or ``.genbank``.
 
 
 Compressed formats
@@ -162,7 +165,7 @@ The most popular compressed file formats are ``.gz`` (the most common on Unix-ba
 
 .. todo::
    1. Try to uncompress the previous files using ``gunzip``, or ``gzip`` to compress again.
-   2. Open the three file formats (``.fasta``, ``.fastq`` and ``.gbff``) with your favourite text editor such as `Atom <https://atom.io/>`_ or `Sublime <https://www.sublimetext.com/>`_.
+   2. Open one example of the three file formats (``.fasta``, ``.fastq`` and ``.gbk``) with your favourite text editor such as `Atom <https://atom.io/>`_ or `Sublime <https://www.sublimetext.com/>`_.
 
 
 Fasta files
@@ -206,7 +209,7 @@ Fastq files
       , "Next to the white space a short **description** can be provided"
    "4", "Representation of the **quality score** for each base of line 2"
 
-* Each letter is represented by a |phred| quality score using `ASCII <https://upload.wikimedia.org/wikipedia/commons/1/1b/ASCII-Table-wide.svg>`_ characters, assigning a probability of an incorrect base call.
+* Each letter in line 4 is represented by a |phred| quality score using `ASCII <https://upload.wikimedia.org/wikipedia/commons/1/1b/ASCII-Table-wide.svg>`_ characters, assigning a probability of an incorrect base call.
 
 * |phred| quality score (Q) is a property logarithmically related to the base-calling error probabilities (P).
 
@@ -225,7 +228,7 @@ Fastq files
 GenBank files
 *************
 
-The GenBank format represents in a human-readable form a lot of information that can go from the DNA sequence to gene annotation and other types of features.
+The GenBank format represents in a human-readable form a lot of information that can go from the DNA sequence to gene annotation (using sequence ontology) and other types of features.
 
 If you are interested in a detailed explanation of each represented field in a GenBank file, please go `here <https://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html>`_.
 

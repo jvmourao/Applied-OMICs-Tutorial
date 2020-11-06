@@ -80,10 +80,61 @@ html_context = {
     "github_version": "master/docs/source/",
 }
 
+# -- Options for HTMLHelp output ---------------------------------------------
+
+# Language to be used for generating the HTML full-text search index.
+# Output file base name for HTML help builder.
+htmlhelp_basename = "AppliedOMICsDoc"
+
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
 html_logo = "./Images/Logo.png"
+
+# -- Options for LaTeX output ---------------------------------------------
+
+latex_engine = 'pdflatex'
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    "papersize": "a4paper",
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    "pointsize": "10pt",
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
+    "preamble": r"""
+        \usepackage{charter}
+        \usepackage[defaultsans]{lato}
+        \usepackage{inconsolata}
+    	""",
+    # Latex figure (float) alignment
+    #
+    #'figure_align': 'htbp',
+}
+
+# The name of an image file (relative to this directory) to place at the top of
+# the title page.
+#
+latex_logo = "./Images/Logo.png"
+
+# For "manual" documents, if this is true, then toplevel headings are parts,
+# not chapters.
+#
+latex_use_parts = False
+
+# If true, show page references after internal links.
+#
+latex_show_pagerefs = True
+
+# If true, show URL addresses after external links.
+# one of:
+# 'no' – do not display URLs (default)
+# 'footnote' – display URLs in footnotes
+# 'inline' – display URLs inline in parentheses
+
+latex_show_urls = "footnote"
 
 # -- Options for Texinfo output -------------------------------------------
 
