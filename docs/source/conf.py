@@ -86,11 +86,6 @@ html_context = {
 # Output file base name for HTML help builder.
 htmlhelp_basename = "AppliedOMICsDoc"
 
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-#
-html_logo = "./Images/Logo.png"
-
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_engine = 'pdflatex'
