@@ -114,11 +114,6 @@ latex_elements = {
     #'figure_align': 'htbp',
 }
 
-# The name of an image file (relative to this directory) to place at the top of
-# the title page.
-#
-latex_logo = "./Images/Logo.png"
-
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
 #
