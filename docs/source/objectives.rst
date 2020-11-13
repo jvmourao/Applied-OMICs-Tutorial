@@ -36,7 +36,7 @@ What you'll build
 Pipeline
 ########
 
-.. figure:: ./Images/Pipeline.png
+.. figure:: ./images/Pipeline.png
 	 :figclass: align-left
 
 *Figure 1. The pipeline used in this tutorial to acquire, process, and analyze microbial genomic data.*

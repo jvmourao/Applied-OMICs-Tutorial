@@ -20,7 +20,7 @@ To check if you already have |conda| installed open the Terminal and type:
 
    $ conda --version
 
-.. figure:: ./Images/Conda_version.png
+.. figure:: ./images/Conda_version.png
    :figclass: align-left
 
 *Figure 3. macOS Terminal showing the current version of conda.*
@@ -100,15 +100,15 @@ In this Tutorial, you will create a conda environment and install all the requir
 
 .. code-block:: bash
 
-   # This will create an environment with a different Python version (e.g., 3.5)
-   $ conda create -n ENVNAME python=3.5
+   # This will create an environment with a different Python version (e.g., 3.7)
+   $ conda create -n ENVNAME python=3.7
 
 2. You can also install at the same time all the packages that you want to include in the environment.
 
 .. code-block:: bash
 
    # This will create an environment with Python and NumPy
-   $ conda create -n ENVNAME python=3.5 numpy=1.9.3
+   $ conda create -n ENVNAME python=3.7 numpy=1.9.3
 
 .. attention::
    It is recommended that you install all the packages at the same time to help avoid dependency conflicts.
@@ -125,7 +125,7 @@ In this Tutorial, you will create a conda environment and install all the requir
 
    $ conda deactivate
 
-.. figure:: ./Images/Conda_environment.png
+.. figure:: ./images/Conda_environment.png
    :figclass: align-left
 
 *Figure 4. macOS Terminal showing an activated environment named "assembly".*

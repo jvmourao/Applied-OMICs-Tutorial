@@ -68,7 +68,7 @@ The |sra| is a public repository that stores raw sequence data from next-generat
    # You can compress the files to take up less space in your computer
    $ gzip ~/tutorial/raw_data/*.fastq
 
-.. figure:: ./Images/Data_acquisition.png
+.. figure:: ./images/Data_acquisition.png
    :figclass: align-left
 
 *Figure 5. Acquisition of raw sequence reads using SRA Toolkit in a macOS.*
@@ -129,7 +129,7 @@ Understanding the file content
 
    * To do this, first install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv ~/tutorial/raw_data/*.gbff ~/tutorial/raw_data/*.gbk``.
 
-At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbk), that will be used along with the Tutorial.
+At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbk), that will be used along with the Tutorial. The explanation of each file is provided below.
 
 ::
 
@@ -165,28 +165,6 @@ The most popular compressed file formats are ``.gz`` (the most common on Unix-ba
 
 .. todo::
    1. Try to uncompress the previous files using ``gunzip``, or ``gzip`` to compress again.
-   2. Open one example of the three file formats (``.fasta``, ``.fastq`` and ``.gbk``) with your favourite text editor such as `Atom <https://atom.io/>`_ or `Sublime <https://www.sublimetext.com/>`_.
-
-
-Fasta files
-***********
-
-* Fasta format files can store nucleotide or amino acid sequences and the information about their origin.
-
-* A fasta file can contain multiple sequences each starting by ``>`` and the respective header.
-
-.. csv-table:: A Fasta format file description
-   :header: "Line", "Description"
-   :widths: 20, 40
-
-   "1", "Starts with ``>`` character and a unique **identifier** for the sequence"
-      , "Next to the white space a short optional **description** of the sequence can be provided (e.g., organism)"
-   "2", "The actual nucleotide or amino acid **sequence**"
-
-.. figure:: ./Images/Fasta.png
-   :figclass: align-left
-
-*Figure 6. Fasta file corresponding to the E. coli O157:H7 str. SAKAI reference genome opened with Atom text editor.*
 
 
 Fastq files
@@ -194,7 +172,7 @@ Fastq files
 
 * Fastq are standard output files used by most sequencers.
 
-* They contain sequence information, as previously observed with **Fasta** files, but also its associated **quality scores**.
+* They contain sequence information, but also its associated **quality scores**.
 
 * Fastq files have four lines for each entry.
 
@@ -219,10 +197,31 @@ Fastq files
 
    P = 10^\frac{-Q}{10} <-> P = 10^\frac{-20}{10} <-> P = 100
 
-.. figure:: ./Images/Fastq.png
+.. figure:: ./images/Fastq.png
    :figclass: align-left
 
-*Figure 7. Fastq file corresponding to the sequenced E. coli O157:H7 strains opened with Atom text editor.*
+*Figure 6. Fastq file corresponding to the sequenced E. coli O157:H7 strains opened with Atom text editor.*
+
+
+Fasta files
+***********
+
+* Fasta format files can store nucleotide or amino acid sequences and the information about their origin.
+
+* A fasta file can contain multiple sequences each starting by ``>`` and the respective header.
+
+.. csv-table:: A Fasta format file description
+   :header: "Line", "Description"
+   :widths: 20, 40
+
+   "1", "Starts with ``>`` character and a unique **identifier** for the sequence"
+      , "Next to the white space a short optional **description** of the sequence can be provided (e.g., organism)"
+   "2", "The actual nucleotide or amino acid **sequence**"
+
+.. figure:: ./images/Fasta.png
+   :figclass: align-left
+
+*Figure 7. Fasta file corresponding to the E. coli O157:H7 str. SAKAI reference genome opened with Atom text editor.*
 
 
 GenBank files
@@ -232,10 +231,13 @@ The GenBank format represents in a human-readable form a lot of information that
 
 If you are interested in a detailed explanation of each represented field in a GenBank file, please go `here <https://www.ncbi.nlm.nih.gov/Sitemap/samplerecord.html>`_.
 
-.. figure:: ./Images/GenBank.png
+.. figure:: ./images/GenBank.png
    :figclass: align-left
 
 *Figure 8. GenBank file corresponding to the E. coli O157:H7 str. SAKAI reference genome opened with Atom text editor.*
+
+.. todo::
+   2. Open one example of the three file formats (``.fasta``, ``.fastq`` and ``.gbk``) with your favourite text editor such as `Atom <https://atom.io/>`_ or `Sublime <https://www.sublimetext.com/>`_ and try to identify the descriptors of each file.
 
 
 References

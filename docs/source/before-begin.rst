@@ -32,7 +32,7 @@ Yet, if you have a Windows-based system, you will need to install a Shell and a 
 Whenever you open a Terminal, you will see your last login credentials and a Shell prompt.
 The appearance might vary a little, but usually, you will see the username@machinename followed by a ``$`` sign.
 
-.. figure:: ./Images/Terminal.png
+.. figure:: ./images/Terminal.png
 	 :figclass: align-left
 
 *Figure 2. This is an example of a macOS Terminal.*

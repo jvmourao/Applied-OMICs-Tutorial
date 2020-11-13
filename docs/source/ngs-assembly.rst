@@ -191,7 +191,7 @@ Usage
    "``-o OUT``", "Output directory (required)"
    "``-t THREADS``", "Number of threads used (default: 8)"
 
-.. figure:: ./Images/Unicycler_modes.png
+.. figure:: ./images/Unicycler_modes.png
    :figclass: align-left
 
 *Figure 15. Specific differences between the three allowed modes. Retrieved from Unicycler official GitHub page.*
@@ -280,7 +280,7 @@ Usage
 .. seealso::
    For detailed information about |bandage| please see the full `manual <https://github.com/rrwick/Bandage/wiki/Getting-started>`_.
 
-.. figure:: ./Images/Bandage_graph.png
+.. figure:: ./images/Bandage_graph.png
    :figclass: align-left
 
 *Figure 16. Visualization of a assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
@@ -360,7 +360,7 @@ Usage
    "``-g <filename>``", "File with genes annotations for given species (GFF, BED, NCBI or TXT)"
    "``<fasta_file(s)>``", "Full path for the assembly FASTA files"
 
-.. figure:: ./Images/Quast_report.png
+.. figure:: ./images/Quast_report.png
    :figclass: align-left
 
 *Figure 17. Example of a QUAST HTML quality report of hybrid assemblies.*

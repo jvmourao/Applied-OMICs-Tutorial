@@ -118,7 +118,7 @@ Usage
    $ cd
 
    # Run Prokka in your assembled genomes (FASTA format)
-   $ prokka --centre strainA --compliant --locustag strainA --prefix mygenome --outdir mydir ~/tutorial/assembly/*.fasta
+   $ prokka --locustag strainA --prefix mygenome --outdir mydir ~/tutorial/assembly/*.fasta
 
    # Move your result files to the Prokka directory
    $ mv <path_results_prokka> ~/tutorial/annotation/prokka/
@@ -201,7 +201,7 @@ Usage
 
 ``Output``: A tab-separated file containing the following columns:
 
-.. figure:: ./Images/Abricate_report.png
+.. figure:: ./images/Abricate_report.png
    :figclass: align-left
 
 *Figure 18. Example of an ABRicate report using the ARG-ANNOT database. From left to right you can see the following columns: the filename, the sequence in the filename, start and end coordinates in the sequence, strand, gene name, what proportion of the gene is in your sequence, a visual representation of the hit, gaps in subject and query, the proportion of gene covered, the proportion of exact nucleotide matches, database name, accession number of the sequence source, and gene product (if available).*
@@ -276,7 +276,7 @@ Installation
 
 2. Unzip the content on your computer.
 
-.. figure:: ./Images/IGV_window.png
+.. figure:: ./images/IGV_window.png
    :figclass: align-left
 
 *Figure 19. Visualization of the main window of IGV showing data from The Cancer Genome Atlas. 1 - IGV toolbar to access commonly used features; 2 - red box indicates the portion of the chromosome that is displayed; 3 - the ruler reflects the visible part of the chromosome; 4 - data is shown in horizontal rows called tracks; 5 - gene features; 6 - track names; 7 - optional attribute panel represented as coloured blocks.*
@@ -307,7 +307,7 @@ Usage
    For detailed information about IGV please see the full `manual <http://software.broadinstitute.org/software/igv/UserGuide>`_.
 
 .. todo::
-   4. Visualize your genome annotations using Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ explained in the section below.
+   4. Visualize your genome annotations using Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ explained in the section below. Try to identify the *mdf(A)* gene.
 
 
 Assembly completeness
@@ -356,7 +356,7 @@ Usage
 
 ``Input``: Accepts a genome assembly, an annotated gene set, or a transcriptome assembly.
 
-``Output``: Several files are produced, although particular attention should be paid to ``short_summary.txt`` (a short summary of BUSCO report), ``full_table.tsv`` (list of all BUSCO genes), and ``missing_buscos_list.tsv`` (list of missing BUSCO gene).
+``Output``: Several files are produced, although particular attention should be paid to ``short_summary.txt`` (a short summary of BUSCO report), ``full_table.tsv`` (list of all BUSCO genes), and ``missing_buscos_list.tsv`` (list of missing BUSCO genes).
 
 **2. Basic commands**
 
@@ -365,24 +365,19 @@ Usage
    # Let's first create new directories to store your annotations
    $ cd ~/tutorial/annotation/
    $ mkdir busco
-
-   # Check BUSCO databases that will be used to assess orthologue presence absence the genome
-   $ busco --list-datasets
-
-   # Move the configuration file to a location with "write" privileges
-   $ cp -r ~/miniconda3/envs/annotation/config/ .
+   $ cd
 
    # Run BUSCO in your assembled genomes (.fasta format)
-   $ busco -i ~/tutorial/assembly/*.fasta -o OUTPUT_NAME -l bacteria_odb10 -m geno --config config/config.ini
+   $ busco -i ~/tutorial/assembly/*.fasta -o OUTPUT_NAME -l bacteria_odb10 -m geno
 
    # Or run BUSCO in you annotated genomes (.faa format)
-   $ busco -i ~/tutorial/annotation/prokka/*.faa -o OUTPUT_NAME -l bacteria_odb10 -m prot --config config/config.ini
+   $ busco -i ~/tutorial/annotation/prokka/*.faa -o OUTPUT_NAME -l bacteria_odb10 -m prot
 
    # Move your result files to the BUSCO directory
    $ mv <path_results_busco> ~/tutorial/annotation/busco/
 
    # Plot the results obtained by BUSCO
-   $ generate_plot -wd PATH
+   $ ~/miniconda3/env/busco/bin/generate_plot.py -wd <path_results_busco>
 
 .. csv-table:: Parameters explanation when using BUSCO
    :header: "Parameter", "Description"
@@ -402,8 +397,9 @@ Usage
    $ busco --help
 
 .. todo::
-   5. How many marker genes have BUSCO found? How many are absent?
-   6. Do you think that your results are good in terms of genome annotation completeness? Why?
+   5. Run |busco| in the hybrid assemblies from Unicycler.
+   6. How many marker genes have BUSCO found? How many are absent?
+   7. Do you think that your results are good in terms of genome annotation completeness? Why?
 
 
 Folder structure

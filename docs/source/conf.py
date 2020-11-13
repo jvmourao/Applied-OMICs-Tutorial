@@ -10,10 +10,19 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('.'))
 
+# Redefine supported_image_types for the HTML builder
+from sphinx.builders.html import StandaloneHTMLBuilder
+
+StandaloneHTMLBuilder.supported_image_types = [
+    "image/gif",
+    "image/png",
+    "image/jpeg",
+    "image/svg+xml",
+]
 
 # -- Project information -----------------------------------------------------
 
@@ -56,6 +65,17 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
+# Omit any prefix values from the static 404 URLs
+notfound_no_urls_prefix = True
+
+html_css_files = ["custom.css"]
+
+# Use automatic figure numbering
+numfig = True
+# you need to specify all three in this section otherwise throws error for latex
+# numfig_format={'figure': 'Figure %s', 'table': 'Table %s', 'code-block': 'Listing %s'}
+# numfig_secnum_depth = 1
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -89,7 +109,7 @@ htmlhelp_basename = "AppliedOMICsDoc"
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 #
-html_logo = "./Images/Logo.png"
+html_logo = "./images/Logo.png"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -113,6 +133,11 @@ latex_elements = {
     #
     #'figure_align': 'htbp',
 }
+
+# The name of an image file (relative to this directory) to place at the top of
+# the title page.
+#
+latex_logo = "./images/Logo.png"
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.

@@ -131,7 +131,7 @@ Usage
 
 If you open the **standard Kraken2 output file** with a text editor you will see that each line represents a classified sequence.
 
-.. figure:: ./Images/Kraken_standard.png
+.. figure:: ./images/Kraken_standard.png
    :figclass: align-left
 
 *Figure 11. Example of a standard Kraken2 output format file.*
@@ -146,7 +146,7 @@ You will see 5 columns in this report that represents from left to right:
 
 If you open the **sample report output file** with a text editor you will see that each line represents a taxon.
 
-.. figure:: ./Images/Kraken_sample.png
+.. figure:: ./images/Kraken_sample.png
    :figclass: align-left
 
 *Figure 12. Example of a sample report output format file.*
@@ -179,7 +179,7 @@ From left to the right you can identify 6 columns representing:
 
 If you open the **Bracken output file** with a text editor you will see that each line represents a species.
 
-.. figure:: ./Images/Bracken_result.png
+.. figure:: ./images/Bracken_result.png
    :figclass: align-left
 
 *Figure 13. Example of a Bracken output file.*
@@ -280,7 +280,7 @@ Usage
     $ firefox strainA.krona.html # In Linux
     $ open strainA.krona.html # In macOS
 
-.. figure:: ./Images/Krona_result.png
+.. figure:: ./images/Krona_result.png
    :figclass: align-left
 
 *Figure 14. Example of a Krona HTML report on a macOS.*
