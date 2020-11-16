@@ -306,7 +306,7 @@ Installation
     # Extract the file contents to your installation folder on the computer
     $ tar -xvzf BBMap_(version).tar.gz
 
-    # To test the installation run stats.sh against the PhiX reference genome
+    # To test the installation run stats.sh against the PhiX reference genome located in ~/bbmap/resources
     # At the end you should see some statistics in your shell
     $ ~/bbmap/stats.sh in=(installation directory)/resources/phix174_ill.ref.fa.gz
 
@@ -323,11 +323,14 @@ Usage
 **2. Basic commands**
 
 .. note::
-   When you have the *paired-end reads* in 2 files you should *always processed them together*, not one at a time.
+   When you have the **paired-end reads** in 2 files you should **always processed them together**, not one at a time.
+
+   In the commands provided below don't forget to add the full path of your ``fastq.gz`` files.
 
 .. code-block:: bash
 
     # Trim adapters when present in the raw sequence reads
+    # For this example we will use a fasta file containing all adapters (adapters.fasta) that should be located in ~/bbmap/resources
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq ref=adapters.fasta ktrim=r k=23 mink=11 hdist=1 tpe tbo
 
     # Trim sequences based on a Phred score (you can also try trimq=20)
@@ -337,9 +340,10 @@ Usage
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq maq=10
 
     # Filter raw sequence data based on Kmer
-    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fastq outm2=matched2.fastq ref=contamination.fasta k=31 hdist=1 stats=statistics.txt
+    # For this example we will use a fasta file containing the Illumina PhiX spike-in reference genome (phix174_ill.ref.fa) that should be located in ~/bbmap/resources
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fastq outm2=matched2.fastq ref=phix174_ill.ref.fa k=31 hdist=1 stats=statistics.txt
 
-    # Evaluate all raw reads lenght and display basic statistics
+    # Optionally you can also evaluate all raw reads length and display basic statistics
     $ ~/bbmap/readlength.sh in=reads.fastq.gz out=histogram.txt
 
 .. csv-table:: Parameters explanation when using BBDuk

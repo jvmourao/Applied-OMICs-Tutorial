@@ -93,36 +93,30 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
 .. code-block:: bash
 
     # Create a new directory (mkdir)
-    # In this case, it creates a directory called genomics
-    $ mkdir genomics
+    $ mkdir <folder_name1>
 
     # Moves one or more files from one directory to another (mv)
     # You need to specify the <source_file> and the <destination> directory
     $ mv <source_file> <destination>
 
     # Used to create empty new files (touch)
-    # In this case, it creates two files named virus.txt and bacteria.txt
-    $ touch virus.txt bacteria.txt
+    $ touch <filename1> <filename2>
 
     # Delete a file (rm)
-    # In this case, it will remove the previous file called virus.txt
-    $ rm virus.txt
+    $ rm <filename1>
 
     # Delete directories and every file inside it (rm -r)
-    # In this case, we removed the previous created genomics directory
-    $ rm -r genomics
+    $ rm -r <folder_name1>
 
     # Remove empty directories (rmdir)
-    # In this case, we removed the previous created genomics directory
-    % rmdir genomics
+    % rmdir <folder_name1>
 
     # Copy files to another directory (cp)
     # You need to specify the <source_file> to be copied and the <destination> directory
     $ cp <source_file> <destination>
 
     # Copy a directory and its contents to another directory (cp -r)
-    # In this case, it moves the directory genomics to a new created omics directory
-    $ cp -r genomics omics
+    $ cp -r <folder_name1> <folder_name2>
 
 .. note::
    In most of these previous examples, you shouldn't forget to write in the command line what is the file or directory that you want to move, remove, create, or copy.
@@ -132,33 +126,42 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
 
 .. code-block:: bash
 
-   # Display the first 10 lines of the previous bacteria.txt file (head)
-   $ head bacteria.txt
+   # Display the first 10 lines of a created file (head)
+   $ head -n <no. of lines> <filename1>
 
-   # Display the last 100 lines of the previous bacteria.txt file (tail)
-   # To increase the number of lines viewed from 10 to 100 add the –100 argument to the command
-   $ tail -100 bacteria.txt
+   # Display the last X lines of a created file (tail)
+   $ tail -n <no. of lines> <filename1>
 
    # Concatenate or join two or more files into a single one (cat)
-   $ cat bacteria.txt virus.txt > bacteria_virus.txt
+   $ cat <filename1> <filename2> > <filename3_join>.txt
 
    # Search for patterns in a file (grep)
    # Extract the lines that match the ‘>’ symbol in this case the headers
    $ grep ‘>’ NC_002695.2.fasta
 
-   # Search for a nucliotide sequence and print 1 line before and after any match
+   # Search for a nucleotide sequence and print 1 line before and after any match
    $ grep -B 1 -A 1 'GAGGTTGTTGAAATCGA' NC_002695.2.fasta
+
+   # View content of a created file (less)
+   $ less <filename1>
+   $ Q # Press Q to exit less
+
+   # Edit content of a created file (nano)
+   $ nano <filename1>
 
 
 **E. Other usefull commands**
 
 .. code-block:: bash
 
+   # Clear the terminal screen
+   $ clear
+
    # Print the current working directory
    $ pwd
 
-   # Clear the terminal screen
-   $ clear
+   # Print how much if the computer working
+   $ top
 
    # Download files from the internet using a link (wget)
    # You need to specify the <link_source> to the file
