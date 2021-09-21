@@ -27,14 +27,14 @@ StandaloneHTMLBuilder.supported_image_types = [
 # -- Project information -----------------------------------------------------
 
 project = 'Applied OMICs Tutorial'
-copyright = '2020, Joana Mourão'
+copyright = '2021, Joana Mourão'
 author = 'Joana Mourão'
 
 # The short X.Y version.
-version = "1.0"
+version = "2.0"
 
 # The full version, including alpha/beta/rc tags
-release = '2020.1.0'
+release = '2021.1.0'
 
 
 # -- General configuration ---------------------------------------------------

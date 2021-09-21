@@ -116,6 +116,7 @@ Usage
    "``-t <int>``", "Number of threads [default: 16]"
    "``-o <output_dir>``", "Directory to store all the resulting files (required)"
    "``--isolate``", "Improves the assembly quality and running time"
+   "``--cov-cutoff``", "Read coverage cutoff value. Must be a positive float value, or 'auto', or 'off"
 
 .. attention::
    If you have high-coverage data for bacterial isolate, |spades| developers highly recommend to use the ``--isolate`` option that is not compatible with ``--careful`` option; thus, you must disable the last one.

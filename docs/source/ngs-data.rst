@@ -32,7 +32,7 @@ After finishing this Tutorial section, you will be able to:
 Acquire raw sequence reads from SRA
 ###################################
 
-The |sra| is a public repository that stores raw sequence data from next-generation sequencing technologies including **Illumina, Ion torrent, Oxford, and PacBio**.
+The |sra| is a public repository that stores **raw sequence data** from next-generation sequencing technologies including **Illumina, Ion torrent, Oxford, and PacBio**.
 
 1. You will start by acquiring Oxford Nanopore reads and a set of paired-end Illumina reads from two Shiga toxin-producing *Escherichia coli* (STEC) O157:H7 isolates [GREIG2019]_. These data will be used throughout all the Tutorial steps.
 

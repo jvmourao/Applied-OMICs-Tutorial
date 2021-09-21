@@ -78,7 +78,11 @@ Let's try to do some basic analysis and calculate the coverage using the **paire
 Visualization of data quality
 #############################
 
-The first step after receiving the sequencing data is to evaluate its quality. We’ll first use two programs called |fastqc| and |multiqc|, to visualize the quality of the raw reads.
+1. The first step after receiving the sequencing data is to perform some simple quality control evaluations.
+
+2. This step will be important to ensure that your raw data looks good and there are no problems or biases.
+
+2. For that, you’ll first use two programs called |fastqc| and |multiqc|, to visualize the quality of the raw reads.
 
 
 FastQC
@@ -88,14 +92,14 @@ FastQC
 
 * In this section, we will see how to visualize all these scores collectively using |fastqc|.
 
-* |fastqc| allows you to:
+* Also, |fastqc| will allow you to:
 
   1. Create user-friendly **plots** and **tables** to assess the general quality and composition of raw sequence data.
-  2. Identify any **problems** in your data that should be considered when moving for further analysis.
+  2. Identify any **problems** originated either in the sequencer or in the starting library material.
   3. Export the results to an **HTML** based reports.
 
 .. note::
-   Don't forget that fastq errors are not accurate measures, hence use them as **warnings** for further analysis.
+   Don't forget that fastq errors are not entirely accurate measures, hence use them as **warnings** for further analysis.
 
 
 Installation
@@ -333,13 +337,16 @@ Usage
     # For this example we will use a fasta file containing all adapters (adapters.fasta) that should be located in ~/bbmap/resources
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq ref=adapters.fasta ktrim=r k=23 mink=11 hdist=1 tpe tbo
 
-    # Trim sequences based on a Phred score (you can also try trimq=20)
+    # Trim regions with an average quality below 10 (you can also try trimq=20)
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq qtrim=rl trimq=10
 
-    # Filter raw sequence data based on an average quality values (you can also try maq=20)
+    # Discard raw sequence reads with average quality below 10 - after trimming (you can also try maq=20)
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq maq=10
 
-    # Filter raw sequence data based on Kmer
+    # Trim regions with an average quality below 10 and discard reads with average quality below 5 after trimming
+    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq trimq=10 maq=5
+
+    # Filter raw sequence reads based on Kmer
     # For this example we will use a fasta file containing the Illumina PhiX spike-in reference genome (phix174_ill.ref.fa) that should be located in ~/bbmap/resources
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fastq outm2=matched2.fastq ref=phix174_ill.ref.fa k=31 hdist=1 stats=statistics.txt
 
@@ -368,6 +375,7 @@ Usage
    "``tpe``", "Trim both reads to the same length"
    "``trimq``", "Quality-trim using the Phred algorithm (e.g., trimq=10, it will trimm regions with an average quality BELOW 10)"
    "``-Xmx1g``", "It forces BBDuk to use 1 GB of memory"
+   "``minlength=10``", "Reads shorter than this after trimming will be discarded"
 
 .. note::
    After performing quality control in your raw sequence reads, move the clean files to the directory ``~/tutorial/qc_improvement/``.
