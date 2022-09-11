@@ -65,8 +65,8 @@ Installation
     # Activate the qc environment
     $ conda activate qc
 
-    # Install Bracken (make sure you install version 2.6.0)
-    $ conda install -c bioconda bracken=2.6.0
+    # Install Bracken with conda
+    $ conda install -c bioconda bracken
 
     # Check if all the packages are installed
     $ kraken2 --version
@@ -98,14 +98,14 @@ Usage
     $ cd
 
     # Download the MiniKraken v1 database
-    $ wget https://genome-idx.s3.amazonaws.com/kraken/minikraken2_v1_8GB_201904.tgz
+    $ wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/old/minikraken2_v1_8GB_201904.tgz
 
     # Extract the archive content to your computer
     $ tar -xvzf ~/minikraken2_v1_8GB_201904_UPDATE.tgz
     $ rm minikraken2_v1_8GB_201904_UPDATE.tgz
 
     # Run Kraken2 in your paired-end sequence reads
-    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_1.fastq.gz ~/tutorial/raw_data/seqs_2.fastq.gz --output strainA.kraken
+    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_1.fastq.gz ~/tutorial/raw_data/seqs_2.fastq.gz --output strainA.kraken2
 
     # Move your result files to the directory kraken_bracken
     $ mv <path_results_kraken2> ~/tutorial/taxonomy/kraken_bracken/

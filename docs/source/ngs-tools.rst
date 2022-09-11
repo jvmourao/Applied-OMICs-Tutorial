@@ -42,13 +42,13 @@ Miniconda is a small version of Anaconda that only includes conda, its dependenc
 .. attention::
    Contrarily to Miniconda, if you are interested in the hundreds of packages included with the Anaconda Individual Edition remember that this will require a lot of disk space in your computer (minimum 5 GB to download and install).
 
-The example provided below is for a standard installation on a Linux-based system with Python 3.8. For `Windows <https://conda.io/projects/conda/en/latest/user-guide/install/windows.html>`_ and `macOS <https://conda.io/projects/conda/en/latest/user-guide/install/macos.html>`_ follow the instructions provided in |miniconda| official page.
+The example provided below is for a standard installation on a Linux-based system with Python 3.9. For `Windows <https://conda.io/projects/conda/en/latest/user-guide/install/windows.html>`_ and `macOS <https://conda.io/projects/conda/en/latest/user-guide/install/macos.html>`_ follow the instructions provided in |miniconda| official page.
 
 1. Download the latest miniconda installer by typing in the Terminal window:
 
 .. code-block:: bash
 
-   $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   $ wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
 
 .. note::
    In alternative to Terminal, you can download the miniconda installer directly by clicking on **Miniconda3 Linux 64-bit** `here <https://docs.conda.io/en/latest/miniconda.html#linux-installers>`_.
@@ -100,15 +100,15 @@ In this Tutorial, you will create a conda environment and install all the requir
 
 .. code-block:: bash
 
-   # This will create an environment with a different Python version (e.g., 3.7)
-   $ conda create -n ENVNAME python=3.7
+   # This will create an environment with a different Python version (e.g., 3.9)
+   $ conda create -n ENVNAME python=3.9
 
 2. You can also install at the same time all the packages that you want to include in the environment.
 
 .. code-block:: bash
 
    # This will create an environment with Python and NumPy
-   $ conda create -n ENVNAME python=3.7 numpy=1.9.3
+   $ conda create -n ENVNAME python=3.9 numpy=1.9.3
 
 .. attention::
    It is recommended that you install all the packages at the same time to help avoid dependency conflicts.

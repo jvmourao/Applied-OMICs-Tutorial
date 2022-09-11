@@ -30,7 +30,6 @@ What you'll build
 
   - A complete or draft microbial genome
   - A report of specific genotypic features
-  - A comparative genomic analysis
 
 
 Pipeline

@@ -57,13 +57,13 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named assembly
-   $ conda create -n assembly python=3.7
+   $ conda create -n assembly python=3.9
 
    # Activate the new environment
    $ conda activate assembly
 
    # Install Unicycler and its dependencies (including SPAdes)
-   $ conda install -c bioconda unicycler
+   $ conda install -c davebx unicycler
 
    # Update SPAdes to the last version
    $ conda update spades
@@ -316,10 +316,10 @@ Installation
    $ conda activate qc
 
    # Install QUAST
-   $ conda install -c bioconda quast
+   $ pip install quast
 
    # Check QUAST installation
-   $ quast --version
+   $ quast.py --version
 
 
 Usage
@@ -344,10 +344,10 @@ Usage
    $ quast.py [parameters] <fasta_file(s)>
 
    # Run QUAST in your assembly FASTA files
-   $ quast -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
+   $ quast.py -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
 
    # Run QUAST in your assembly FASTA files but also providing a reference genome
-   $ quast -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
+   $ quast.py -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
 
    # Move your report files to the QUAST directory
    $ mv <path_results_quast> ~/tutorial/assembly/quast/
@@ -390,7 +390,7 @@ Usage
 .. code-block:: bash
 
    # To see a full list of available options in QUAST
-   $ quast --help
+   $ quast.py --help
 
 .. todo::
    3. Assess the quality of both |spades| and |unicycler| assemblies using |quast|.

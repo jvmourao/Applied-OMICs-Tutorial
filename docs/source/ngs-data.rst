@@ -48,7 +48,7 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
    $ mkdir raw_data
 
    # Create a new conda environment named "data"
-   $ conda create -n data python=3.7
+   $ conda create -n data python=3.9
 
    # Activate your "data" environment
    $ conda activate data

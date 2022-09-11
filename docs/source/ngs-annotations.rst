@@ -83,15 +83,14 @@ Installation
 
 .. code-block:: bash
 
-   # Create a new environment named annotation
-   $ conda create -n annotation python=3.7
+   # Create a new environment named prokka with bioperl
+   $ conda create -n prokka python=3.9 perl-bioperl=1.7.2
 
-   # Activate the new environment
-   $ conda activate annotation
+   # Activate the prokka environment
+   $ conda activate prokka
 
    # Install and update to the latest version of Prokka
    $ conda install -c conda-forge -c bioconda -c defaults prokka
-   $ conda update prokka
 
    # Check Prokka installation
    $ prokka --version
@@ -118,7 +117,7 @@ Usage
    $ cd
 
    # Run Prokka in your assembled genomes (FASTA format)
-   $ prokka --locustag strainA --prefix mygenome --outdir mydir ~/tutorial/assembly/*.fasta
+   $ prokka --locustag strainA --genus Escherichia --species coli --strain strainA --outdir mydir ~/tutorial/assembly/*.fasta
 
    # Move your result files to the Prokka directory
    $ mv <path_results_prokka> ~/tutorial/annotation/prokka/
@@ -129,15 +128,17 @@ Usage
 
    "``--centre [X]``", "Sequencing centre ID (default '')"
    "``--compliant``", "Force Genbank/ENA/DDJB compliance: --addgenes --mincontiglen 200 --centre XXX (default OFF)"
+   "``--genus [X]``", "Genus name (default 'Genus')"
+   "``--species [X]``", "Species name (default 'species')"
+   "``--strain [X]``", "Strain name (default 'strain')"
    "``--locustag [X]``", "Locus tag prefix [auto] (default '')"
-   "``--prefix [X]``", "Filename output prefix [auto] (default '')"
    "``--outdir [X]``", "Output folder [auto] (default '')"
 
 .. attention::
    When running |prokka| the header ID in your ``.fasta`` file must be **less than 38 characters** to avoid conflicts with GenBank annotations. To withdraw this issue use the ``--centre [X]`` and ``--compliant`` options.
 
 .. seealso::
-   `RAST <https://rast.nmpdr.org/>`_ web tool is an excellent alternative if you want a more **detailed annotation** and **pathway analysis** of your genome that is not provided with |prokka|. However, you need to upload the assemblies one by one, and usually, it can take a **few hours** to run a genome.
+   `RAST <https://rast.nmpdr.org/>`_ web tool is an excellent alternative if you want a more **detailed annotation** and **pathway analysis** of your genome that is not provided with |prokka|. However, you need to upload the assemblies one by one, and usually, it can take a **several minutes** to run a genome.
 
 **3. Additional options**
 
@@ -178,8 +179,11 @@ Installation
 
 .. code-block:: bash
 
-   # Activate the annotation environment
-   $ conda activate annotation
+   # Activate the abricate environment with bioperl and the last blast version
+   $ conda create -n abricate python=3.9 perl-bioperl=1.7.2 blast=2.12.0
+
+   # Activate the abricate environment
+   $ conda activate abricate
 
    # Install ABRicate
    $ conda install -c conda-forge -c bioconda -c defaults abricate
@@ -191,6 +195,8 @@ Installation
    # See the list of installed databases in ABRicate
    $ abricate --list
 
+   # Re-create and update all the databases
+   $ abricate --setupdb
 
 Usage
 .....
@@ -330,7 +336,7 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named busco
-   $ conda create -n busco python=3.7
+   $ conda create -n busco python=3.9
 
    # Activate the busco environment
    $ conda activate busco

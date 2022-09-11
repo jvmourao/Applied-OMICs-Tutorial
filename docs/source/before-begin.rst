@@ -27,7 +27,11 @@ Open the Terminal as explained below:
 * If you're on a Mac, you'll find the Terminal under Applications -> Utilities. The easiest way is to press 'command + space' which will bring up Spotlight, and then you can write Terminal.
 * If you're on a Linux then you will probably find it in Applications -> System or Applications -> Utilities.
 
-Yet, if you have a Windows-based system, you will need to install a Shell and a Terminal. You can install `Windows Subsystem for Linux (WSL) <https://docs.microsoft.com/en-us/windows/wsl/about>`_ or `Git Bash <https://git-scm.com/download/win>`_.
+.. attention::
+   Yet, if you have a Windows-based system, you will need to install a Shell and a Terminal.
+   First, be sure that you have all the Windows 10 or Windows 11 upgrades performed.
+   Second, install the `Windows Subsystem for Linux (WSL) <https://docs.microsoft.com/en-us/windows/wsl/install>`_ following the instructions provided in the URL.
+   Finally, reboot your computer and your new terminar will appear as ``Ubuntu on Windows``.
 
 Whenever you open a Terminal, you will see your last login credentials and a Shell prompt.
 The appearance might vary a little, but usually, you will see the username@machinename followed by a ``$`` sign.

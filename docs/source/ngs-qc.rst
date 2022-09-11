@@ -108,7 +108,7 @@ Installation
 .. code-block:: bash
 
     # Create a new conda environment named qc
-    $ conda create -n qc python=3.7
+    $ conda create -n qc python=3.9
 
     # Activate the new environment
     $ conda activate qc
@@ -198,25 +198,17 @@ Installation
 .. code-block:: bash
 
     # Create a new conda environment named multiqc
-    $ conda create -n multiqc python=3.7
+    $ conda create -n multiqc python=3.9
 
     # Activate the new environment
     $ conda activate multiqc
 
-    # Install MultiQC with pip
-    $ pip install multiqc
+    # Install MultiQC with conda
+    $ conda install -c bioconda multiqc
 
     # Check if MultiQC is installed
     # If installed you will see "multiqc, version 1.9"
     $ multiqc --version
-
-.. warning::
-   After installing MultiQC if you experience some problems with Numpy installation, run these commands in your multiqc activated environment.
-
-   1. ``pip uninstall -y numpy``
-   2. ``pip uninstall -y setuptools``
-   3. ``pip install setuptools``
-   4. ``pip install numpy``
 
 
 Usage
@@ -302,7 +294,7 @@ Installation
     $ cd
 
     # Download the latest version of BBTools from Sourceforge to your computer
-    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.87.tar.gz
+    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.94.tar.gz
 
     # Go to the parent directory where you have BBTools file
     $ cd (installation parent directory)
@@ -337,10 +329,10 @@ Usage
     # For this example we will use a fasta file containing all adapters (adapters.fasta) that should be located in ~/bbmap/resources
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq ref=adapters.fasta ktrim=r k=23 mink=11 hdist=1 tpe tbo
 
-    # Trim regions with an average quality below 10 (you can also try trimq=20)
+    # Trim regions with an average quality below 10
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq qtrim=rl trimq=10
 
-    # Discard raw sequence reads with average quality below 10 - after trimming (you can also try maq=20)
+    # Discard raw sequence reads with average quality below 10
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq maq=10
 
     # Trim regions with an average quality below 10 and discard reads with average quality below 5 after trimming
