@@ -31,7 +31,11 @@ Open the Terminal as explained below:
    Yet, if you have a Windows-based system, you will need to install a Shell and a Terminal.
    First, be sure that you have all the Windows 10 or Windows 11 upgrades performed.
    Second, install the `Windows Subsystem for Linux (WSL) <https://docs.microsoft.com/en-us/windows/wsl/install>`_ following the instructions provided in the URL.
-   Finally, reboot your computer and your new terminar will appear as ``Ubuntu on Windows``.
+   Finally, reboot your computer and your new Terminal will appear as ``Ubuntu on Windows``.
+
+   If you are working with the WSL, remember that if you want to access the ``Documents`` folder you should write on the command line ``/mnt/c/Users/XXX/Documents`` instead of ``\Users\XXX\Documents``.
+
+   Additionally, if you want to open locally the ``Documents`` folder just write on the command line ``explorer.exe .``
 
 Whenever you open a Terminal, you will see your last login credentials and a Shell prompt.
 The appearance might vary a little, but usually, you will see the username@machinename followed by a ``$`` sign.
@@ -47,7 +51,32 @@ Basic Bash Commands
 
 Try to run in the Terminal some of the basic Bash commands and look at the output. Below you can see handy comments for users that were added after the hash ``#`` mark and are ignored by Bash.
 
-**A. List (ls) commands**
+.. note::
+   In most of these examples, you shouldn't forget to write in the command line what is the file or directory that you want to move, remove, create, or copy.
+
+
+**A. Change Directory (cd) commands**
+
+.. code-block:: bash
+
+   # Navigate between directories on your computer
+   # In this case, it will go to Documents directory
+   $ cd Documents/
+
+   # Display the current directory
+   $ cd .
+
+   # Go back to the directory above
+   $ cd ..
+
+   # Go back to the home directory
+   $ cd ~
+
+   # Go to the root of the file system
+   $ cd /
+
+
+**B. List (ls) commands**,
 
 .. code-block:: bash
 
@@ -67,30 +96,6 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
   # Regardless of what directory you are into it will always list your home directory
   $ ls ~
 
-**B. Change Directory (cd) commands**
-
-.. code-block:: bash
-
-  # Navigate between directories on your computer
-  # In this case, it will go to Documents directory
-  $ cd Documents/
-
-  # Display the current directory
-  $ cd .
-
-  # Go back to the directory above
-  $ cd ..
-
-  # Go back to the home directory
-  $ cd ~
-
-  # Go to the root of the file system
-  $ cd /
-
-.. seealso::
-   You can also use a semicolon ``;`` character to write two commands on the same line.
-
-   If you have a very long command you can run separate code chunks onto separate lines by using the ``\`` character to make it more readable.
 
 **C. Organizing files and directories**
 
@@ -99,12 +104,12 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
     # Create a new directory (mkdir)
     $ mkdir <folder_name1>
 
+    # Used to create empty new files (touch)
+    $ touch <filename1> <filename2>
+
     # Moves one or more files from one directory to another (mv)
     # You need to specify the <source_file> and the <destination> directory
     $ mv <source_file> <destination>
-
-    # Used to create empty new files (touch)
-    $ touch <filename1> <filename2>
 
     # Delete a file (rm)
     $ rm <filename1>
@@ -122,22 +127,19 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
     # Copy a directory and its contents to another directory (cp -r)
     $ cp -r <folder_name1> <folder_name2>
 
-.. note::
-   In most of these previous examples, you shouldn't forget to write in the command line what is the file or directory that you want to move, remove, create, or copy.
-
 
 **D. Viewing and exploring file content**
 
 .. code-block:: bash
 
    # Display the first 10 lines of a created file (head)
-   $ head -n <no. of lines> <filename1>
+   $ head -n 10 <filename1>
 
-   # Display the last X lines of a created file (tail)
-   $ tail -n <no. of lines> <filename1>
+   # Display the last 10 lines of a created file (tail)
+   $ tail -n 10 <filename1>
 
    # Concatenate or join two or more files into a single one (cat)
-   $ cat <filename1> <filename2> > <filename3_join>.txt
+   $ cat <filename1>.txt <filename2>.txt > <filename3_join>.txt
 
    # Search for patterns in a file (grep)
    # Extract the lines that match the ‘>’ symbol in this case the headers
@@ -154,7 +156,7 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
    $ nano <filename1>
 
 
-**E. Other usefull commands**
+**E. Other useful commands**
 
 .. code-block:: bash
 
@@ -171,11 +173,16 @@ Try to run in the Terminal some of the basic Bash commands and look at the outpu
    # You need to specify the <link_source> to the file
    $ wget <link_source>
 
+.. seealso::
+   You can also use a semicolon ``;`` character to write two commands on the same line.
+
+   If you have a very long command you can run separate code chunks onto separate lines by using the ``\`` character to make it more readable.
+
 
 Further Reading
 ***************
 
-This small tutorial is only a little start to basic Bash commands; however you will see in the future that they will bring you a lot of advantages and benefits.
+This small tutorial is only a little start to basic Bash commands. However, you will see in the future that they will bring you a lot of advantages and benefits.
 If you want to dig a little bit more about specific or advanced Bash commands, I leave here some available online resources and books:
 
 * `UNIX Tutorial for Beginners <http://www.ee.surrey.ac.uk/Teaching/Unix/>`_

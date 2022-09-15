@@ -42,13 +42,16 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
 
 .. code-block:: bash
 
-   # Create two new directories to store your data
+   # Create a first directory, for example in your Documents folder
    $ mkdir tutorial
-   $ cd ~/tutorial
+   $ cd tutorial/
+
+   # Create a second directory inside the tutorial directory to store the acquired data
    $ mkdir raw_data
+   $ cd raw_data/
 
    # Create a new conda environment named "data"
-   $ conda create -n data python=3.9
+   $ conda create -n data python=3.8
 
    # Activate your "data" environment
    $ conda activate data
@@ -62,10 +65,7 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
    # Convert SRA raw sequence reads data into fastq format using fastq-dump command
    $ fastq-dump --split-files SRR7184397 SRR6052929 SRR7477814 SRR7477813
 
-   # Move the previous acquired raw sequence reads to your new directory
-   $ mv ~/reads ~/tutorial/raw_data
-
-   # You can compress the files to take up less space in your computer
+   # Compress the files in the raw_data directory, to take up less space in your computer
    $ gzip ~/tutorial/raw_data/*.fastq
 
 .. figure:: ./images/Data_acquisition.png
@@ -74,8 +74,8 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
 *Figure 5. Acquisition of raw sequence reads using SRA Toolkit in a macOS.*
 
 
-Acquire bacterial genome sequences from NCBI
-############################################
+Acquire bacterial assembled genomes from NCBI
+#############################################
 
 Now that you have acquired your raw sequence reads, you will need to obtain complete or partial assembled bacterial genomes to use in comparative genomic analysis in further steps of this Tutorial.
 
@@ -99,6 +99,9 @@ Let's try both ways to acquire the data:
 
 .. code-block:: bash
 
+   # Make sure that you are in the raw_data directory
+   $ cd ~/tutorial/raw_data
+
    # Retrieve the E. coli reference genome using the accession number in fasta format
    $ ncbi-acc-download --format fasta NC_002695.2
 
@@ -108,11 +111,11 @@ Let's try both ways to acquire the data:
    # Retrieve the E. coli reference genome using the assembly accession in GenBank format
    $ ncbi-genome-download -s refseq -F genbank -A GCF_000008865.2 bacteria
 
-   # Move the acquired reference genomes to the directory raw_data
-   $ mv ~/genomes ~/tutorial/raw_data
-
    # Uncompress the GCF_000008865.2_ASM886v2_genomic files
-   $ gunzip ~/tutorial/raw_data/GCF_000008865.2_ASM886v2_genomic.*.gz
+   $ gunzip ~/tutorial/raw_data/refseq/bacteria/GCF_000008865.2/GCF_000008865.2_ASM886v2_genomic.*.gz
+
+   # Move the uncompress files to the raw_data directory
+   $ mv ~/tutorial/raw_data/refseq/bacteria/GCF_000008865.2/GCF_000008865.2_ASM886v2_genomic.* ~/tutorial/raw_data
 
 .. note::
    For more information about the full usage of each one of the tools you can go to the official page of `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ or type in the Terminal ``ncbi-genome-download --help`` or ``ncbi-genome-download --help``.
@@ -123,11 +126,16 @@ Understanding the file content
 
 .. note::
 
-   * To avoid recognition problems it's recommended to put all Fasta files with the same file extension. To do this type in the Terminal ``mv ~/tutorial/raw_data/*.fa ~/tutorial/raw_data/*.fasta`` and ``mv ~/tutorial/raw_data/*.fna ~/tutorial/raw_data/*.fasta``.
+   * To avoid recognition problems it's recommended to put all Fasta and Genkank files with the same file extension.
 
-   * Also let's convert ``/*.gbff`` to ``/*.gbk`` since some packages and tools are not able to recognize ``/*.gbff`` extension.
+   * To do this type in the Terminal:
 
-   * To do this, first install the mmv utility tool ``sudo apt-get install mmv``, after that run ``sudo mmv ~/tutorial/raw_data/*.gbff ~/tutorial/raw_data/*.gbk``.
+      * ``for file in *.fa; do mv "$file" "${file%.fa}.fasta"; done``
+
+      * ``for file in *.fna; do mv "$file" "${file%.fna}.fasta"; done``
+
+      * ``for file in *.gbff; do mv "$file" "${file%.gbff}.gbk"; done``
+
 
 At the end of this section, you will have a directory with **9 files** with three different file extensions (.fastq, .fasta and .gbk), that will be used along with the Tutorial. The explanation of each file is provided below.
 
@@ -147,7 +155,7 @@ At the end of this section, you will have a directory with **9 files** with thre
 
 In the folder structure above:
 
-* ``raw_data`` is the **directory** (or folder) that you create initially.
+* ``raw_data`` is the **directory** (or folder) that you created initially.
 
 * ``/*.fastq.gz`` are the compressed fastq files containing the **raw** sequence reads.
 
@@ -243,5 +251,5 @@ If you are interested in a detailed explanation of each represented field in a G
 References
 ##########
 
-.. [ZHULIN2015] Zhulin IB. 2015. Databases for Microbiologists. J Bacteriol. 197(15):2458–2467. `DOI: 10.1128/JB.00330-15 <https://dx.doi.org/10.1128%2FJB.00330-15>`_
 .. [GREIG2019] Greig DR, Jenkins C, Gharbia S, Dallman TJ. 2019. Gigascience. 8(8):giz104. `DOI: 10.1093/gigascience/giz104 <https://dx.doi.org/10.1093/gigascience/giz104>`_
+.. [ZHULIN2015] Zhulin IB. 2015. Databases for Microbiologists. J Bacteriol. 197(15):2458–2467. `DOI: 10.1128/JB.00330-15 <https://dx.doi.org/10.1128%2FJB.00330-15>`_

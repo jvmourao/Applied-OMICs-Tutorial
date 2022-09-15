@@ -166,8 +166,8 @@ rst_epilog = """
 .. |abricate| replace:: `ABRicate <https://github.com/tseemann/abricate>`__
 .. |anaconda| replace:: `Anaconda <https://docs.anaconda.com/anaconda/install/>`__
 .. |bandage| replace:: `Bandage <https://rrwick.github.io/Bandage/>`__
-.. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
-.. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`__
+.. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
+.. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/>`__
 .. |bracken| replace:: `Bracken <https://ccb.jhu.edu/software/bracken/>`__
 .. |busco| replace:: `BUSCO <https://busco.ezlab.org/>`__
 .. |conda| replace:: `conda <https://conda.io/projects/conda/en/latest/index.html>`__

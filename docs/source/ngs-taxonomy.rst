@@ -24,7 +24,7 @@ After finishing this Tutorial section, you will be able to:
 
 * Perform a complete taxonomic classification of raw sequence data.
 * Estimate the abundance of species or genera using the taxonomy labels.
-* Visualize and interpret taxonomic classification in samples.
+* Visualise and interpret taxonomic classification in samples.
 
 
 Taxonomy assignment
@@ -42,7 +42,7 @@ Kraken2 and Bracken
 
 * Besides installing |kraken| and |bracken|, you need to download or create a **database** that will be used by both tools. To create a custom database, you will need a lot of disk space (at least 100 GB) in your computer.
 
-* So, for the purpose of this Tutorial, we will use an already pre-build standard `MiniKraken <https://benlangmead.github.io/aws-indexes/k2>`_ database that is already prepared to be used also by |bracken|. The **MiniKraken** v1 was built from RefSeq bacteria, archaea, and viral sequences.
+* So, for the purpose of this Tutorial, we will use an already pre-build standard `MiniKraken <https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads>`_ database that is already prepared to be used also by |bracken|. The **MiniKraken** v1 was built from RefSeq bacteria, archaea, and viral sequences.
 
 * A |kraken| database is a directory containing at least 3 files:
 
@@ -62,6 +62,9 @@ Installation
 
 .. code-block:: bash
 
+    # Deactivate all current environments
+    $ conda deactivate
+
     # Activate the qc environment
     $ conda activate qc
 
@@ -70,7 +73,7 @@ Installation
 
     # Check if all the packages are installed
     $ kraken2 --version
-    $ bracken --version
+    $ bracken --help
 
 
 Usage
@@ -95,7 +98,7 @@ Usage
     $ mkdir taxonomy
     $ cd ~/tutorial/taxonomy/
     $ mkdir kraken_bracken krona
-    $ cd
+    $ cd kraken_bracken
 
     # Download the MiniKraken v1 database
     $ wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/old/minikraken2_v1_8GB_201904.tgz
@@ -104,11 +107,11 @@ Usage
     $ tar -xvzf ~/minikraken2_v1_8GB_201904_UPDATE.tgz
     $ rm minikraken2_v1_8GB_201904_UPDATE.tgz
 
-    # Run Kraken2 in your paired-end sequence reads
-    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_1.fastq.gz ~/tutorial/raw_data/seqs_2.fastq.gz --output strainA.kraken2
+    # Go to the directory kraken_bracken where you will storage the results
+    $ cd ~/tutorial/taxonomy/kraken_bracken
 
-    # Move your result files to the directory kraken_bracken
-    $ mv <path_results_kraken2> ~/tutorial/taxonomy/kraken_bracken/
+    # Run Kraken2 in your paired-end sequence reads
+    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_strainA_1.fastq.gz ~/tutorial/raw_data/seqs_strainA_2.fastq.gz --output strainA.kraken2
 
 .. csv-table:: Parameters explanation when using Kraken2
    :header: "Parameter", "Description"
@@ -123,11 +126,6 @@ Usage
    "``--output FILENAME``", "Print output to filename"
    "``seqs_1.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 1"
    "``seqs_2.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 2"
-
-.. error::
-   After running Kraken2 if you see this error ``Segmentation fault: 11``, probably you will not have the final report file (created using ``--report FILENAME``) needed to run |bracken|.
-   If this happens, please download the final Kraken2 reports :download:`https://drive.google.com/drive/folders/11pa-h7ukHsZwgperJIAmjF7c5-XjlelO?usp=sharing`.
-   This is an issue that happens mostly in macOS systems and it now being currently corrected by |kraken| developers.
 
 If you open the **standard Kraken2 output file** with a text editor you will see that each line represents a classified sequence.
 
@@ -162,11 +160,11 @@ From left to the right you can identify 6 columns representing:
 
 .. code-block:: bash
 
+    # Go to the directory kraken_bracken where you will storage the results
+    $ cd ~/tutorial/taxonomy/kraken_bracken
+
     # Now let's run Bracken using the previous sample report from Kraken2
     $ bracken -d ~/minikraken2_v1_8GB/ -i ~/tutorial/taxonomy/kraken_bracken/strainA.kreport -l S -o strainA.bracken
-
-    # Move your result files to the directory kraken_bracken
-    $ mv <path_results_bracken> ~/tutorial/taxonomy/kraken_bracken/
 
 .. csv-table:: Parameters explanation when using Bracken
    :header: "Parameter", "Description"
@@ -208,14 +206,14 @@ From left to the right you can identify 7 columns representing:
    1. Run |kraken| and |bracken| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
 
 
-Taxonomy visualization
+Taxonomy visualisation
 ######################
 
 
 Krona
 *****
 
-* |krona| allows visualizing the previous taxa content of your samples obtained by |kraken| [ONDOV2011]_.
+* |krona| allows visualising the previous taxa content of your samples obtained by |kraken| [ONDOV2011]_.
 
 * |krona| produces interactive multi-layered pie charts that can be explored with zooming and exported for publication using the snapshot tool.
 
@@ -233,20 +231,13 @@ Installation
     # Install Krona
     $ conda install -c bioconda krona
 
-    # Delete a symbolic link that is not correct
-    $ rm -rf ~/miniconda3/envs/qc/opt/krona/taxonomy
-
-    # Create a directory in our home where the krona database will live
-    $ mkdir -p ~/krona/taxonomy
-
-    # Make a symbolic link to that directory
-    $ ln -s ~/krona/taxonomy ~/miniconda3/envs/qc/opt/krona/taxonomy
+    # Update your system's repository list and install the make command
+    $ sudo apt-get update
+    $ sudo apt-get install -y make
 
     # Build a taxonomy database for Krona
-    $ ktUpdateTaxonomy.sh ~/krona/taxonomy
-
-    # Extract the file contents to your computer
-    $ gzip -d ~/krona/taxonomy/taxonomy.tab.gz
+    $ cd
+    $ ktUpdateTaxonomy.sh ~/miniconda3/envs/qc/opt/krona/taxonomy
 
 
 Usage
@@ -263,7 +254,7 @@ Usage
 .. code-block:: bash
 
     # Run Krona using the Kraken2 output
-    $ ktImportTaxonomy -q 2 -t 3 ~/tutorial/taxonomy/kraken_bracken/strainA.kraken -o ~/tutorial/taxonomy/krona/strainA_krona.html
+    $ ktImportTaxonomy -q 2 -t 3 ~/tutorial/taxonomy/kraken_bracken/strainA.kraken2 -o ~/tutorial/taxonomy/krona/strainA_krona.html
 
 .. csv-table:: Parameters explanation when using Krona
    :header: "Parameter", "Description"
@@ -275,10 +266,14 @@ Usage
 
 .. code-block:: bash
 
-    # Open the HTML files produced by Krona
+    # Let's go to the directory where the HTML files produced by Krona are
     $ cd ~/tutorial/taxonomy/krona/
-    $ firefox strainA.krona.html # In Linux
-    $ open strainA.krona.html # In macOS
+
+    # Open FastQC html report in Ubuntu/WSL
+    $ sensible-browser <filename>_krona.html
+
+    # Or open FastQC html report in macOS
+    $ open <filename>_krona.html
 
 .. figure:: ./images/Krona_result.png
    :figclass: align-left
@@ -286,7 +281,7 @@ Usage
 *Figure 14. Example of a Krona HTML report on a macOS.*
 
 .. todo::
-   2. Visualize the |kraken| results using |krona| and save the final charts to your computer.
+   2. Visualize the |kraken| results using |krona| for strainA and strainB and save the final charts to your computer.
    3. What is the primary taxonomy ID present in your samples? And the genus?
    4. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
 
@@ -330,6 +325,6 @@ At the end of this section, you will have the following folder structure.
 References
 ##########
 
-.. [WOOD2019] Wood DE, Lu J, Langmead B. 2019. Improved metagenomic analysis with Kraken 2. Genome Biol. 20:257. `DOI: 10.1186/s13059-019-1891-0 <https://dx.doi.org/10.1186%2Fs13059-019-1891-0>`_.
 .. [LU2017] Lu J, Breitwieser FP, Thielen P, Salzberg SL. 2017. Bracken: estimating species abundance in metagenomics data. PeerJ Computer Science. 3:e104. `DOI: 10.7717/peerj-cs.104 <https://dx.doi.org/10.7717/peerj-cs.104>`_.
 .. [ONDOV2011] Ondov BD, Bergman NH, Phillippy AM. 2011. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 12:385. `DOI: 10.1186/1471-2105-12-385 <https://dx.doi.org/10.1186/1471-2105-12-385>`_.
+.. [WOOD2019] Wood DE, Lu J, Langmead B. 2019. Improved metagenomic analysis with Kraken 2. Genome Biol. 20:257. `DOI: 10.1186/s13059-019-1891-0 <https://dx.doi.org/10.1186%2Fs13059-019-1891-0>`_.

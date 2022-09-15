@@ -4,7 +4,7 @@
 Tools installation
 ******************
 
-* Before you start this Tutorial, you need to have installed |conda| in your UNIX-based or Windows operating system.
+* Before you start this Tutorial, you need to have installed |conda| in your UNIX-based system.
 
 * |conda| is an open-source package management system and environment management system that runs on Windows, macOS, and Linux, that can:
 
@@ -42,7 +42,7 @@ Miniconda is a small version of Anaconda that only includes conda, its dependenc
 .. attention::
    Contrarily to Miniconda, if you are interested in the hundreds of packages included with the Anaconda Individual Edition remember that this will require a lot of disk space in your computer (minimum 5 GB to download and install).
 
-The example provided below is for a standard installation on a Linux-based system with Python 3.9. For `Windows <https://conda.io/projects/conda/en/latest/user-guide/install/windows.html>`_ and `macOS <https://conda.io/projects/conda/en/latest/user-guide/install/macos.html>`_ follow the instructions provided in |miniconda| official page.
+The example provided below is for a standard installation on a Linux-based system with Python 3.8. For `macOS <https://conda.io/projects/conda/en/latest/user-guide/install/macos.html>`_ follow the instructions provided in |miniconda| official page.
 
 1. Download the latest miniconda installer by typing in the Terminal window:
 
@@ -86,7 +86,7 @@ A `conda environment <https://docs.conda.io/projects/conda/en/latest/user-guide/
 For example, you can have several conda environments, each one with different packages that required different Python versions.
 You can quickly **activate** or **deactivate** environments, and because of that, they will work independently, thus minimizing the risk of incompatibilities between installed packages.
 
-In this Tutorial, you will create a conda environment and install all the required packages to assemble and analyze bacterial genomes. All these steps will be performed in the Terminal window.
+In this Tutorial, you will create a conda environment and install all the required packages to analyze and assemble bacterial genomes. All these steps will be performed in the Terminal window.
 
 1. To create an environment with ``conda`` for Python development you can run:
 
@@ -181,20 +181,20 @@ Here is a list of all packages that you will install throughout the Tutorial.
    :header: "Package name", "Version", "Tutorial section", "Environment", "Conda command"
    :widths: 20, 10, 20, 10, 20
 
-   "sra-tools", "2.8.0", "Data acquisition", "data", "``conda install -c bioconda sra-tools``"
-   "ncbi-genome-download", "0.3.0", "Data acquisition", "data", "``conda install -c bioconda ncbi-genome-download``"
-   "ncbi-acc-download", "0.2.6", "Data acquisition", "data", "``conda install -c bioconda ncbi-acc-download``"
+   "sra-tools", "2.11.0", "Data acquisition", "data", "``conda install -c bioconda sra-tools``"
+   "ncbi-genome-download", "0.3.1", "Data acquisition", "data", "``conda install -c bioconda ncbi-genome-download``"
+   "ncbi-acc-download", "0.2.8", "Data acquisition", "data", "``conda install -c bioconda ncbi-acc-download``"
    "fastqc", "0.11.9", "Quality control", "qc", "``conda install -c bioconda fastqc``"
-   "multiqc", "1.9", "Quality control", "multiqc", "``pip install multiqc``"
-   "bbtools", "37.62", "Quality control", "home directory", "Install in your home directory"
-   "kraken2", "2.1.0", "Taxonomy", "qc", "This package will be installed with Bracken"
-   "bracken", "2.6.0", "Taxonomy", "qc", "``conda install -c bioconda bracken=2.6.0``"
-   "krona", "2.7.1", "Taxonomy", "qc", "``conda install -c bioconda krona``"
-   "spades", "3.14.1", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
-   "unicycler", "0.4.8", "De novo genome assembly", "assembly", "``conda install -c bioconda unicycler``"
+   "multiqc", "1.13", "Quality control", "multiqc", "``conda install -c bioconda multiqc``"
+   "bbtools", "38.98", "Quality control", "home directory", "Install in your home directory"
+   "kraken2", "2.1.2", "Taxonomy", "qc", "This package will be installed with Bracken"
+   "bracken", "2.7.0", "Taxonomy", "qc", "``conda install -c bioconda bracken``"
+   "krona", "2.8.1", "Taxonomy", "qc", "``conda install -c bioconda krona``"
+   "spades", "3.15.5", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
+   "unicycler", "0.5.0", "De novo genome assembly", "assembly", "``conda install -c bioconda unicycler``"
    "bandage", "0.8.1", "De novo genome assembly", "qc", "``conda install qt=5.12.9 bandage``"
    "quast", "5.0.2", "De novo genome assembly", "qc", "``conda install -c bioconda quast``"
-   "prokka", "1.14.6", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults prokka``"
+   "bakta", "1.14.6", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults prokka``"
    "abricate", "1.0.1", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
    "busco", "4.1.2", "Genome annotation", "busco", "``conda install -c bioconda busco``"
 

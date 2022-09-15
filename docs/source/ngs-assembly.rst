@@ -16,7 +16,7 @@ Introduction
 
 4. The most broadly accepted data file format for an assembly is ``FASTA``.
 
-5. In this section you will use |spades| for assembling Illumina-only raw reads and |unicycler| for a hybrid assembly, i.e. when we have Illumina and PacBio or Nanopore raw reads.
+5. In this section you will use |spades| for assembling Illumina-only raw reads and |unicycler| for a hybrid assembly, i.e. when we have Illumina (2nd generation) and PacBio or Nanopore (3rd generation) raw reads.
 
 
 Learning objectives
@@ -40,12 +40,13 @@ SPAdes
 
 * Besides the typical |spades| module for short- and long-read genome assembly using de Bruijn graphs other additional pipelines are also available such as:
 
-  1. ``metaSPAdes`` for assembly of **metagenomic** data sets [NURK2017]_.
-  2. ``plasmidSPAdes`` for extracting and assembling **plasmids** from whole-genome sequencing data [ANTIPOV2016]_.
-  3. ``metaplasmidSPAdes`` – a pipeline for extracting and assembling **plasmids from metagenomic** data sets [ANTIPOV2019]_.
-  4. ``rnaSPAdes`` – a de novo transcriptome assembler from **RNA-Seq** data [BUSHMANOVA2019]_.
-  5. ``truSPAdes`` – a module for **TruSeq** barcode assembly [BANKEVICH2016]_.
-  6. ``biosyntheticSPAdes`` – a module for **biosynthetic** gene cluster assembly with paired-end reads [MELESHKO2019]_.
+  1. ``hybridSPAdes`` assembling **short and long** reads and benchmark it on a variety of bacterial assembly projects [ANTIPOV2016A]_.
+  2. ``metaSPAdes`` for assembly of **metagenomic** data sets [NURK2017]_.
+  3. ``plasmidSPAdes`` for extracting and assembling **plasmids** from whole-genome sequencing data [ANTIPOV2016B]_.
+  4. ``metaplasmidSPAdes`` – a pipeline for extracting and assembling **plasmids from metagenomic** data sets [ANTIPOV2019]_.
+  5. ``rnaSPAdes`` – a de novo transcriptome assembler from **RNA-Seq** data [BUSHMANOVA2019]_.
+  6. ``truSPAdes`` – a module for **TruSeq** barcode assembly [BANKEVICH2016]_.
+  7. ``biosyntheticSPAdes`` – a module for **biosynthetic** gene cluster assembly with paired-end reads [MELESHKO2019]_.
 
 
 Installation
@@ -57,16 +58,13 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named assembly
-   $ conda create -n assembly python=3.9
+   $ conda create -n assembly python=3.8
 
    # Activate the new environment
    $ conda activate assembly
 
    # Install Unicycler and its dependencies (including SPAdes)
-   $ conda install -c davebx unicycler
-
-   # Update SPAdes to the last version
-   $ conda update spades
+   $ conda install -c bioconda unicycler
 
    # Check SPAdes installation
    $ spades.py --version
@@ -96,14 +94,11 @@ Usage
    $ mkdir assembly
    $ cd ~/tutorial/assembly/
    $ mkdir spades unicycler
-   $ cd
+   $ cd ~/tutorial/assembly/spades
 
-   # Run SPAdes in your trimmed and untrimmed paired-end Illumina reads
-   $ spades.py -1 strainA_R1_paired_trimmed.fastq.gz -2 strainA_R2_paired_trimmed.fastq.gz --careful -k 21,33,55,77 -t 8 -o strainA_SPAdes
-   $ spades.py -1 strainA_R1_paired_untrimmed.fastq.gz -2 strainA_R2_paired_untrimmed.fastq.gz --careful -k 21,33,55,77 -t 8 -o strainA_SPAdes
-
-   # Move your result files to the SPAdes directory
-   $ mv <path_results_spades> ~/tutorial/assembly/spades/
+   # Run SPAdes in your untrimmed and trimmed (if applied) paired-end Illumina reads
+   $ spades.py -1 ~/tutorial/raw_data/strainA_untrimmed_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_untrimmed_R2.fastq.gz --careful -k 21,33,55,77 -t 4 --cov-cutoff auto -o strainA_untrimmed
+   $ spades.py -1 ~/tutorial/raw_data/strainA_trimmed_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_trimmed_R2.fastq.gz --careful -k 21,33,55,77 -t 4 --cov-cutoff auto -o strainA_trimmed
 
 .. csv-table:: Parameters explanation when using SPAdes
    :header: "Parameter", "Description"
@@ -208,7 +203,7 @@ Usage
    2. Run |unicycler| for a hybrid assembly using the short-read paired-end Illumina and the long-read Nanopore.
 
 
-Assembly visualization
+Assembly visualisation
 ######################
 
 
@@ -217,7 +212,7 @@ Bandage
 
 * |bandage| - Bioinformatics Application for Navigating De novo Assembly Graphs Easily - is a useful Software for **visualising assembly graphs** and the hidden connections between nodes [WICK2015]_.
 
-* You can easily interact with graphs using the zoom, pan and rotate options, customise the visualization (e.g., label and colour nodes), search for sequences, extract sequences, and more.
+* You can easily interact with graphs using the zoom, pan and rotate options, customise the visualisation (e.g., label and colour nodes), search for sequences, extract sequences, and more.
 
 
 Installation
@@ -457,17 +452,18 @@ At the end of this section, you will have the following folder structure.
 References
 ##########
 
-.. [MILLER2010] Miller JR, Koren S, Sutton G. 2010. Assembly algorithms for next-generation sequencing data. Genomics. 95(6):315-27. `DOI: 10.1016/j.ygeno.2010.03.001 <https://dx.doi.org/10.1016/j.ygeno.2010.03.001>`_.
-.. [BANKEVICH2012] Bankevich A, et al. 2012. SPAdes: A New Genome Assembly Algorithm and Its Applications to Single-Cell Sequencing. J Comput Biol. 19(5):455–477. `DOI: 10.1089/cmb.2012.0021 <https://dx.doi.org/10.1089/cmb.2012.0021>`_.
-.. [NURK2017] Nurk S, Meleshko D, Korobeynikov A, Pevzner PA. 2017. metaSPAdes: a new versatile metagenomic assembler. Genome Res. 27(5):824–834. `DOI: 10.1101/gr.213959.116 <https://dx.doi.org/10.1101/gr.213959.116>`_.
-.. [ANTIPOV2016] Antipov D, et al. 2016. plasmidSPAdes: assembling plasmids from whole genome sequencing data. Bioinformatics. 32(22):3380-3387. `DOI: 10.1093/bioinformatics/btw493 <https://dx.doi.org/10.1093/bioinformatics/btw493>`_.
+.. [ANTIPOV2016A] Antipov D, et al. 2016. hybridSPAdes: an algorithm for hybrid assembly of short and long reads. Bioinformatics. 32(7):1009–1015. `DOI: 10.1093/bioinformatics/btv688 <https://dx.doi.org/10.1093/bioinformatics/btv688>`_.
+.. [ANTIPOV2016B] Antipov D, et al. 2016. plasmidSPAdes: assembling plasmids from whole genome sequencing data. Bioinformatics. 32(22):3380-3387. `DOI: 10.1093/bioinformatics/btw493 <https://dx.doi.org/10.1093/bioinformatics/btw493>`_.
 .. [ANTIPOV2019] Antipov D, Raiko M, Lapidus A, Pevzner PA. 2019. Plasmid detection and assembly in genomic and metagenomic data sets. Genome Res. 29(6):961-968. `DOI: 10.1101/gr.241299.118 <https://dx.doi.org/10.1101/gr.241299.118>`_.
-.. [BUSHMANOVA2019] Bushmanova E, Antipov D, Lapidus A, Prjibelski AD. 2019. rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data. Gigascience. 8(9):giz100. `DOI: 10.1093/gigascience/giz100 <https://dx.doi.org/10.1093/gigascience/giz100>`_.
+.. [BANKEVICH2012] Bankevich A, et al. 2012. SPAdes: A New Genome Assembly Algorithm and Its Applications to Single-Cell Sequencing. J Comput Biol. 19(5):455–477. `DOI: 10.1089/cmb.2012.0021 <https://dx.doi.org/10.1089/cmb.2012.0021>`_.
 .. [BANKEVICH2016] Bankevich A, Pevzner PA. 2016. TruSPAdes: barcode assembly of TruSeq synthetic long reads. Nat Methods. 13(3):248-50. `DOI: 10.1038/nmeth.3737 <https://dx.doi.org/10.1038/nmeth.3737>`_.
+.. [BUSHMANOVA2019] Bushmanova E, Antipov D, Lapidus A, Prjibelski AD. 2019. rnaSPAdes: a de novo transcriptome assembler and its application to RNA-Seq data. Gigascience. 8(9):giz100. `DOI: 10.1093/gigascience/giz100 <https://dx.doi.org/10.1093/gigascience/giz100>`_.
+.. [GUREVICH2013] Gurevich A, Saveliev V, Vyahhi N, Tesler G. 2013. QUAST: quality assessment tool for genome assemblies. Bioinformatics. 29(8):1072–1075. `DOI: 10.1093/bioinformatics/btt086 <https://dx.doi.org/10.1093/bioinformatics/btt086>`_.
 .. [MELESHKO2019] Meleshko D, et al. 2019. BiosyntheticSPAdes: reconstructing biosynthetic gene clusters from assembly graphs. Genome Res. 29(8):1352–1362. `DOI: 10.1101/gr.243477.118 <https://dx.doi.org/10.1101/gr.243477.118>`_.
+.. [MILLER2010] Miller JR, Koren S, Sutton G. 2010. Assembly algorithms for next-generation sequencing data. Genomics. 95(6):315-27. `DOI: 10.1016/j.ygeno.2010.03.001 <https://dx.doi.org/10.1016/j.ygeno.2010.03.001>`_.
+.. [NURK2017] Nurk S, Meleshko D, Korobeynikov A, Pevzner PA. 2017. metaSPAdes: a new versatile metagenomic assembler. Genome Res. 27(5):824–834. `DOI: 10.1101/gr.213959.116 <https://dx.doi.org/10.1101/gr.213959.116>`_.
 .. [WICK2017] Wick RR, Judd LM, Gorrie CL, Holt KE. 2017. Unicycler: Resolving bacterial genome assemblies from short and long sequencing reads. PLoS Comput Biol. 13(6):e1005595. `DOI: 10.1371/journal.pcbi.1005595 <https://dx.doi.org/10.1371/journal.pcbi.1005595>`_.
 .. [WICK2015] Wick RR, Schultz MB, Zobel J, Holt KE. 2015. Bandage: interactive visualization of de novo genome assemblies. Bioinformatics. 31(20):3350-2. `DOI: 10.1093/bioinformatics/btv383 <https://dx.doi.org/10.1093/bioinformatics/btv383>`_.
-.. [GUREVICH2013] Gurevich A, Saveliev V, Vyahhi N, Tesler G. 2013. QUAST: quality assessment tool for genome assemblies. Bioinformatics. 29(8):1072–1075. `DOI: 10.1093/bioinformatics/btt086 <https://dx.doi.org/10.1093/bioinformatics/btt086>`_.
 
 
 List of Assembly tools

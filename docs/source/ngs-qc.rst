@@ -16,7 +16,7 @@ Introduction
 
 4. After that, we will **trim** and **filter** low quality or uninformative reads/bases through |bbduk|.
 
-5. You will be working only with the paired-end raw data acquired through the **Illumina HiSeq 2500** Plattform [GREIG2019]_.
+5. You will be working only with the paired-end raw data acquired through the **Illumina HiSeq 2500** Platform [GREIG2019]_.
 
 
 Learning objectives
@@ -75,7 +75,7 @@ Let's try to do some basic analysis and calculate the coverage using the **paire
    4. Calculate the coverage, assuming a genome size of ~5.5 MB.
 
 
-Visualization of data quality
+Visualisation of data quality
 #############################
 
 1. The first step after receiving the sequencing data is to perform some simple quality control evaluations.
@@ -108,7 +108,7 @@ Installation
 .. code-block:: bash
 
     # Create a new conda environment named qc
-    $ conda create -n qc python=3.9
+    $ conda create -n qc python=3.8
 
     # Activate the new environment
     $ conda activate qc
@@ -134,22 +134,26 @@ Usage
 .. code-block:: bash
 
     # Let's first create three new directories to keep your reports
-    $ cd tutorial/
+    $ cd ~/tutorial/
     $ mkdir qc_visualization
     $ cd qc_visualization/
     $ mkdir trimmed untrimmed
     $ cd
 
-    # Run FastQC on a single file
+    # Run FastQC on multiple fastqc.gz files
     # Specify the directory where your Illumina fastq.gz files are located
-    $ fastqc ~/tutorial/raw_data/untrimmed.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
+    $ fastqc -t 4 ~/tutorial/raw_data/*.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
 
-    # Or run FastQC on multiple files
-    # Specify the directory where your Illumina fastq.gz files are located
-    $ fastqc ~/tutorial/raw_data/*.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
+.. csv-table:: Parameters explanation when using FastQC
+   :header: "Parameter", "Description"
+   :widths: 20, 60
 
-.. note::
-   The parameter ``-o`` will create all output files in the specified output directory.
+   "``-t NUM``", "Specifies the number of files which can be processed simultaneously (1 thread = 250 Mb memory)"
+   "``-o NAME``", "Create all output files in the specified and already created output directory"
+   "``--memory NUM``", "Sets the base amount of memory, in Megabytes, used to process each file (default: 512 Mb)"
+   "``--nano``", "Files come from nanopore sequences and are in fast5 format"
+   "``-q``", "Suppress all progress messages on stdout and only report errors"
+   "``*.fastq.gz``", "Full path to paired-end Illumina raw sequence reads"
 
 .. code-block:: bash
 
@@ -157,12 +161,12 @@ Usage
     $ cd ~/tutorial/qc_visualization/untrimmed/
     $ ls
 
-    # Open FastQC html report on Linux
-    $ firefox filename_fastqc.html
+    # Open FastQC html report in Ubuntu/WSL
+    $ sensible-browser <filename>_fastqc.html
     $ cd
 
-    # Or open FastQC html report on macOS
-    $ open filename_fastqc.html
+    # Or open FastQC html report in macOS
+    $ open <filename>_fastqc.html
     $ cd
 
 **3. Additional options**
@@ -197,8 +201,11 @@ Installation
 
 .. code-block:: bash
 
+    # Deactivate all current environments
+    $ conda deactivate
+
     # Create a new conda environment named multiqc
-    $ conda create -n multiqc python=3.9
+    $ conda create -n multiqc python=3.8
 
     # Activate the new environment
     $ conda activate multiqc
@@ -207,7 +214,7 @@ Installation
     $ conda install -c bioconda multiqc
 
     # Check if MultiQC is installed
-    # If installed you will see "multiqc, version 1.9"
+    # If installed you will see "multiqc, version 1.13"
     $ multiqc --version
 
 
@@ -216,7 +223,7 @@ Usage
 
 **1. Input/Output files**
 
-``Input``: In this tutorial you will use the ``fastqc.*`` quality visualization reports.
+``Input``: In this tutorial you will use the ``fastqc.*`` quality visualisation reports.
 
 ``Output``: The MultiQC will generate an ``.html`` file containing the full report and a folder that contains easily machine readable data analysis.
 
@@ -228,16 +235,21 @@ Usage
     # Specify the directory where your FastQC reports are located
     $ multiqc ~/tutorial/qc_visualization/untrimmed/*fastqc* -o ~/tutorial/qc_visualization/untrimmed/
 
-.. note::
-   The parameter ``-o`` will create all output files in the specified output directory.
+.. csv-table:: Parameters explanation when using MultiQC
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-o NAME``", "Create report in the specified and already created output directory"
+   "``-q``", "Only show log warnings"
+   "``*fastqc*``", "Full path to the FastQC quality visualisation reports"
 
 .. code-block:: bash
 
-    # Navigate to the directory containing the .html file
+    # Navigate to the directory containing the MultiQC .html report
     $ cd ~/tutorial/qc_visualization/untrimmed/
 
-    # Open MultiQC html report in Linux
-    $ firefox multiqc_report.html
+    # Open MultiQC html report in Ubuntu/WSL
+    $ sensible-browser multiqc_report.html
     $ cd
 
     # Or open MultiQC html report in macOS
@@ -264,7 +276,7 @@ Usage
 Quality control
 ###############
 
-1. In the previous section, we have **evaluated** and **visualized** the quality of our raw sequence reads using |fastqc|.
+1. In the previous section, we have **evaluated** and **visualised** the quality of our raw sequence reads using |fastqc|.
 
 2. Now you have to decide if your data should be subject to **Quality Control (QC)**, i.e. the process of improving data by removing identifiable errors from it.
 
@@ -284,9 +296,15 @@ Installation
 ............
 
 .. warning::
-   To run |bbtools|, you need to have **Java 7** or higher installed on the computer.
+
+   * To run |bbtools|, you need to have **Java 7** or higher installed on the computer.
+
+   * You can install Java through conda ``conda install -c anaconda java-1.7.0-openjdk-cos6-x86_64``.
 
 .. code-block:: bash
+
+    # Deactivate all current environments
+    $ conda deactivate
 
     # Let's first create a new directory to keep the clean raw sequence reads
     $ cd ~/tutorial/
@@ -294,10 +312,10 @@ Installation
     $ cd
 
     # Download the latest version of BBTools from Sourceforge to your computer
-    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.94.tar.gz
+    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.98.tar.gz
 
     # Go to the parent directory where you have BBTools file
-    $ cd (installation parent directory)
+    $ cd <installation path parent directory>
 
     # Extract the file contents to your installation folder on the computer
     $ tar -xvzf BBMap_(version).tar.gz
@@ -319,11 +337,15 @@ Usage
 **2. Basic commands**
 
 .. note::
-   When you have the **paired-end reads** in 2 files you should **always processed them together**, not one at a time.
 
-   In the commands provided below don't forget to add the full path of your ``fastq.gz`` files.
+   * When you have the **paired-end reads** in 2 files you should **always processed them together**, not one at a time.
+
+   * In the commands provided below don't forget to add the full path of your ``fastq.gz`` files.
 
 .. code-block:: bash
+
+    # Go to the directory where you want to keep the trimmed data
+    $ cd ~/tutorial/qc_improvement/
 
     # Trim adapters when present in the raw sequence reads
     # For this example we will use a fasta file containing all adapters (adapters.fasta) that should be located in ~/bbmap/resources
@@ -337,10 +359,6 @@ Usage
 
     # Trim regions with an average quality below 10 and discard reads with average quality below 5 after trimming
     $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq out2=clean2.fastq trimq=10 maq=5
-
-    # Filter raw sequence reads based on Kmer
-    # For this example we will use a fasta file containing the Illumina PhiX spike-in reference genome (phix174_ill.ref.fa) that should be located in ~/bbmap/resources
-    $ ~/bbmap/bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=unmatched1.fastq out2=unmatched2.fastq outm1=matched1.fastq outm2=matched2.fastq ref=phix174_ill.ref.fa k=31 hdist=1 stats=statistics.txt
 
     # Optionally you can also evaluate all raw reads length and display basic statistics
     $ ~/bbmap/readlength.sh in=reads.fastq.gz out=histogram.txt
@@ -369,8 +387,6 @@ Usage
    "``-Xmx1g``", "It forces BBDuk to use 1 GB of memory"
    "``minlength=10``", "Reads shorter than this after trimming will be discarded"
 
-.. note::
-   After performing quality control in your raw sequence reads, move the clean files to the directory ``~/tutorial/qc_improvement/``.
 
 **3. Additional options**
 
@@ -384,7 +400,7 @@ Usage
    13. Run |fastqc| in the trimmed files.
    14. Aggregate all the reports of trimmed and untrimmed files with |multiqc|.
    15. Did you noticed any kind of improvement in quality after the trimming and filtering process? Which parameters are now better?
-   16. Move all the quality visualization files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualization/trimmed``.
+   16. Move all the quality visualisation files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualization/trimmed``.
 
 .. hint::
    If you want to use less disk space in your computer, you can compress all the previous ``.fastq`` files by using the ``gzip`` command.
@@ -436,11 +452,13 @@ List of QC tools
    :header: "Package name", "Version", "Main objective"
    :widths: 20, 20, 40
 
-   "`BBTools <https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/>`_", "38.87", "Quality control tools (contains BBMap, BBDuk)"
-   "`Cutadapt <https://cutadapt.readthedocs.io/en/stable/>`_", "2.10", "Quality control tool"
-   "`FastQC <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_", "0.11.8", "Quality control visualization"
-   "`MultiQC <https://multiqc.info/>`_", "1.9", "Quality control visualization"
-   "`PRINSEQ <https://edwards.sdsu.edu/cgi-bin/prinseq/prinseq.cgi>`_", "0.20.4", "Quality control visualization and improvement"
-   "`Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`_", "0.38", "Quality control tool"
+   "`BBTools <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/>`_", "37.62", "Quality control tools (contains BBMap, BBDuk)"
+   "`Cutadapt <https://cutadapt.readthedocs.io/en/stable/>`_", "4.1", "Quality control tool"
+   "`FastQC <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_", "0.11.9", "Quality control visualisation"
+   "`MultiQC <https://multiqc.info/>`_", "1.13", "Quality control visualisation"
+   "`PRINSEQ <http://prinseq.sourceforge.net>`_", "0.20.4", "Quality control visualisation and improvement"
+   "`Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`_", "0.36", "Quality control tool"
    "`Trim Galore <http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`_", "0.6.2", "Quality control tool"
-   "`LongQC <https://github.com/yfukasawa/LongQC>`_", "1.2.0", "Quality control visualization for Third Generation Sequencing Long Read Data"
+   "`NanoPlot <https://github.com/wdecoster/NanoPlot>`_", "1.20.0", "Quality control visualisation for for Oxford Nanopore reads"
+   "`Porechop <https://github.com/rrwick/Porechop>`_", "0.2.4", "Quality control improvement for Oxford Nanopore reads"
+   "`Nanofilt <https://github.com/wdecoster/nanofilt>`_", "2.3.0", "Quality control visualisation and improvement for Oxford Nanopore reads"
