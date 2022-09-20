@@ -135,14 +135,14 @@ Usage
 
     # Let's first create three new directories to keep your reports
     $ cd ~/tutorial/
-    $ mkdir qc_visualization
-    $ cd qc_visualization/
+    $ mkdir qc_visualisation
+    $ cd qc_visualisation/
     $ mkdir trimmed untrimmed
     $ cd
 
     # Run FastQC on multiple fastqc.gz files
     # Specify the directory where your Illumina fastq.gz files are located
-    $ fastqc -t 4 ~/tutorial/raw_data/*.fastq.gz -o ~/tutorial/qc_visualization/untrimmed/
+    $ fastqc -t 4 ~/tutorial/raw_data/*.fastq.gz -o ~/tutorial/qc_visualisation/untrimmed/
 
 .. csv-table:: Parameters explanation when using FastQC
    :header: "Parameter", "Description"
@@ -158,7 +158,7 @@ Usage
 .. code-block:: bash
 
     # See the files that FastQC created
-    $ cd ~/tutorial/qc_visualization/untrimmed/
+    $ cd ~/tutorial/qc_visualisation/untrimmed/
     $ ls
 
     # Open FastQC html report in Ubuntu/WSL
@@ -233,7 +233,7 @@ Usage
 
     # Run MultiQC to combine the reports of all FastQC runs
     # Specify the directory where your FastQC reports are located
-    $ multiqc ~/tutorial/qc_visualization/untrimmed/*fastqc* -o ~/tutorial/qc_visualization/untrimmed/
+    $ multiqc ~/tutorial/qc_visualisation/untrimmed/*fastqc* -o ~/tutorial/qc_visualisation/untrimmed/
 
 .. csv-table:: Parameters explanation when using MultiQC
    :header: "Parameter", "Description"
@@ -246,7 +246,7 @@ Usage
 .. code-block:: bash
 
     # Navigate to the directory containing the MultiQC .html report
-    $ cd ~/tutorial/qc_visualization/untrimmed/
+    $ cd ~/tutorial/qc_visualisation/untrimmed/
 
     # Open MultiQC html report in Ubuntu/WSL
     $ sensible-browser multiqc_report.html
@@ -400,7 +400,7 @@ Usage
    13. Run |fastqc| in the trimmed files.
    14. Aggregate all the reports of trimmed and untrimmed files with |multiqc|.
    15. Did you noticed any kind of improvement in quality after the trimming and filtering process? Which parameters are now better?
-   16. Move all the quality visualisation files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualization/trimmed``.
+   16. Move all the quality visualisation files produced by |fastqc| and |multiqc| to the directory ``~/tutorial/qc_visualisation/trimmed``.
 
 .. hint::
    If you want to use less disk space in your computer, you can compress all the previous ``.fastq`` files by using the ``gzip`` command.
@@ -417,7 +417,7 @@ At the end of this section, you will have the following folder structure.
     │   ├── files_fastq.gz
     │   ├── files.fasta
     │   ├── files.gbk
-    ├── qc_visualization
+    ├── qc_visualisation
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
     │   │   ├── files_clean_fastqc.zip

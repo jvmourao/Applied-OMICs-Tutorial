@@ -12,7 +12,7 @@ Introduction
 
 2. Genome annotation is the process that allows us to **identify** features of interest in those contigs and to **label** them with useful information.
 
-3. In this section, you will use |prokka| for whole-genome annotation, |abricate| for a more specific one and `IGV <http://software.broadinstitute.org/software/igv/>`_ for its interactive visualization. In the end, you will evaluate assembly completeness using |busco|.
+3. In this section, you will use |bakta| for whole-genome annotation, |abricate| for a more specific one and `IGV <http://software.broadinstitute.org/software/igv/>`_ for its interactive visualisation. In the end, you will evaluate assembly completeness using |busco|.
 
 4. When it comes to annotation process there are two key concepts, **Sequence Ontology** and **Gene Ontology**, that you should understand before you move forward.
 
@@ -57,25 +57,27 @@ After finishing this Tutorial section, you will be able to:
 * Make gene predictions of assembled genomes.
 * Evaluate the presence of specific genes conferring adaptive features.
 * Evaluate assembly completeness through the search of orthologues presence or absence.
-* Use specific software to visualize and edit genome annotations.
+* Use specific software to visualise and edit genome annotations.
 
 
 Whole-genome annotation
 #######################
 
 
-Prokka
-******
+Bakta
+*****
 
-* |prokka| - Prokaryotic Annotation - is a software tool that finds and annotate bacterial, archaeal and viral features from genome sequences quickly and produce standards-compliant output files (e.g., GenBank, EMBL and GFF formats) [SEEMANN2014]_.
+* |bakta| - is a tool for the rapid & standardised annotation of bacterial genomes and plasmids from both isolates and MAGs [SCHWENGERS2021]_.
 
-* The annotation process of protein-coding genes by |prokka| relies on several external feature prediction tools and has two main steps:
+* The annotation process of |bakta| relies on several external feature prediction tools and has many advantages:
 
-  1. First, it uses Prodigal to identify the coordinates of candidate genes on the assembled genome.
+  1. It provides a comprehensive annotation workflow including the detection of small proteins taking into account replicon metadata.
 
-  2. Second, the putative gene product is predicted by similarity against an extensive database of known sequences.
+  2. The annotation of coding sequences is accelerated via an alignment-free sequence identification approach that in addition facilitates the precise assignment of public database cross-references.
 
-* You will use |prokka| to annotate all your bacterial assemblies from |spades| and |unicycler|.
+  3. Annotation results are exported in GFF3 and International Nucleotide Sequence Database Collaboration (INSDC)-compliant flat files, as well as comprehensive JSON files, facilitating automated downstream analysis.
+
+* You will use |bakta| to annotate all your bacterial assemblies from |spades| and |unicycler|.
 
 
 Installation
@@ -83,27 +85,33 @@ Installation
 
 .. code-block:: bash
 
-   # Create a new environment named prokka with bioperl
-   $ conda create -n prokka python=3.9 perl-bioperl=1.7.2
+   # Create a new environment named Bakta
+   $ conda create -n bakta python=3.8
 
-   # Activate the prokka environment
-   $ conda activate prokka
+   # Activate the Bakta environment
+   $ conda activate bakta
 
-   # Install and update to the latest version of Prokka
-   $ conda install -c conda-forge -c bioconda -c defaults prokka
+   # Install Bakta with conda
+   $ conda install -c bioconda bakta
 
-   # Check Prokka installation
-   $ prokka --version
+   # Check Bakta installation
+   $ bakta --version
 
 
 Usage
 .....
 
+.. warning::
+
+   * You will need at least 8-12 Gb of RAM to be able to run |bakta|.
+
+   * If you are unable to run |bakta| please download the final hybrid annotations using this `link <https://mega.nz/folder/4uZymaKb#xL9gxvv7gDFqMXMTu5J63g>`_.
+
 **1. Input/Output files**
 
-``Input``: Single or multiple ``.fasta`` files from assembly tools.
+``Input``: Bacterial genomes and plasmids (complete/draft assemblies) in (zipped) ``.fasta`` format.
 
-``Output``: Several output files are generated. A particular attention should be given to ``.gff`` and ``.gbk`` (information about the annotated features), ``.txt`` (number of annotated features), ``.faa`` (protein sequences of annotated genes), and ``.ffn`` (nucleotide sequences of annotated genes).
+``Output``: Annotation results are provided in standard bioinformatics file formats. A particular attention should be given to ``.gff3`` and ``.gbff`` (information about the annotated features), ``.txt`` (summary of annotated features), ``.faa`` (protein sequences of annotated genes), and ``.ffn`` (nucleotide sequences of annotated genes).
 
 **2. Basic commands**
 
@@ -113,39 +121,44 @@ Usage
    $ cd ~/tutorial
    $ mkdir annotation
    $ cd ~/tutorial/annotation/
-   $ mkdir prokka abricate
-   $ cd
+   $ mkdir bakta abricate
+   $ cd bakta/
 
-   # Run Prokka in your assembled genomes (FASTA format)
-   $ prokka --locustag strainA --genus Escherichia --species coli --strain strainA --outdir mydir ~/tutorial/assembly/*.fasta
+   # Download the mandatory database for Bakta
+   $ bakta_db list
+   $ bakta_db download --output ~/tutorial/annotation/bakta
 
-   # Move your result files to the Prokka directory
-   $ mv <path_results_prokka> ~/tutorial/annotation/prokka/
+   # Run Bakta in your assembled genomes using the .fasta format
+   $ bakta --db ~/tutorial/annotation/bakta/db --verbose --output ~/tutorial/annotation/bakta/strainX --prefix strainX ~/tutorial/assembly/unicycler/<genome>.fasta
 
-.. csv-table:: Parameters explanation when using Prokka
+.. csv-table:: Parameters explanation when using Bakta
    :header: "Parameter", "Description"
    :widths: 20, 60
 
-   "``--centre [X]``", "Sequencing centre ID (default '')"
-   "``--compliant``", "Force Genbank/ENA/DDJB compliance: --addgenes --mincontiglen 200 --centre XXX (default OFF)"
-   "``--genus [X]``", "Genus name (default 'Genus')"
-   "``--species [X]``", "Species name (default 'species')"
-   "``--strain [X]``", "Strain name (default 'strain')"
-   "``--locustag [X]``", "Locus tag prefix [auto] (default '')"
-   "``--outdir [X]``", "Output folder [auto] (default '')"
-
-.. attention::
-   When running |prokka| the header ID in your ``.fasta`` file must be **less than 38 characters** to avoid conflicts with GenBank annotations. To withdraw this issue use the ``--centre [X]`` and ``--compliant`` options.
+   "``--db DB``", "Database path (default = <bakta_path>/db)"
+   "``--verbose``", "Print verbose information"
+   "``--output OUTPUT``", "Output directory (default = current working directory)"
+   "``--prefix PREFIX``", "Prefix for output files"
+   "``--threads THREADS``", "Number of threads to use (default = number of available CPUs)"
+   "``<genome>``", "Genome sequences in (zipped) fasta format"
+   "``--genus GENUS``", "Genus name"
+   "``--species SPECIES``", "Species name"
+   "``--strain STRAIN``", "Strain name"
+   "``--plasmid PLASMID``", "Plasmid name"
+   "``--compliant``", "Force Genbank/ENA/DDJB compliance"
 
 .. seealso::
-   `RAST <https://rast.nmpdr.org/>`_ web tool is an excellent alternative if you want a more **detailed annotation** and **pathway analysis** of your genome that is not provided with |prokka|. However, you need to upload the assemblies one by one, and usually, it can take a **several minutes** to run a genome.
+
+   * `RAST <https://rast.nmpdr.org/>`_ web tool is an excellent alternative if you want a more **detailed annotation** and **pathway analysis** of your genome that is not provided with other tools.
+
+   * However, you need to upload the assemblies one by one, and usually, it can take **several minutes** to run a genome.
 
 **3. Additional options**
 
 .. code-block:: bash
 
-   # To see a full list of available options in Prokka
-   $ prokka --help
+   # To see a full list of available options in Bakta
+   $ bakta --help
 
 
 Specific annotations
@@ -179,8 +192,8 @@ Installation
 
 .. code-block:: bash
 
-   # Activate the abricate environment with bioperl and the last blast version
-   $ conda create -n abricate python=3.9 perl-bioperl=1.7.2 blast=2.12.0
+   # Create the abricate environment with bioperl and the last blast version
+   $ conda create -n abricate python=3.8 perl-bioperl blast
 
    # Activate the abricate environment
    $ conda activate abricate
@@ -194,9 +207,6 @@ Installation
 
    # See the list of installed databases in ABRicate
    $ abricate --list
-
-   # Re-create and update all the databases
-   $ abricate --setupdb
 
 Usage
 .....
@@ -216,8 +226,8 @@ Usage
 
 .. code-block:: bash
 
-   # General ABRicate usage
-   $ abricate [options] <contigs.{fasta,gbk,embl}[.gz] ...> > out.tab
+   # Let's first go to the directory where we want to store ABRicate results
+   $ cd ~/tutorial/annotation/abricate/
 
    # Run ABRicate database ResFinder in your assembled genomes (FASTA format)
    $ abricate --db resfinder --quiet ~/tutorial/assembly/*.fasta > resfinder_ann.tab
@@ -228,13 +238,14 @@ Usage
    # Run ABRicate database Ecoli_VF in your assembled genomes (FASTA format)
    $ abricate --db ecoli_vf --quiet ~/tutorial/assembly/*.fasta > ecoli_vf_ann.tab
 
+   # Run ABRicate database EcOH in your assembled genomes (FASTA format)
+   $ abricate --db ecoh --quiet ~/tutorial/assembly/*.fasta > ecoh_ann.tab
+
    # Generate a summary report for each analysis
    $ abricate --summary resfinder_ann.tab > resfinder_ann_summary.tab
    $ abricate --summary plasmidfinder_ann.tab > plasmidfinder_ann_summary.tab
    $ abricate --summary ecoli_vf_ann.tab > ecoli_vf_summary.tab
-
-   # Move your result files to the ABRicate directory
-   $ mv <path_results_abricate> ~/tutorial/annotation/abricate/
+   $ abricate --summary ecoh_ann.tab > ecoh_summary.tab
 
 .. csv-table:: Parameters explanation when using ABRicate
    :header: "Parameter", "Description"
@@ -242,6 +253,8 @@ Usage
 
    "``--db [X]``", "Database to use (default 'ncbi')"
    "``--quiet``", "Quiet mode, no stderr output"
+   "``abricate-get_db --db NAME``", "Re-use existing download and just regenerate the database"
+   "``abricate-get_db --db NAME --force``", "Force download of latest version"
 
 **3. Additional options**
 
@@ -251,28 +264,28 @@ Usage
    $ abricate --help
 
 .. todo::
-   1. Run |prokka| and |abricate| in your assembled draft genomes using the ``.fasta`` files.
+   1. Run |bakta| and |abricate| in your assembled draft genomes using the ``.fasta`` files.
    2. Did your isolates carry putative antimicrobial resistance or virulence genes? Which ones are present?
    3. How many coding sequences (CDS) were predicted?
 
 .. seealso::
    * Although you use draft assembled genomes for this specific annotation process, it is also viable to use the initial **raw sequence reads** using for example `ARIBA <https://github.com/sanger-pathogens/ariba>`_.
 
-   * Yet, it is essential to highlight that assembled sequences facilitate an understanding of the genetic context of the resistance mechanism by assessing, for example, gene synteny, mutations on regulatory regions or co-localization with other genes [KWONG2017]_.
+   * Yet, it is essential to highlight that assembled sequences facilitate an understanding of the genetic context of the resistance mechanism by assessing, for example, gene synteny, mutations on regulatory regions or co-localisation with other genes [KWONG2017]_.
 
 
-Interactive visualization
+Interactive visualisation
 #########################
 
 
 IGV
 ***
 
-* The Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ is a freely-available and interactive high-performance desktop tool for visualization of diverse genomic data [THORVALDSDOTTIR2013]_.
+* The Integrative Genomics Viewer - `IGV <http://software.broadinstitute.org/software/igv/>`_ is a freely-available and interactive high-performance desktop tool for visualisation of diverse genomic data [THORVALDSDOTTIR2013]_.
 
 * In this section we will use IGV to explore our previous genome annotations.
 
-* There are a panoply of other desktop applications for visualization of genomic data that you can also explore such as `Geneious <https://www.geneious.com/>`_, `UGENE <http://ugene.net/>`_, `Tablet <https://ics.hutton.ac.uk/tablet/>`_, or `Artemis <https://sanger-pathogens.github.io/Artemis/>`_.
+* There are a panoply of other desktop applications for visualisation of genomic data that you can also explore such as `Geneious <https://www.geneious.com/>`_, `UGENE <http://ugene.net/>`_, `Tablet <https://ics.hutton.ac.uk/tablet/>`_, or `Artemis <https://sanger-pathogens.github.io/Artemis/>`_.
 
 
 Installation
@@ -285,7 +298,7 @@ Installation
 .. figure:: ./images/IGV_window.png
    :figclass: align-left
 
-*Figure 19. Visualization of the main window of IGV showing data from The Cancer Genome Atlas. 1 - IGV toolbar to access commonly used features; 2 - red box indicates the portion of the chromosome that is displayed; 3 - the ruler reflects the visible part of the chromosome; 4 - data is shown in horizontal rows called tracks; 5 - gene features; 6 - track names; 7 - optional attribute panel represented as coloured blocks.*
+*Figure 19. Visualisation of the main window of IGV showing data from The Cancer Genome Atlas. 1 - IGV toolbar to access commonly used features; 2 - red box indicates the portion of the chromosome that is displayed; 3 - the ruler reflects the visible part of the chromosome; 4 - data is shown in horizontal rows called tracks; 5 - gene features; 6 - track names; 7 - optional attribute panel represented as coloured blocks.*
 
 
 Usage
@@ -336,17 +349,16 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named busco
-   $ conda create -n busco python=3.9
+   $ conda create -n busco python=3.8
 
    # Activate the busco environment
    $ conda activate busco
 
-   # Install BUSCO and Augustus
-   $ conda install -c bioconda -c conda-forge busco=4.1.4 augustus=3.3.3
+   # Install BUSCO with conda
+   $ conda install -c conda-forge -c bioconda busco=5.4.2
 
    # Check BUSCO installation
    $ busco --version
-   $ augustus --version
 
    # See a list of all available datasets in BUSCO
    $ busco --list-datasets # When running an analysis BUSCO will download the dataset
@@ -371,19 +383,24 @@ Usage
    # Let's first create new directories to store your annotations
    $ cd ~/tutorial/annotation/
    $ mkdir busco
-   $ cd
+   $ cd busco/
 
    # Run BUSCO in your assembled genomes (.fasta format)
    $ busco -i ~/tutorial/assembly/*.fasta -o OUTPUT_NAME -l bacteria_odb10 -m geno
 
    # Or run BUSCO in you annotated genomes (.faa format)
-   $ busco -i ~/tutorial/annotation/prokka/*.faa -o OUTPUT_NAME -l bacteria_odb10 -m prot
-
-   # Move your result files to the BUSCO directory
-   $ mv <path_results_busco> ~/tutorial/annotation/busco/
+   $ busco -i ~/tutorial/annotation/bakta/*.faa -o OUTPUT_NAME -l bacteria_odb10 -m prot
 
    # Plot the results obtained by BUSCO
    $ ~/miniconda3/env/busco/bin/generate_plot.py -wd <path_results_busco>
+
+   # Open BUSCO .png image in Ubuntu/WSL
+   $ sensible-browser busco_figure.png
+   $ cd
+
+   # Or open BUSCO html report in macOS
+   $ open busco_figure.png
+   $ cd
 
 .. csv-table:: Parameters explanation when using BUSCO
    :header: "Parameter", "Description"
@@ -421,7 +438,7 @@ At the end of this section, you will have the following folder structure.
     │   ├── files.fasta
     │   ├── files.gbk
     │   ├── files.gff
-    ├── qc_visualization
+    ├── qc_visualisation
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
     │   │   ├── files_clean_fastqc.zip
@@ -461,10 +478,12 @@ At the end of this section, you will have the following folder structure.
     │   │   ├── report_without_reference.html
     │   │   ├── report_with_reference.html
     ├── annotation
-    │   ├── prokka
-    │   │   │   ├── annotations.gff
-    │   │   │   ├── annotations.gbk
+    │   ├── bakta
+    │   │   │   ├── annotations.gff3
+    │   │   │   ├── annotations.gbff
+    │   │   │   ├── annotations.txt
     │   │   │   ├── annotations.faa
+    │   │   │   ├── annotations.ffn
     │   ├── abricate
     │   │   │   ├── annotations.csv
     │   │   │   ├── annotations.tab
@@ -474,16 +493,16 @@ At the end of this section, you will have the following folder structure.
 References
 ##########
 
-.. [EILBECK2005] Eilbeck K, et al. 2005. The Sequence Ontology: a tool for the unification of genome annotations. Genome Biol. 6(5):R44. `DOI: 10.1186/gb-2005-6-5-r44 <https://dx.doi.org/10.1186/gb-2005-6-5-r44>`_.
-.. [SEEMANN2014] Seemann T. 2014. Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9. `DOI: 10.1093/bioinformatics/btu153 <https://dx.doi.org/10.1093/bioinformatics/btu153>`_.
-.. [FELDGARDEN2019] Feldgarden M, et al. 2019. Validating the AMRFinder Tool and Resistance Gene Database by Using Antimicrobial Resistance Genotype-Phenotype Correlations in a Collection of Isolates. Antimicrob Agents Chemother. 63(11):e00483-19. `DOI: 10.1128/AAC.00483-19 <https://dx.doi.org/10.1128/AAC.00483-19>`_.
 .. [ALCOCK2020] Alcock BP, et al. 2020. CARD 2020: antibiotic resistome surveillance with the comprehensive antibiotic resistance database. Nucleic Acids Res. 48(D1):D517–D525. `DOI: 10.1093/nar/gkz935 <https://dx.doi.org/10.1093/nar/gkz935>`_.
-.. [GUPTA2014] Gupta AK, et al. 2014. ARG-ANNOT, a new bioinformatic tool to discover antibiotic resistance genes in bacterial genomes. Antimicrob Agents Chemother. 58(1):212-20. `DOI: 10.1128/AAC.01310-13 <https://dx.doi.org/10.1128/AAC.01310-13>`_.
-.. [ZANKARI2012] Zankari E, et al. 2012. Identification of acquired antimicrobial resistance genes. J Antimicrob Chemother. 67(11):2640-4. `DOI: 10.1093/jac/dks261 <https://dx.doi.org/10.1093/jac/dks261>`_.
-.. [DOSTER2020] Doster E, et al. 2020. MEGARes 2.0: a database for classification of antimicrobial drug, biocide and metal resistance determinants in metagenomic sequence data. Nucleic Acids Res. 48(D1):D561–D569. `DOI: 10.1093/nar/gkz1010 <https://dx.doi.org/10.1093/nar/gkz1010>`_.
-.. [INGLE2016] Ingle DJ, et al. 2016. In silico serotyping of E. coli from short read data identifies limited novel O-loci but extensive diversity of O:H serotype combinations within and between pathogenic lineages. Microb Genom. 2(7):e000064. `DOI: 10.1099/mgen.0.000064 <https://dx.doi.org/10.1099/mgen.0.000064>`_.
 .. [CARATTOLI2014] Carattoli A, et al. 2014. In Silico Detection and Typing of Plasmids using PlasmidFinder and Plasmid Multilocus Sequence Typing. Antimicrob Agents Chemother. 58(7):3895–3903. `DOI: 10.1128/AAC.02412-14 <https://dx.doi.org/10.1128/AAC.02412-14>`_.
 .. [CHEN2016] Chen L, et al. 2016. VFDB 2016: hierarchical and refined dataset for big data analysis—10 years on. Nucleic Acids Res. 44(DI):D694–D697. `DOI: 10.1093/nar/gkv1239 <https://dx.doi.org/10.1093/nar/gkv1239>`_.
+.. [DOSTER2020] Doster E, et al. 2020. MEGARes 2.0: a database for classification of antimicrobial drug, biocide and metal resistance determinants in metagenomic sequence data. Nucleic Acids Res. 48(D1):D561–D569. `DOI: 10.1093/nar/gkz1010 <https://dx.doi.org/10.1093/nar/gkz1010>`_.
+.. [EILBECK2005] Eilbeck K, et al. 2005. The Sequence Ontology: a tool for the unification of genome annotations. Genome Biol. 6(5):R44. `DOI: 10.1186/gb-2005-6-5-r44 <https://dx.doi.org/10.1186/gb-2005-6-5-r44>`_.
+.. [FELDGARDEN2019] Feldgarden M, et al. 2019. Validating the AMRFinder Tool and Resistance Gene Database by Using Antimicrobial Resistance Genotype-Phenotype Correlations in a Collection of Isolates. Antimicrob Agents Chemother. 63(11):e00483-19. `DOI: 10.1128/AAC.00483-19 <https://dx.doi.org/10.1128/AAC.00483-19>`_.
+.. [GUPTA2014] Gupta AK, et al. 2014. ARG-ANNOT, a new bioinformatic tool to discover antibiotic resistance genes in bacterial genomes. Antimicrob Agents Chemother. 58(1):212-20. `DOI: 10.1128/AAC.01310-13 <https://dx.doi.org/10.1128/AAC.01310-13>`_.
+.. [INGLE2016] Ingle DJ, et al. 2016. In silico serotyping of E. coli from short read data identifies limited novel O-loci but extensive diversity of O:H serotype combinations within and between pathogenic lineages. Microb Genom. 2(7):e000064. `DOI: 10.1099/mgen.0.000064 <https://dx.doi.org/10.1099/mgen.0.000064>`_.
 .. [KWONG2017] Kwong JC, et al. 2017. Comment on: Benchmarking of methods for identification of antimicrobial resistance genes in bacterial whole genome data. J Antimicrob Chemother. 72(2):635-636. `DOI: 10.1093/jac/dkw473 <https://dx.doi.org/10.1093/jac/dkw473>`_.
-.. [THORVALDSDOTTIR2013] Thorvaldsdóttir H, Robinson JT, Mesirov JP. Integrative Genomics Viewer (IGV): high-performance genomics data visualization and exploration. Brief Bioinform. 14(2):178-92. `DOI: 10.1093/bib/bbs017 <https://dx.doi.org/10.1093/bib/bbs017>`_.
+.. [SCHWENGERS2021] Schwengers O, et al. 2021. Bakta: rapid and standardized annotation of bacterial genomes via alignment-free sequence identification. Microbial Genomics. 7(11):000685. `DOI: 10.1099/mgen.0.000685 <https://dx.doi.org/10.1099/mgen.0.000685>`_.
 .. [SEPPEY2019] Seppey M, Manni M, Zdobnov EM. 2019. BUSCO: Assessing Genome Assembly and Annotation Completeness. In: Kollmar M. (eds) Gene Prediction. Methods in Molecular Biology, vol 1962. Humana, New York, NY. 2019. `DOI: 10.1007/978-1-4939-9173-0_14 <https://dx.doi.org/10.1007/978-1-4939-9173-0_14>`_.
+.. [THORVALDSDOTTIR2013] Thorvaldsdóttir H, Robinson JT, Mesirov JP. Integrative Genomics Viewer (IGV): high-performance genomics data visualization and exploration. Brief Bioinform. 14(2):178-92. `DOI: 10.1093/bib/bbs017 <https://dx.doi.org/10.1093/bib/bbs017>`_.
+.. [ZANKARI2012] Zankari E, et al. 2012. Identification of acquired antimicrobial resistance genes. J Antimicrob Chemother. 67(11):2640-4. `DOI: 10.1093/jac/dks261 <https://dx.doi.org/10.1093/jac/dks261>`_.

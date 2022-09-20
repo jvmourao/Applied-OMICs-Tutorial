@@ -57,7 +57,7 @@ The example provided below is for a standard installation on a Linux-based syste
 
 .. code-block:: bash
 
-   $ bash Miniconda3-latest-Linux-x86_64.sh
+   $ bash Miniconda3-py38_4.12.0-Linux-x86_64.sh
 
 3. Follow the prompts that will appear on the installer screen and accept all the default settings.
 
@@ -186,17 +186,17 @@ Here is a list of all packages that you will install throughout the Tutorial.
    "ncbi-acc-download", "0.2.8", "Data acquisition", "data", "``conda install -c bioconda ncbi-acc-download``"
    "fastqc", "0.11.9", "Quality control", "qc", "``conda install -c bioconda fastqc``"
    "multiqc", "1.13", "Quality control", "multiqc", "``conda install -c bioconda multiqc``"
-   "bbtools", "38.98", "Quality control", "home directory", "Install in your home directory"
-   "kraken2", "2.1.2", "Taxonomy", "qc", "This package will be installed with Bracken"
+   "bbtools", "38.98", "Quality control", "home directory", "https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.98.tar.gz"
    "bracken", "2.7.0", "Taxonomy", "qc", "``conda install -c bioconda bracken``"
+   "kraken2", "2.1.2", "Taxonomy", "qc", "This package will be installed with Bracken"
    "krona", "2.8.1", "Taxonomy", "qc", "``conda install -c bioconda krona``"
-   "spades", "3.15.5", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
    "unicycler", "0.5.0", "De novo genome assembly", "assembly", "``conda install -c bioconda unicycler``"
-   "bandage", "0.8.1", "De novo genome assembly", "qc", "``conda install qt=5.12.9 bandage``"
-   "quast", "5.0.2", "De novo genome assembly", "qc", "``conda install -c bioconda quast``"
-   "bakta", "1.14.6", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults prokka``"
-   "abricate", "1.0.1", "Genome annotation", "annotation", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
-   "busco", "4.1.2", "Genome annotation", "busco", "``conda install -c bioconda busco``"
+   "spades", "3.15.5", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
+   "bandage", "0.9.0", "De novo genome assembly", "home directory", "https://rrwick.github.io/Bandage/"
+   "quast", "5.2.0", "De novo genome assembly", "qc", "``conda install -c bioconda quast``"
+   "bakta", "1.5.1", "Genome annotation", "bakta", "``conda install -c bioconda bakta``"
+   "abricate", "0.7", "Genome annotation", "abricate", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
+   "busco", "5.4.2", "Genome annotation", "busco", "``conda install -c conda-forge -c bioconda busco=5.4.2``"
 
 
 Conda cheat sheet

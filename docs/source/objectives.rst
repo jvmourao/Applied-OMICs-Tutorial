@@ -4,7 +4,7 @@
 Objectives
 **********
 
-In this Tutorial, you will learn how to acquire, process, and analyze raw next-generation sequencing (NGS) data from single-cell sequencing.
+In this Tutorial, you will learn how to acquire, process, and analyse raw next-generation sequencing (NGS) data from single-cell sequencing.
 
 .. attention::
    * This is not a mandatory, exhaustive, or official pipeline. The appropriated pipeline will depend on the **type of data** that you have and the main **objectives**.

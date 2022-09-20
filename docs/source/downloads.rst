@@ -94,7 +94,7 @@ Bandage
 QUAST
 .....
 
-* Final Hybrid assembly: [`MEGA <https://mega.nz/folder/4rQ0AKZT#J1cl0S6k-ewvaoQrsDSHxA>`__]
+* SPAdes vs Hybrid assembly: [`MEGA <https://mega.nz/folder/4rQ0AKZT#J1cl0S6k-ewvaoQrsDSHxA>`__]
 
 
 Genome annotation

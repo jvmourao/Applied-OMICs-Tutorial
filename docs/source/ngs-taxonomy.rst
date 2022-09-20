@@ -298,7 +298,7 @@ At the end of this section, you will have the following folder structure.
     │   ├── files_fastq.gz
     │   ├── files.fasta
     │   ├── files.gbk
-    ├── qc_visualization
+    ├── qc_visualisation
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
     │   │   ├── files_clean_fastqc.zip

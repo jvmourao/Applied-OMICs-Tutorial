@@ -179,7 +179,7 @@ rst_epilog = """
 .. |miniconda| replace:: `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`__
 .. |ncbi| replace:: `NCBI <https://www.ncbi.nlm.nih.gov/>`__
 .. |phred| replace:: `Phred <https://en.wikipedia.org/wiki/Phred_quality_score>`__
-.. |prokka| replace:: `Prokka <https://github.com/tseemann/prokka>`__
+.. |bakta| replace:: `Bakta <https://github.com/oschwengers/bakta>`__
 .. |quast| replace:: `Quast <http://quast.sourceforge.net/quast>`__
 .. |rast| replace:: `RAST <https://rast.nmpdr.org/>`__
 .. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/spades_3.14.1/README.md>`__

@@ -57,6 +57,9 @@ Installation
 
 .. code-block:: bash
 
+   # Deactivate all the current environments
+   $ conda deactivate
+
    # Create a new environment named assembly
    $ conda create -n assembly python=3.8
 
@@ -111,7 +114,7 @@ Usage
    "``-t <int>``", "Number of threads [default: 16]"
    "``-o <output_dir>``", "Directory to store all the resulting files (required)"
    "``--isolate``", "Improves the assembly quality and running time"
-   "``--cov-cutoff``", "Read coverage cutoff value. Must be a positive float value, or 'auto', or 'off"
+   "``--cov-cutoff``", "Read coverage cutoff value. Must be a positive float value, or 'auto', or 'off'"
 
 .. attention::
    If you have high-coverage data for bacterial isolate, |spades| developers highly recommend to use the ``--isolate`` option that is not compatible with ``--careful`` option; thus, you must disable the last one.
@@ -168,13 +171,19 @@ Usage
 
 **2. Basic commands**
 
+.. warning::
+
+   * You will need at least 12 Gb of RAM to be able to run |unicycler|.
+
+   * If you are unable to run |unicycler| please download the final hybrid assembly using this `link <https://mega.nz/folder/du5DnCgL#UTgfvuksgI66oiRz3ZO2NA>`_.
+
 .. code-block:: bash
+
+   # Let's first move to the directory where you want to store your assemblies
+   $ cd ~/tutorial/assembly/unicycler
 
    # Run Unicycler in your untrimmed paired-end Illumina and Nanopore raw reads
    $ unicycler -1 short_reads_1.fastq.gz -2 short_reads_2.fastq.gz -l long_reads.fastq.gz --mode normal -o output_dir -t 8
-
-   # Move your result files to the Unicycler directory
-   $ mv <path_results_unicycler> ~/tutorial/assembly/unicycler/
 
 .. csv-table:: Parameters explanation when using Unicycler
    :header: "Parameter", "Description"
@@ -218,26 +227,9 @@ Bandage
 Installation
 ............
 
-1. Download the 64-bit binary executables for **Mac** or **Windows** using the link and instructions provided `here <https://github.com/rrwick/Bandage/releases/>`_.
+1. Download the 64-bit binary executables for **macOS**, **Windows** or **Linux** using the link provided in |bandage| website.
 
-2. For installation on **macOS** and **Windows** you just need to unzip the content on your computer.
-
-3. For Linux you can install it through conda:
-
-.. code-block:: bash
-
-   # Activate your qc environment
-   $ conda activate qc
-
-   # Install Bandage
-   $ conda install -c conda-forge qt=5.12.9 # Install first the last version of QT
-   $ conda install -c bioconda bandage
-
-   # See all Bandage options available
-   $ Bandage --help
-
-   # Launch the Bandage GUI
-   $ Bandage
+2. For installation, you just need to unzip the content on your computer.
 
 
 Usage
@@ -250,7 +242,7 @@ Usage
    $ mkdir bandage
    $ cd
 
-1. Open |bandage| in your computer. If you are in Linux just run ``$ Bandage`` (it will open Bandage GUI).
+1. Open |bandage| in your computer. It will open the Bandage Graphical User Interface (GUI).
 
 2. Go to ``File`` -> ``Load graph``.
 
@@ -269,9 +261,7 @@ Usage
 
 8. On the left panel, check the boxes ``Lenght``, ``Name``, and ``Text outline`` located on **Node Labels** section, to see information about contigs. However, if you have a lot of contigs by doing this, your graph will be overwhelmed with information.
 
-9. Save all the graphs as ``.png`` images using ``File`` -> ``Save image (entire screen)``.
-
-10. Move all your imagens to the bandage directory: ``mv <path_images> ~/tutorial/assembly/bandage/``.
+9. Save all the graphs as ``.png`` images using ``File`` -> ``Save image (entire scene)`` in the directory ``~/tutorial/assembly/bandage/``.
 
 .. seealso::
    For detailed information about |bandage| please see the full `manual <https://github.com/rrwick/Bandage/wiki/Getting-started>`_.
@@ -279,13 +269,13 @@ Usage
 .. figure:: ./images/Bandage_graph.png
    :figclass: align-left
 
-*Figure 16. Visualization of a assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
+*Figure 16. Visualisation of a assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
 
 
 Assembly quality control
 ########################
 
-* Quality control metrics of a genome assembly evaluates both the completeness (e.g., genome size) and contiguity of an assembly.
+* Quality control metrics of a genome assembly evaluates the contiguity, completeness (e.g., genome size), and correctness (i.e., proportion of the genome that is free from mistakes) of an assembly.
 
 * Assembly size is usually given by statistics including maximum length, average length, combined total length, and N50.
 
@@ -299,19 +289,20 @@ QUAST
 
 * This tool can be used in single or multiple assemblies from different platforms to compare them and decide what is the best one for your further analysis.
 
-* The |quast| Software can be used as a command-line tool or `web interface <http://cab.cc.spbu.ru/quast/>`_.
-
 
 Installation
 ............
 
 .. code-block:: bash
 
+   # Deactivate all the current environments
+   $ conda deactivate
+
    # Activate the qc environment
    $ conda activate qc
 
    # Install QUAST
-   $ pip install quast
+   $ conda install -c bioconda quast
 
    # Check QUAST installation
    $ quast.py --version
@@ -333,19 +324,21 @@ Usage
    # Let's first create new directories to store your reports
    $ cd ~/tutorial/assembly/
    $ mkdir quast
-   $ cd
-
-   # General QUAST command
-   $ quast.py [parameters] <fasta_file(s)>
+   $ cd quast/
 
    # Run QUAST in your assembly FASTA files
-   $ quast.py -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
+   $ quast.py -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
    # Run QUAST in your assembly FASTA files but also providing a reference genome
-   $ quast.py -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/assembly_spades_trimmed.fasta ~/tutorial/assembly/spades/assembly_unicycler.fasta
+   $ quast.py -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
-   # Move your report files to the QUAST directory
-   $ mv <path_results_quast> ~/tutorial/assembly/quast/
+   # Open QUAST html report in Ubuntu/WSL
+   $ sensible-browser report.html
+   $ cd
+
+   # Or open QUAST html report in macOS
+   $ open report.html
+   $ cd
 
 .. csv-table:: Parameters explanation when using QUAST
    :header: "Parameter", "Description"
@@ -408,7 +401,7 @@ At the end of this section, you will have the following folder structure.
     │   ├── files.fasta
     │   ├── files.gbk
     │   ├── files.gff
-    ├── qc_visualization
+    ├── qc_visualisation
     │   ├── trimmed
     │   │   ├── files_clean_fastqc.html
     │   │   ├── files_clean_fastqc.zip
