@@ -192,14 +192,11 @@ Installation
 
 .. code-block:: bash
 
-   # Create the abricate environment with bioperl and the last blast version
-   $ conda create -n abricate python=3.8 perl-bioperl blast
+   # Create the abricate environment and install ABRicate
+   $ conda create -n abricate -c conda-forge -c bioconda -c defaults abricate=1.0.1
 
    # Activate the abricate environment
    $ conda activate abricate
-
-   # Install ABRicate
-   $ conda install -c conda-forge -c bioconda -c defaults abricate
 
    # Check ABRicate installation
    $ abricate --version
