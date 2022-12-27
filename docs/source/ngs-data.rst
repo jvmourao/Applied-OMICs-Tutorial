@@ -77,11 +77,13 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
 Acquire bacterial assembled genomes from NCBI
 #############################################
 
-Now that you have acquired your raw sequence reads, you will need to obtain complete or partial assembled bacterial genomes to use in comparative genomic analysis in further steps of this Tutorial.
+For this tutorial, you will compare the previous whole-genome assembly of *Escherichia coli* (STEC) O157:H7 (strainA and strainB) with the closely related *E. coli* O157:H7 str. SAKAI reference genome.
 
-For this, you will use the NCBI Genome Downloading Scripts developed and implemented by `Kai Blin <https://github.com/kblin>`_.
+We can download the genome of *E. coli* O157:H7 str. SAKAI deposited in NCBI (accession number **NC002695.1** and assembly accession **GCF_000008865.2**) using the two tools described below.
 
-1. Let's first install `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ to download bacterial genomes from NCBI and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ to download sequences from GenBank/RefSeq by accession through the NCBI.
+You will use the NCBI Genome Downloading Scripts developed and implemented by `Kai Blin <https://github.com/kblin>`_.
+
+1. Let's first install `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ to download bacterial genomes and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ to download GenBank/RefSeq sequences from NCBI.
 
 2. Both tools will be installed in our previous created environment named ``data``.
 
@@ -93,8 +95,6 @@ For this, you will use the NCBI Genome Downloading Scripts developed and impleme
     # Install both ncbi-genome-download and ncbi-acc-download
     $ conda install -c bioconda ncbi-genome-download ncbi-acc-download
 
-3. For the purpose of this tutorial you will compare the previous whole-genome assembly of *Escherichia coli* (STEC) O157:H7 with the closely related *E. coli* O157:H7 str. SAKAI reference genome already deposited in NCBI (accession number **NC002695.1** and assembly accession **GCF_000008865.2**).
-
 Let's try both ways to acquire the data:
 
 .. code-block:: bash
@@ -104,6 +104,9 @@ Let's try both ways to acquire the data:
 
    # Retrieve the E. coli reference genome using the accession number in fasta format
    $ ncbi-acc-download --format fasta NC_002695.2
+
+   # Retrieve the E. coli reference annotated protein using the accession number in gff3 format
+   $ ncbi-acc-download --format gff3 NC_002695.2
 
    # Retrieve the E. coli reference genome using the assembly accession in fasta format
    $ ncbi-genome-download -s refseq -F fasta -A GCF_000008865.2 bacteria
@@ -118,7 +121,7 @@ Let's try both ways to acquire the data:
    $ mv ~/tutorial/raw_data/refseq/bacteria/GCF_000008865.2/GCF_000008865.2_ASM886v2_genomic.* ~/tutorial/raw_data
 
 .. note::
-   For more information about the full usage of each one of the tools you can go to the official page of `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ or type in the Terminal ``ncbi-genome-download --help`` or ``ncbi-genome-download --help``.
+   For more information about the full usage of each one of the tools you can go to the official page of `ncbi-genome-download <https://github.com/kblin/ncbi-genome-download>`_ and `ncbi-acc-download <https://github.com/kblin/ncbi-acc-download>`_ or type in the Terminal ``ncbi-genome-download --help`` or ``ncbi-acc-download --help``.
 
 
 Understanding the file content
@@ -126,7 +129,7 @@ Understanding the file content
 
 .. note::
 
-   * To avoid recognition problems it's recommended to put all Fasta and Genkank files with the same file extension.
+   * It is recommended to put all Fasta and Genkank files with the same file extension to avoid recognition problems.
 
    * To do this type in the Terminal:
 

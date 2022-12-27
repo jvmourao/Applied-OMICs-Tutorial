@@ -181,22 +181,22 @@ Here is a list of all packages that you will install throughout the Tutorial.
    :header: "Package name", "Version", "Tutorial section", "Environment", "Conda command"
    :widths: 20, 10, 20, 10, 20
 
-   "sra-tools", "2.11.0", "Data acquisition", "data", "``conda install -c bioconda sra-tools``"
+   "sra-tools", "3.0.0", "Data acquisition", "data", "``conda install -c bioconda sra-tools``"
    "ncbi-genome-download", "0.3.1", "Data acquisition", "data", "``conda install -c bioconda ncbi-genome-download``"
    "ncbi-acc-download", "0.2.8", "Data acquisition", "data", "``conda install -c bioconda ncbi-acc-download``"
    "fastqc", "0.11.9", "Quality control", "qc", "``conda install -c bioconda fastqc``"
    "multiqc", "1.13", "Quality control", "multiqc", "``conda install -c bioconda multiqc``"
-   "bbtools", "38.98", "Quality control", "home directory", "https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.98.tar.gz"
-   "bracken", "2.7.0", "Taxonomy", "qc", "``conda install -c bioconda bracken``"
+   "bbtools", "39.01", "Quality control", "home directory", "https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_39.01.tar.gz"
+   "bracken", "2.8.0", "Taxonomy", "qc", "``conda install -c bioconda bracken``"
    "kraken2", "2.1.2", "Taxonomy", "qc", "This package will be installed with Bracken"
    "krona", "2.8.1", "Taxonomy", "qc", "``conda install -c bioconda krona``"
    "unicycler", "0.5.0", "De novo genome assembly", "assembly", "``conda install -c bioconda unicycler``"
    "spades", "3.15.5", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
    "bandage", "0.9.0", "De novo genome assembly", "home directory", "https://rrwick.github.io/Bandage/"
    "quast", "5.2.0", "De novo genome assembly", "qc", "``conda install -c bioconda quast``"
-   "bakta", "1.5.1", "Genome annotation", "bakta", "``conda install -c bioconda bakta``"
-   "abricate", "0.7", "Genome annotation", "abricate", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
-   "busco", "5.4.2", "Genome annotation", "busco", "``conda install -c conda-forge -c bioconda busco=5.4.2``"
+   "bakta", "1.6.1", "Genome annotation", "bakta", "``conda install -c conda-forge -c bioconda bakta``"
+   "abricate", "1.0.1", "Genome annotation", "abricate", "``conda install -c conda-forge -c bioconda -c defaults abricate``"
+   "busco", "5.4.4", "Genome annotation", "busco", "``conda install -c conda-forge -c bioconda busco=5.4.4``"
 
 
 Conda cheat sheet

@@ -92,7 +92,7 @@ Installation
    $ conda activate bakta
 
    # Install Bakta with conda
-   $ conda install -c bioconda bakta
+   $ conda install -c conda-forge -c bioconda bakta
 
    # Check Bakta installation
    $ bakta --version
@@ -124,11 +124,11 @@ Usage
    $ mkdir bakta abricate
    $ cd bakta/
 
-   # Download the mandatory database for Bakta
+   # Download the mandatory database for Bakta (~30 Gb)
    $ bakta_db list
    $ bakta_db download --output ~/tutorial/annotation/bakta
 
-   # Run Bakta in your assembled genomes using the .fasta format
+   # Run Bakta in your assembled genomes using the .fasta file
    $ bakta --db ~/tutorial/annotation/bakta/db --verbose --output ~/tutorial/annotation/bakta/strainX --prefix strainX ~/tutorial/assembly/unicycler/<genome>.fasta
 
 .. csv-table:: Parameters explanation when using Bakta
@@ -193,7 +193,7 @@ Installation
 .. code-block:: bash
 
    # Create the abricate environment and install ABRicate
-   $ conda create -n abricate -c conda-forge -c bioconda -c defaults abricate=1.0.1
+   $ conda create -n abricate -c conda-forge -c bioconda -c defaults abricate
 
    # Activate the abricate environment
    $ conda activate abricate
@@ -261,7 +261,7 @@ Usage
    $ abricate --help
 
 .. todo::
-   1. Run |bakta| and |abricate| in your assembled draft genomes using the ``.fasta`` files.
+   1. Run |bakta| and |abricate| in your hybrid assembled draft genomes using the ``.fasta`` files.
    2. Did your isolates carry putative antimicrobial resistance or virulence genes? Which ones are present?
    3. How many coding sequences (CDS) were predicted?
 
@@ -345,14 +345,11 @@ Installation
 
 .. code-block:: bash
 
-   # Create a new environment named busco
-   $ conda create -n busco python=3.8
+   # Create a new environment and install busco at the same time 
+   $ conda create -n busco -c conda-forge -c bioconda busco=5.4.4
 
    # Activate the busco environment
    $ conda activate busco
-
-   # Install BUSCO with conda
-   $ conda install -c conda-forge -c bioconda busco=5.4.2
 
    # Check BUSCO installation
    $ busco --version
@@ -385,7 +382,7 @@ Usage
    # Run BUSCO in your assembled genomes (.fasta format)
    $ busco -i ~/tutorial/assembly/*.fasta -o OUTPUT_NAME -l bacteria_odb10 -m geno
 
-   # Or run BUSCO in you annotated genomes (.faa format)
+   # Or run BUSCO in your annotated genomes (.faa format)
    $ busco -i ~/tutorial/annotation/bakta/*.faa -o OUTPUT_NAME -l bacteria_odb10 -m prot
 
    # Plot the results obtained by BUSCO
@@ -395,7 +392,7 @@ Usage
    $ sensible-browser busco_figure.png
    $ cd
 
-   # Or open BUSCO html report in macOS
+   # Or open BUSCO .png image in macOS
    $ open busco_figure.png
    $ cd
 

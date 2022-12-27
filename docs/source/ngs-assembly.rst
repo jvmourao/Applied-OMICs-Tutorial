@@ -182,7 +182,7 @@ Usage
    # Let's first move to the directory where you want to store your assemblies
    $ cd ~/tutorial/assembly/unicycler
 
-   # Run Unicycler in your untrimmed paired-end Illumina and Nanopore raw reads
+   # Run Unicycler using the untrimmed paired-end Illumina and Nanopore raw reads
    $ unicycler -1 short_reads_1.fastq.gz -2 short_reads_2.fastq.gz -l long_reads.fastq.gz --mode normal -o output_dir -t 8
 
 .. csv-table:: Parameters explanation when using Unicycler
@@ -329,7 +329,7 @@ Usage
    # Run QUAST in your assembly FASTA files
    $ quast.py -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
-   # Run QUAST in your assembly FASTA files but also providing a reference genome
+   # Run QUAST in your assembly FASTA files but provide a reference genome
    $ quast.py -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
    # Open QUAST html report in Ubuntu/WSL

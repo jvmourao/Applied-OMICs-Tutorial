@@ -98,7 +98,7 @@ Usage
     $ mkdir taxonomy
     $ cd ~/tutorial/taxonomy/
     $ mkdir kraken_bracken krona
-    $ cd kraken_bracken
+    $ cd
 
     # Download the MiniKraken v1 database
     $ wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/old/minikraken2_v1_8GB_201904.tgz
@@ -237,7 +237,7 @@ Installation
 
     # Build a taxonomy database for Krona
     $ cd
-    $ ktUpdateTaxonomy.sh ~/miniconda3/envs/qc/opt/krona/taxonomy
+    $ ktUpdateTaxonomy.sh ~/miniconda3/envs/qc/opt/krona/taxonomy/
 
 
 Usage

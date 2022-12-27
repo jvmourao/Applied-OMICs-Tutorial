@@ -10,7 +10,7 @@ Introduction
 
 1. We know that none of the described sequencing technologies is perfect; thus, they will generate different **types** and **amounts** of **errors**.
 
-2. It this, therefore of utmost importance to **identify** the errors that may influence further data analysis and interpretation.
+2. Therefore, it is of utmost importance to **identify** the errors that may influence further data analysis and interpretation.
 
 3. In this section, you will first learn how to visualize the quality of the data using |fastqc| and |multiqc|.
 
@@ -207,14 +207,13 @@ Installation
     # Create a new conda environment named multiqc
     $ conda create -n multiqc python=3.8
 
-    # Activate the new environment
+    # Activate the multiqc environment
     $ conda activate multiqc
 
     # Install MultiQC with conda
     $ conda install -c bioconda multiqc
 
     # Check if MultiQC is installed
-    # If installed you will see "multiqc, version 1.13"
     $ multiqc --version
 
 
@@ -280,7 +279,7 @@ Quality control
 
 2. Now you have to decide if your data should be subject to **Quality Control (QC)**, i.e. the process of improving data by removing identifiable errors from it.
 
-3. You must remember that by performing QC we can also introduce **errors** (we want the same data but with better quality); thus, we should not perform QC if the quality appears to be satisfactory.
+3. You must remember that by performing QC we can also introduce **errors** (we want the same data but with better quality). Thus, we should not perform QC if the quality appears to be satisfactory.
 
 .. attention::
    Only perform QC if your data need it. Whether you should quality-trim, and what the threshold should be, depends on your **data quality** and their **intended use**. Often a threshold of **~10** is pretty good for most of the cases.
@@ -312,9 +311,9 @@ Installation
     $ cd
 
     # Download the latest version of BBTools from Sourceforge to your computer
-    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_38.98.tar.gz
+    $ wget https://sourceforge.net/projects/bbmap/files/latest/download/BBMap_39.01.tar.gz
 
-    # Go to the parent directory where you have BBTools file
+    # Go to the parent directory where you have BBTools *.tar.gz file
     $ cd <installation path parent directory>
 
     # Extract the file contents to your installation folder on the computer
