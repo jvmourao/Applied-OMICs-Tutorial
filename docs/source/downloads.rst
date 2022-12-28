@@ -26,7 +26,7 @@ SRA
 NCBI
 ....
 
-* Bacterial genomes sequences: [`MEGA <https://mega.nz/folder/MyokQDba#ba7UtRKdVzwx1lNbN2gVlw>`__]
+* Assembled bacterial genomes: [`MEGA <https://mega.nz/folder/MyokQDba#ba7UtRKdVzwx1lNbN2gVlw>`__]
 
 
 Quality control

@@ -355,10 +355,8 @@ Installation
    $ busco --version
 
    # See a list of all available datasets in BUSCO
-   $ busco --list-datasets # When running an analysis BUSCO will download the dataset
-
-   # Place the configuration file BUSCO in a location where you have “write” privileges
-   $ cp -r ~/miniconda3/envs/busco/config/ .
+   # When running an analysis BUSCO will download the dataset
+   $ busco --list-datasets
 
 
 Usage
