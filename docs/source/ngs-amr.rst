@@ -68,7 +68,7 @@ Installation
 
    # Create a new environment named amr and install ResFinder and AMRFinderPlus (installed in the next section)
    # KMA and BLAST are installed automatically as dependencies
-   $ conda create -n amr resfinder ncbi-amrfinderplus
+   $ mamba create -n amr resfinder ncbi-amrfinderplus
 
    # Activate the new environment
    $ conda activate amr
@@ -108,7 +108,7 @@ The conda package installs only the program. The **databases** must be downloade
    * Do not give an argument to ``INSTALL.py`` (e.g., ``non_interactive``), since it will be interpreted as the path of a program and the script will try to compile KMA by itself.
 
 .. warning::
-   If the ``conda create`` command fails in macOS with Apple Silicon, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 conda create -n amr resfinder ncbi-amrfinderplus``.
+   If the ``mamba create`` command fails in macOS with Apple Silicon, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 mamba create -n amr resfinder ncbi-amrfinderplus``.
 
 
 Usage
@@ -261,7 +261,7 @@ AMRFinderPlus
 Installation
 ............
 
-|amrfinder| was already installed in the ``amr`` environment together with ResFinder. If you want to install it in a separate environment, run ``conda create -n amrfinder ncbi-amrfinderplus``.
+|amrfinder| was already installed in the ``amr`` environment together with ResFinder. If you want to install it in a separate environment, run ``mamba create -n amrfinder ncbi-amrfinderplus``.
 
 .. code-block:: bash
 

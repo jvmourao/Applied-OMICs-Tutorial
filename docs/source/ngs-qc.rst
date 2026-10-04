@@ -136,14 +136,14 @@ Installation
 
 .. code-block:: bash
 
-    # Create a new conda environment named qc
-    $ conda create -n qc python=3.11
+    # Create a new environment named qc
+    $ mamba create -n qc python=3.11
 
     # Activate the new environment
     $ conda activate qc
 
     # Install FastQC as a command-line utility
-    $ conda install fastqc
+    $ mamba install fastqc
 
     # Check if FastQC is installed
     $ fastqc --version
@@ -249,14 +249,14 @@ Installation
     # Deactivate all current environments
     $ conda deactivate
 
-    # Create a new conda environment named multiqc
-    $ conda create -n multiqc
+    # Create a new environment named multiqc
+    $ mamba create -n multiqc
 
     # Activate the multiqc environment
     $ conda activate multiqc
 
     # Install MultiQC with conda
-    $ conda install multiqc
+    $ mamba install multiqc
 
     # Check if MultiQC is installed
     $ multiqc --version
@@ -342,7 +342,7 @@ Installation
 ............
 
 .. note::
-   |bbtools| is written in Java, but conda will install the required Java version automatically together with the package ``bbmap``. In previous versions of this Tutorial, BBTools was manually downloaded from SourceForge; this is no longer necessary.
+   |bbtools| is written in Java, but mamba will install the required Java version automatically together with the package ``bbmap``. In previous versions of this Tutorial, BBTools was manually downloaded from SourceForge; this is no longer necessary.
 
 .. code-block:: bash
 
@@ -350,7 +350,7 @@ Installation
     $ conda activate qc
 
     # Install BBTools (BBMap package) through conda
-    $ conda install bbmap
+    $ mamba install bbmap
 
     # Let's also create a new directory to keep the clean raw sequence reads
     $ mkdir ~/tutorial/qc_improvement
@@ -377,7 +377,7 @@ Usage
 
    * In the commands provided below don't forget to add the full path of your ``fastq.gz`` files.
 
-   * With the conda installation, the BBTools scripts are available directly in the command line (e.g., ``bbduk.sh``), without any path.
+   * With the mamba installation, the BBTools scripts are available directly in the command line (e.g., ``bbduk.sh``), without any path.
 
 .. code-block:: bash
 

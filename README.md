@@ -7,7 +7,7 @@ Using the Linux/macOS command line, you will go from raw sequencing reads to a c
 ## Contents
 
 - **Before we begin**: Bash commands (files, pipes, tables, variables, loops, scripts)
-- **Tools installation**: Miniforge/conda, environments, channels
+- **Tools installation**: Miniforge3 (mamba), environments, channels
 - **Data acquisition**: SRA reads and NCBI genomes (SRA Toolkit, ncbi-genome-download)
 - **Quality control**: coverage, FastQC, MultiQC, BBDuk
 - **Taxonomy**: Kraken2, Bracken, Krona

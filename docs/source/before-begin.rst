@@ -638,7 +638,7 @@ K. Good practices
 * Never overwrite or edit your **raw data**. Create a copy or work with new output files.
 * Use **descriptive and consistent names** for samples (e.g., ``strainA``) and keep one directory per analysis step.
 * Always **read the log files and error messages**; most of the problems are due to wrong file paths, missing files, or lack of disk space/memory.
-* Keep a record of the **commands, tool versions** and **databases versions** used in your analysis (e.g., using ``history > commands.txt``, ``conda list --export > packages.txt``).
+* Keep a record of the **commands, tool versions** and **databases versions** used in your analysis (e.g., using ``history > commands.txt``, ``mamba list --export > packages.txt``).
 
 When you finish the exercises, you can remove the practice directory with ``rm -r ~/bash_practice``.
 

@@ -66,7 +66,7 @@ Installation
 
    # Create a new environment named plasmidfinder
    # BLAST and KMA are installed automatically as dependencies
-   $ conda create -n plasmidfinder plasmidfinder
+   $ mamba create -n plasmidfinder plasmidfinder
 
    # Activate the new environment
    $ conda activate plasmidfinder
@@ -258,7 +258,7 @@ Installation
    $ conda deactivate
 
    # Create a new environment named mobsuite
-   $ conda create -n mobsuite mob_suite
+   $ mamba create -n mobsuite mob_suite
 
    # Activate the new environment
    $ conda activate mobsuite
@@ -273,7 +273,7 @@ Installation
    By default, ``mob_init`` saves the database inside the environment directory. You can choose another directory with ``mob_init -d <directory>``, but in that case you need to use ``-d <directory>`` in all the ``mob_recon`` and ``mob_typer`` commands.
 
 .. warning::
-   If the ``conda create`` command fails in macOS with Apple Silicon, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 conda create -n mobsuite mob_suite``.
+   If the ``mamba create`` command fails in macOS with Apple Silicon, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 mamba create -n mobsuite mob_suite``.
 
 
 Usage

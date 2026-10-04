@@ -51,8 +51,8 @@ The |sra| is a public repository that stores **raw sequence data** from next-gen
    $ mkdir raw_data
    $ cd raw_data/
 
-   # Create a new conda environment named "data" and install SRA Tools through conda
-   $ conda create -n data sra-tools
+   # Create a new environment named "data" and install SRA Tools with mamba
+   $ mamba create -n data sra-tools
 
    # Activate your "data" environment
    $ conda activate data
@@ -138,7 +138,7 @@ You will use the NCBI Genome Downloading Scripts developed and implemented by `K
     $ conda activate data
 
     # Install both ncbi-genome-download and ncbi-acc-download
-    $ conda install ncbi-genome-download ncbi-acc-download
+    $ mamba install ncbi-genome-download ncbi-acc-download
 
 Let's try both ways to acquire the data:
 

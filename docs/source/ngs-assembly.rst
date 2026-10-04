@@ -61,13 +61,13 @@ Installation
    $ conda deactivate
 
    # Create a new environment named assembly
-   $ conda create -n assembly
+   $ mamba create -n assembly
 
    # Activate the new environment
    $ conda activate assembly
 
    # Install Unicycler and its dependencies (including SPAdes)
-   $ conda install unicycler
+   $ mamba install unicycler
 
    # Check SPAdes installation
    $ spades.py --version
@@ -380,7 +380,7 @@ Installation
    $ conda activate qc
 
    # Install QUAST
-   $ conda install quast
+   $ mamba install quast
 
    # Check QUAST installation
    $ quast.py --version
@@ -466,7 +466,7 @@ Usage
    |quast| does not need a loop to run in several assemblies: just list all the ``.fasta`` files in the same command, as in the previous examples. If you also have the final hybrid assemblies of **several samples** (e.g., ``strainA_unicycler.fasta`` and ``strainB_unicycler.fasta``), the report will have one column for each of them. To control the names that appear in the report use ``--labels``.
 
 .. warning::
-   If |quast| fails with the error ``No module named 'distutils'``, your environment has a Python version higher than 3.11. Create the environment with ``conda create -n qc python=3.11`` and install again all the packages.
+   If |quast| fails with the error ``No module named 'distutils'``, your environment has a Python version higher than 3.11. Create the environment with ``mamba create -n qc python=3.11`` and install again all the packages.
 
 .. todo::
    3. Assess the quality of both |spades| and |unicycler| assemblies using |quast|.

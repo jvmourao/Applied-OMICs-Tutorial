@@ -165,6 +165,7 @@ latex_show_urls = "footnote"
 rst_epilog = """
 .. |abricate| replace:: `ABRicate <https://github.com/tseemann/abricate>`__
 .. |amrfinder| replace:: `AMRFinderPlus <https://github.com/ncbi/amr/wiki>`__
+.. |mamba| replace:: `mamba <https://mamba.readthedocs.io/>`__
 .. |miniforge| replace:: `Miniforge <https://github.com/conda-forge/miniforge>`__
 .. |mobsuite| replace:: `MOB-suite <https://github.com/phac-nml/mob-suite>`__
 .. |plasmidfinder| replace:: `PlasmidFinder <https://bitbucket.org/genomicepidemiology/plasmidfinder/src/master/>`__

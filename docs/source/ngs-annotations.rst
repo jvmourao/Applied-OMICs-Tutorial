@@ -106,13 +106,13 @@ Installation
 .. code-block:: bash
 
    # Create a new environment named bakta
-   $ conda create -n bakta
+   $ mamba create -n bakta
 
    # Activate the Bakta environment
    $ conda activate bakta
 
    # Install Bakta with conda
-   $ conda install bakta
+   $ mamba install bakta
 
    # Check Bakta installation
    $ bakta --version
@@ -254,7 +254,7 @@ Installation
 .. code-block:: bash
 
    # Create the abricate environment and install ABRicate
-   $ conda create -n abricate abricate
+   $ mamba create -n abricate abricate
 
    # Activate the abricate environment
    $ conda activate abricate
@@ -267,7 +267,7 @@ Installation
    $ abricate --list
 
 .. warning::
-   Some of the |abricate| dependencies (Perl modules) are not available for macOS with Apple Silicon (M1/M2/M3...). If the installation fails, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 conda create -n abricate abricate``.
+   Some of the |abricate| dependencies (Perl modules) are not available for macOS with Apple Silicon (M1/M2/M3...). If the installation fails, create the environment using the Intel architecture: ``CONDA_SUBDIR=osx-64 mamba create -n abricate abricate``.
 
 Usage
 .....
@@ -435,7 +435,7 @@ Installation
 .. code-block:: bash
 
    # Create a new environment and install busco at the same time
-   $ conda create -n busco busco
+   $ mamba create -n busco busco
 
    # Activate the busco environment
    $ conda activate busco

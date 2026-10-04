@@ -63,7 +63,7 @@ Installation
     $ conda deactivate
 
     # Create a new environment named taxonomy and install Kraken2
-    $ conda create -n taxonomy kraken2
+    $ mamba create -n taxonomy kraken2
 
     # Activate the taxonomy environment
     $ conda activate taxonomy
@@ -76,7 +76,7 @@ Installation
 .. code-block:: bash
 
     # Linux: install Bracken with conda, in the same environment
-    $ conda install bracken
+    $ mamba install bracken
 
     # Check if Bracken is installed
     $ bracken -v
@@ -295,7 +295,7 @@ Installation
     $ conda activate taxonomy
 
     # Install Krona
-    $ conda install krona
+    $ mamba install krona
 
     # Build a taxonomy database for Krona (it needs the command line tools curl and make)
     $ ktUpdateTaxonomy.sh $CONDA_PREFIX/opt/krona/taxonomy
