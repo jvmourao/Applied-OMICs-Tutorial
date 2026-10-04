@@ -107,11 +107,11 @@ To avoid confusion and to make it easier to run the same commands in **several s
       $ printf "strainA\tSRR6052929\tSRR7477813\nstrainB\tSRR7184397\tSRR7477814\n" > ~/tutorial/accessions.tsv
 
       # Rename all files using the table
-      $ while IFS=$'\t' read -r sample illumina nanopore; do
-      >    mv ${illumina}_1.fastq.gz ${sample}_R1.fastq.gz
-      >    mv ${illumina}_2.fastq.gz ${sample}_R2.fastq.gz
-      >    mv ${nanopore}.fastq.gz ${sample}_nanopore.fastq.gz
-      > done < ~/tutorial/accessions.tsv
+      while IFS=$'\t' read -r sample illumina nanopore; do
+         mv ${illumina}_1.fastq.gz ${sample}_R1.fastq.gz
+         mv ${illumina}_2.fastq.gz ${sample}_R2.fastq.gz
+         mv ${nanopore}.fastq.gz ${sample}_nanopore.fastq.gz
+      done < ~/tutorial/accessions.tsv
 
    The same table can also be used to download all the accessions at once: ``cut -f 2,3 accessions.tsv | tr '\t' '\n' | xargs prefetch``.
 
@@ -201,9 +201,9 @@ In the last sections of the Tutorial, you will run the same analysis in **severa
    $ ncbi-genome-download -s refseq -F fasta -A $(cut -f 2 public_genomes.tsv | paste -sd, -) -o public_genomes bacteria
 
    # Uncompress each genome and save it with its name (loop)
-   $ while IFS=$'\t' read -r name accession; do
-   >    gunzip -c public_genomes/refseq/bacteria/${accession}/*_genomic.fna.gz > genomes/${name}.fasta
-   > done < public_genomes.tsv
+   while IFS=$'\t' read -r name accession; do
+      gunzip -c public_genomes/refseq/bacteria/${accession}/*_genomic.fna.gz > genomes/${name}.fasta
+   done < public_genomes.tsv
 
    # Check how many sequences (chromosomes and plasmids) each genome has
    $ grep -c '>' genomes/*.fasta

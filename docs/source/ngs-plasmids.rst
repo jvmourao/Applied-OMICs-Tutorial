@@ -174,19 +174,19 @@ PlasmidFinder accepts several input files in the same command, but the results o
 
    $ cd ~/tutorial
    $ mkdir -p logs
-   $ for genome in genomes/*.fasta; do
-   >    sample=$(basename $genome .fasta)
-   >    echo "Running PlasmidFinder in ${sample}"
-   >    mkdir -p plasmids/plasmidfinder/${sample}
-   >    plasmidfinder.py -i $genome -o plasmids/plasmidfinder/${sample} -p ~/databases/cge/plasmidfinder_db -x > logs/${sample}_plasmidfinder.log 2>&1
-   > done
+   for genome in genomes/*.fasta; do
+      sample=$(basename $genome .fasta)
+      echo "Running PlasmidFinder in ${sample}"
+      mkdir -p plasmids/plasmidfinder/${sample}
+      plasmidfinder.py -i $genome -o plasmids/plasmidfinder/${sample} -p ~/databases/cge/plasmidfinder_db -x > logs/${sample}_plasmidfinder.log 2>&1
+   done
 
    # Combine the replicons of all the genomes in a single table (the 1st column is the name of the genome)
    $ echo -e "genome\tdatabase\treplicon\tidentity\tquery_template_length\tcontig\tposition" > plasmids/plasmidfinder_all.tsv
-   $ for dir in plasmids/plasmidfinder/*/; do
-   >    sample=$(basename $dir)
-   >    tail -n +2 $dir/results_tab.tsv | cut -f 1-6 | awk -F'\t' -v s=$sample '{print s"\t"$0}' >> plasmids/plasmidfinder_all.tsv
-   > done
+   for dir in plasmids/plasmidfinder/*/; do
+      sample=$(basename $dir)
+      tail -n +2 $dir/results_tab.tsv | cut -f 1-6 | awk -F'\t' -v s=$sample '{print s"\t"$0}' >> plasmids/plasmidfinder_all.tsv
+   done
 
    # Visualise the table (without the 6th column, the name of the contig, which is very long)
    $ cut -f 1-5,7 plasmids/plasmidfinder_all.tsv | column -t -s $'\t'
@@ -357,18 +357,18 @@ The ``mobtyper_results.txt`` has the same type of information but **for each rec
 .. code-block:: bash
 
    $ cd ~/tutorial
-   $ for genome in genomes/*.fasta; do
-   >    sample=$(basename $genome .fasta)
-   >    echo "Running MOB-recon in ${sample}"
-   >    mob_recon -i $genome -o plasmids/mobsuite/${sample} -s ${sample} -n 4 -f > logs/${sample}_mobrecon.log 2>&1
-   > done
+   for genome in genomes/*.fasta; do
+      sample=$(basename $genome .fasta)
+      echo "Running MOB-recon in ${sample}"
+      mob_recon -i $genome -o plasmids/mobsuite/${sample} -s ${sample} -n 4 -f > logs/${sample}_mobrecon.log 2>&1
+   done
 
    # Combine the reconstructed plasmids of all the genomes in a single table
    # The header is taken from the first file (head -n 1) and then only the data lines of all the files are added
    $ head -n 1 plasmids/mobsuite/EC958/mobtyper_results.txt > plasmids/mobsuite_plasmids_all.tsv
-   $ for dir in plasmids/mobsuite/*/; do
-   >    if [ -s $dir/mobtyper_results.txt ]; then tail -n +2 $dir/mobtyper_results.txt >> plasmids/mobsuite_plasmids_all.tsv; fi
-   > done
+   for dir in plasmids/mobsuite/*/; do
+      if [ -s $dir/mobtyper_results.txt ]; then tail -n +2 $dir/mobtyper_results.txt >> plasmids/mobsuite_plasmids_all.tsv; fi
+   done
 
    # See the main columns: sample, number of contigs, size, replicons, mobility and closest organism
    $ cut -f 1,2,3,6,14,17 plasmids/mobsuite_plasmids_all.tsv | column -t -s $'\t'
@@ -471,15 +471,15 @@ Usage
 .. code-block:: bash
 
    $ cd ~/tutorial/plasmids/plasmidspades
-   $ while read -r sample; do
-   >    echo "Running plasmidSPAdes in ${sample}"
-   >    spades.py --plasmid -t 4 -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz -o ${sample} > ${sample}.stdout 2>&1
-   > done < ~/tutorial/samples.txt
+   while read -r sample; do
+      echo "Running plasmidSPAdes in ${sample}"
+      spades.py --plasmid -t 4 -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz -o ${sample} > ${sample}.stdout 2>&1
+   done < ~/tutorial/samples.txt
 
    # Count the contigs and the total length for each sample
-   $ for sample in $(cat ~/tutorial/samples.txt); do
-   >    grep '>' ${sample}/contigs.fasta | awk -F'_' -v s=$sample '{n++; l+=$4} END{print s"\t"n" contigs\t"l" bp"}'
-   > done
+   for sample in $(cat ~/tutorial/samples.txt); do
+      grep '>' ${sample}/contigs.fasta | awk -F'_' -v s=$sample '{n++; l+=$4} END{print s"\t"n" contigs\t"l" bp"}'
+   done
 
 .. warning::
    plasmidSPAdes returns **plasmid-like** contigs, not confirmed plasmids. In the example of strainA, the output contains more than 300 contigs (~350 kb), although the real plasmids have, in total, ~150 kb. Always confirm the plasmid contigs with other evidence: replicons (PlasmidFinder), plasmid database hits (|mobsuite|), size, coverage, and circularity.
@@ -525,9 +525,9 @@ With **long reads**, plasmids are usually assembled as **single and circular** s
 
    # Type each plasmid sequence with MOB-typer (activate the mobsuite environment first)
    $ conda activate mobsuite
-   $ for file in ~/tutorial/plasmids/strainA_sequences/*.fasta; do
-   >    mob_typer --infile $file --out_file ${file%.fasta}_mobtyper.txt
-   > done
+   for file in ~/tutorial/plasmids/strainA_sequences/*.fasta; do
+      mob_typer --infile $file --out_file ${file%.fasta}_mobtyper.txt
+   done
 
 .. note::
    The headers of the example above are only illustrative. Your results (number of plasmids, sizes, depths) will be different. If you were not able to run |unicycler|, you can use the complete genomes of the tutorial (Sakai, EC958 and LT2) to practise these steps, since each of their sequences is a complete and circular replicon.
@@ -561,12 +561,12 @@ You only need to join them by the name of the contig:
 
    # For each genome, list the AMR genes (core, type AMR) of AMRFinderPlus, the contig, and if the contig is a chromosome or a plasmid
    # In the MOB-suite report, the name of the contig is the full header, so we only use the first word (split)
-   $ for genome in EC958 Sakai; do
-   >    mobsuite_report=plasmids/mobsuite/${genome}/contig_report.txt
-   >    awk -F'\t' -v g=$genome 'FNR==NR { if (FNR>1) { split($5,a," "); mol[a[1]]=$2; cl[a[1]]=$3 } next }
-   >         FNR>1 && $9=="core" && $10=="AMR" { print g"\t"$7"\t"$12"\t"$3"\t"mol[$3]"\t"cl[$3] }' \
-   >         $mobsuite_report amr/amrfinder/${genome}.tsv
-   > done | column -t -s $'\t'
+   for genome in EC958 Sakai; do
+      mobsuite_report=plasmids/mobsuite/${genome}/contig_report.txt
+      awk -F'\t' -v g=$genome 'FNR==NR { if (FNR>1) { split($5,a," "); mol[a[1]]=$2; cl[a[1]]=$3 } next }
+           FNR>1 && $9=="core" && $10=="AMR" { print g"\t"$7"\t"$12"\t"$3"\t"mol[$3]"\t"cl[$3] }' \
+           $mobsuite_report amr/amrfinder/${genome}.tsv
+   done | column -t -s $'\t'
 
 The output of this command has the following columns: **genome**, **gene**, **antibiotic class**, **contig**, **molecule** (chromosome or plasmid), and **plasmid cluster**. In EC958, you will find that the genes ``blaCTX-M-15``, ``blaTEM-1``, ``blaOXA-1``, ``aac(6')-Ib-cr``, ``aadA5``, ``sul1``, ``dfrA17``, ``tet(A)``, ``mph(A)`` and ``catB3`` are all in the same plasmid (cluster ``AA735``, IncFIA/IncFII, conjugative), while the ``blaCMY-23`` gene and the point mutations in *gyrA*, *parC* and *parE* are in the chromosome.
 
@@ -574,13 +574,13 @@ The output of this command has the following columns: **genome**, **gene**, **an
 
    # Do the same for all the genomes, saving the table in a file
    $ echo -e "genome\tgene\tclass\tcontig\tmolecule\tplasmid_cluster" > amr/amr_location_all.tsv
-   $ for dir in plasmids/mobsuite/*/; do
-   >    genome=$(basename $dir)
-   >    [ -s amr/amrfinder/${genome}.tsv ] || continue
-   >    awk -F'\t' -v g=$genome 'FNR==NR { if (FNR>1) { split($5,a," "); mol[a[1]]=$2; cl[a[1]]=$3 } next }
-   >         FNR>1 && $9=="core" && $10=="AMR" { print g"\t"$7"\t"$12"\t"$3"\t"mol[$3]"\t"cl[$3] }' \
-   >         $dir/contig_report.txt amr/amrfinder/${genome}.tsv >> amr/amr_location_all.tsv
-   > done
+   for dir in plasmids/mobsuite/*/; do
+      genome=$(basename $dir)
+      [ -s amr/amrfinder/${genome}.tsv ] || continue
+      awk -F'\t' -v g=$genome 'FNR==NR { if (FNR>1) { split($5,a," "); mol[a[1]]=$2; cl[a[1]]=$3 } next }
+           FNR>1 && $9=="core" && $10=="AMR" { print g"\t"$7"\t"$12"\t"$3"\t"mol[$3]"\t"cl[$3] }' \
+           $dir/contig_report.txt amr/amrfinder/${genome}.tsv >> amr/amr_location_all.tsv
+   done
 
    # Count the number of AMR genes/mutations in the chromosome and in plasmids of each genome
    $ tail -n +2 amr/amr_location_all.tsv | cut -f 1,5 | sort | uniq -c

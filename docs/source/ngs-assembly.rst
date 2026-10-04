@@ -142,14 +142,14 @@ Use a loop to assemble all the samples with the same parameters. SPAdes is a hea
 .. code-block:: bash
 
    $ cd ~/tutorial/assembly/spades
-   $ while read -r sample; do
-   >    echo "Assembling ${sample}"
-   >    spades.py --isolate -t 4 -m 12 \
-   >       -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
-   >       -o ${sample}_untrimmed > ${sample}_untrimmed.stdout 2>&1
-   >    cp ${sample}_untrimmed/contigs.fasta ${sample}_spades_untrimmed.fasta
-   >    cp ${sample}_untrimmed/assembly_graph_with_scaffolds.gfa ${sample}_spades_untrimmed.gfa
-   > done < ~/tutorial/samples.txt
+   while read -r sample; do
+      echo "Assembling ${sample}"
+      spades.py --isolate -t 4 -m 12 \
+         -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
+         -o ${sample}_untrimmed > ${sample}_untrimmed.stdout 2>&1
+      cp ${sample}_untrimmed/contigs.fasta ${sample}_spades_untrimmed.fasta
+      cp ${sample}_untrimmed/assembly_graph_with_scaffolds.gfa ${sample}_spades_untrimmed.gfa
+   done < ~/tutorial/samples.txt
 
    # Count the number of contigs in each assembly
    $ grep -c '>' *_spades_untrimmed.fasta
@@ -269,16 +269,16 @@ The sequence headers of the ``assembly.fasta`` file produced by |unicycler| cont
 .. code-block:: bash
 
    $ cd ~/tutorial/assembly/unicycler
-   $ while read -r sample; do
-   >    echo "Assembling ${sample}"
-   >    unicycler -t 8 --mode normal \
-   >       -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
-   >       -l ~/tutorial/raw_data/${sample}_nanopore.fastq.gz \
-   >       -o ${sample} > ${sample}_unicycler.stdout 2>&1
-   >    cp ${sample}/assembly.fasta ${sample}_unicycler.fasta
-   >    cp ${sample}/assembly.gfa ${sample}_unicycler.gfa
-   >    cp ${sample}/unicycler.log ${sample}_unicycler.log
-   > done < ~/tutorial/samples.txt
+   while read -r sample; do
+      echo "Assembling ${sample}"
+      unicycler -t 8 --mode normal \
+         -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
+         -l ~/tutorial/raw_data/${sample}_nanopore.fastq.gz \
+         -o ${sample} > ${sample}_unicycler.stdout 2>&1
+      cp ${sample}/assembly.fasta ${sample}_unicycler.fasta
+      cp ${sample}/assembly.gfa ${sample}_unicycler.gfa
+      cp ${sample}/unicycler.log ${sample}_unicycler.log
+   done < ~/tutorial/samples.txt
 
    # Give a look at the sequences of all the final assemblies
    $ grep '>' *_unicycler.fasta

@@ -91,9 +91,9 @@ Now, repeat the same calculation for **all the samples** using a loop and save t
 
    $ cd ~/tutorial
    $ echo -e "sample\treads\tbases\tcoverage" > coverage.tsv
-   $ while read -r sample; do
-   >    gunzip -c raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz | awk -v s=$sample -v G=5500000 'NR%4==2{n++; b+=length($0)} END{printf "%s\t%d\t%d\t%.1f\n", s, n, b, b/G}' >> coverage.tsv
-   > done < samples.txt
+   while read -r sample; do
+      gunzip -c raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz | awk -v s=$sample -v G=5500000 'NR%4==2{n++; b+=length($0)} END{printf "%s\t%d\t%d\t%.1f\n", s, n, b, b/G}' >> coverage.tsv
+   done < samples.txt
    $ column -t coverage.tsv
 
 .. todo::
@@ -214,9 +214,9 @@ FastQC accepts many files in the same command, so a loop is not mandatory. Howev
 
    $ cd ~/tutorial
    $ mkdir -p logs
-   $ while read -r sample; do
-   >    fastqc -t 2 raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz -o qc_visualisation/untrimmed/ &> logs/${sample}_fastqc.log
-   > done < samples.txt
+   while read -r sample; do
+      fastqc -t 2 raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz -o qc_visualisation/untrimmed/ &> logs/${sample}_fastqc.log
+   done < samples.txt
 
 .. hint::
    To run more than one sample **at the same time** you can use ``xargs``: ``cat samples.txt | xargs -P 2 -I {} sh -c 'fastqc -t 1 raw_data/{}_R1.fastq.gz raw_data/{}_R2.fastq.gz -o qc_visualisation/untrimmed/'``. Here ``-P 2`` means two samples in parallel. Do not use more processes than the CPUs of your computer.
@@ -436,15 +436,15 @@ In practice, you need to run BBDuk in all the samples of your project with the *
 
    $ cd ~/tutorial
    $ mkdir -p logs
-   $ while read -r sample; do
-   >    echo "Trimming ${sample}"
-   >    bbduk.sh -Xmx2g \
-   >       in1=raw_data/${sample}_R1.fastq.gz in2=raw_data/${sample}_R2.fastq.gz \
-   >       out1=qc_improvement/${sample}_clean_R1.fastq.gz out2=qc_improvement/${sample}_clean_R2.fastq.gz \
-   >       ref=adapters ktrim=r k=23 mink=11 hdist=1 tpe tbo \
-   >       qtrim=rl trimq=10 minlength=50 \
-   >       stats=qc_improvement/${sample}_bbduk_stats.txt 2> logs/${sample}_bbduk.log
-   > done < samples.txt
+   while read -r sample; do
+      echo "Trimming ${sample}"
+      bbduk.sh -Xmx2g \
+         in1=raw_data/${sample}_R1.fastq.gz in2=raw_data/${sample}_R2.fastq.gz \
+         out1=qc_improvement/${sample}_clean_R1.fastq.gz out2=qc_improvement/${sample}_clean_R2.fastq.gz \
+         ref=adapters ktrim=r k=23 mink=11 hdist=1 tpe tbo \
+         qtrim=rl trimq=10 minlength=50 \
+         stats=qc_improvement/${sample}_bbduk_stats.txt 2> logs/${sample}_bbduk.log
+   done < samples.txt
 
    # Check how many reads were kept in each sample
    $ grep -H "Result:" logs/*_bbduk.log

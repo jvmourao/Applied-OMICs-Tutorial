@@ -202,10 +202,10 @@ Each genome may belong to a **different species**, so the species must be adjust
 
    # Run ResFinder and PointFinder in all the genomes
    $ mkdir -p logs
-   $ while IFS=$'\t' read -r genome species; do
-   >    echo "Running ResFinder in ${genome} (${species})"
-   >    run_resfinder.py -ifa genomes/${genome}.fasta -o amr/resfinder/${genome} -s "${species}" --acquired --point > logs/${genome}_resfinder.log 2>&1
-   > done < species.tsv
+   while IFS=$'\t' read -r genome species; do
+      echo "Running ResFinder in ${genome} (${species})"
+      run_resfinder.py -ifa genomes/${genome}.fasta -o amr/resfinder/${genome} -s "${species}" --acquired --point > logs/${genome}_resfinder.log 2>&1
+   done < species.tsv
 
 .. warning::
    The species must be correct! PointFinder looks for mutations in the genes of the species that you provide. If you run a *Salmonella* genome as if it was *E. coli*, it may find false mutations because the reference sequences are different.
@@ -216,17 +216,17 @@ Now you have one directory for each genome. To compare them it is useful to **co
 
    # Combine the acquired genes of all the genomes in a single table (the 1st column is the name of the genome)
    $ echo -e "genome\tgene\tidentity\tcoverage\tphenotype" > amr/resfinder_acquired_all.tsv
-   $ for dir in amr/resfinder/*/; do
-   >    genome=$(basename $dir)
-   >    tail -n +2 $dir/ResFinder_results_tab.txt | awk -F'\t' -v g=$genome '{print g"\t"$1"\t"$2"\t"$4"\t"$8}' >> amr/resfinder_acquired_all.tsv
-   > done
+   for dir in amr/resfinder/*/; do
+      genome=$(basename $dir)
+      tail -n +2 $dir/ResFinder_results_tab.txt | awk -F'\t' -v g=$genome '{print g"\t"$1"\t"$2"\t"$4"\t"$8}' >> amr/resfinder_acquired_all.tsv
+   done
 
    # Combine the point mutations of all the genomes in a single table
    $ echo -e "genome\tmutation\tamino_acid_change\tresistance" > amr/pointfinder_all.tsv
-   $ for dir in amr/resfinder/*/; do
-   >    genome=$(basename $dir)
-   >    tail -n +2 $dir/PointFinder_results.txt | awk -F'\t' -v g=$genome '{print g"\t"$1"\t"$3"\t"$4}' >> amr/pointfinder_all.tsv
-   > done
+   for dir in amr/resfinder/*/; do
+      genome=$(basename $dir)
+      tail -n +2 $dir/PointFinder_results.txt | awk -F'\t' -v g=$genome '{print g"\t"$1"\t"$3"\t"$4}' >> amr/pointfinder_all.tsv
+   done
 
    # Visualise the tables
    $ column -t -s $'\t' amr/resfinder_acquired_all.tsv | cut -c 1-120
@@ -363,10 +363,10 @@ As in ResFinder, each genome may need a different organism option. Note that the
    $ printf "strainA\tEscherichia\nstrainB\tEscherichia\nSakai\tEscherichia\nEC958\tEscherichia\nK12\tEscherichia\nLT2\tSalmonella\n" > organisms.tsv
 
    # Run AMRFinderPlus in all the genomes
-   $ while IFS=$'\t' read -r genome organism; do
-   >    echo "Running AMRFinderPlus in ${genome} (${organism})"
-   >    amrfinder -n genomes/${genome}.fasta -O ${organism} --plus --name ${genome} --threads 4 -o amr/amrfinder/${genome}.tsv -q
-   > done < organisms.tsv
+   while IFS=$'\t' read -r genome organism; do
+      echo "Running AMRFinderPlus in ${genome} (${organism})"
+      amrfinder -n genomes/${genome}.fasta -O ${organism} --plus --name ${genome} --threads 4 -o amr/amrfinder/${genome}.tsv -q
+   done < organisms.tsv
 
    # Combine all the results in a single table (keeping only one header)
    $ awk 'FNR==1 && NR!=1 {next} {print}' amr/amrfinder/*.tsv > amr/amrfinder_all.tsv

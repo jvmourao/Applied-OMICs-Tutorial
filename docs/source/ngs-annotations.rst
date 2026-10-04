@@ -68,9 +68,9 @@ From now on, you will analyse **several genomes** with the same commands. For th
 .. code-block:: bash
 
    # Copy the final hybrid assemblies of your samples to the genomes directory
-   $ while read -r sample; do
-   >    cp ~/tutorial/assembly/unicycler/${sample}_unicycler.fasta ~/tutorial/genomes/${sample}.fasta
-   > done < ~/tutorial/samples.txt
+   while read -r sample; do
+      cp ~/tutorial/assembly/unicycler/${sample}_unicycler.fasta ~/tutorial/genomes/${sample}.fasta
+   done < ~/tutorial/samples.txt
 
    # Check all the genomes that you will analyse
    $ ls -lh ~/tutorial/genomes/
@@ -196,13 +196,13 @@ Usage
 
    $ cd ~/tutorial
    $ mkdir -p logs
-   $ for genome in genomes/*.fasta; do
-   >    sample=$(basename $genome .fasta)
-   >    echo "Annotating ${sample}"
-   >    bakta --db ~/databases/bakta/db-light --threads 4 \
-   >       --output annotation/bakta/${sample} --prefix ${sample} --locus-tag ${sample} \
-   >       $genome > logs/${sample}_bakta.log 2>&1
-   > done
+   for genome in genomes/*.fasta; do
+      sample=$(basename $genome .fasta)
+      echo "Annotating ${sample}"
+      bakta --db ~/databases/bakta/db-light --threads 4 \
+         --output annotation/bakta/${sample} --prefix ${sample} --locus-tag ${sample} \
+         $genome > logs/${sample}_bakta.log 2>&1
+   done
 
    # Check the summary of the annotation of all the genomes (number of CDS, tRNAs, etc.)
    $ grep -H "^CDSs" annotation/bakta/*/*.txt
@@ -319,10 +319,10 @@ You do not need a loop to run |abricate| in several genomes since it accepts man
 .. code-block:: bash
 
    # Run all the main databases and save one table per database
-   $ for db in ncbi card resfinder argannot plasmidfinder vfdb ecoli_vf; do
-   >    abricate --db $db --quiet --threads 4 --minid 90 --mincov 80 ~/tutorial/genomes/*.fasta > ${db}_ann.tab
-   >    abricate --summary ${db}_ann.tab > ${db}_summary.tab
-   > done
+   for db in ncbi card resfinder argannot plasmidfinder vfdb ecoli_vf; do
+      abricate --db $db --quiet --threads 4 --minid 90 --mincov 80 ~/tutorial/genomes/*.fasta > ${db}_ann.tab
+      abricate --summary ${db}_ann.tab > ${db}_summary.tab
+   done
 
    # Count the number of genes found in each genome in each database
    $ for file in *_ann.tab; do echo "== $file"; tail -n +2 $file | cut -f 1 | sort | uniq -c; done

@@ -246,24 +246,24 @@ To classify all your samples with the same parameters, use a loop over the sampl
    $ cd ~/tutorial
    $ DB=~/databases/kraken2_standard_08
    $ mkdir -p logs
-   $ while read -r sample; do
-   >    echo "Classifying ${sample}"
-   >    kraken2 --threads 4 --db $DB --gzip-compressed --paired \
-   >       --report taxonomy/kraken_bracken/${sample}.kreport \
-   >       --output taxonomy/kraken_bracken/${sample}.kraken2 \
-   >       raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz 2> logs/${sample}_kraken2.log
-   >    python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}.kreport \
-   >       -k $DB/database100mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}.bracken -l S
-   > done < samples.txt
+   while read -r sample; do
+      echo "Classifying ${sample}"
+      kraken2 --threads 4 --db $DB --gzip-compressed --paired \
+         --report taxonomy/kraken_bracken/${sample}.kreport \
+         --output taxonomy/kraken_bracken/${sample}.kraken2 \
+         raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz 2> logs/${sample}_kraken2.log
+      python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}.kreport \
+         -k $DB/database100mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}.bracken -l S
+   done < samples.txt
 
    # See the percentage of classified reads of each sample
    $ grep -H "classified" logs/*_kraken2.log
 
    # Print the 3 most abundant species of each sample (7th column = fraction of total reads)
-   $ for file in taxonomy/kraken_bracken/*.bracken; do
-   >    echo "== $(basename $file .bracken)"
-   >    tail -n +2 $file | sort -t$'\t' -k7,7nr | head -n 3 | cut -f 1,6,7
-   > done
+   for file in taxonomy/kraken_bracken/*.bracken; do
+      echo "== $(basename $file .bracken)"
+      tail -n +2 $file | sort -t$'\t' -k7,7nr | head -n 3 | cut -f 1,6,7
+   done
 
 .. note::
    If the ``--classified-out`` option is not used, Kraken2 does not save the classified reads, which saves a lot of disk space. Use it only if you want to extract the reads from a specific taxon.
@@ -350,9 +350,9 @@ Usage
    $ cd ~/tutorial/taxonomy
 
    # One chart for each sample (loop)
-   $ while read -r sample; do
-   >    ktImportTaxonomy -q 2 -t 3 kraken_bracken/${sample}.kraken2 -o krona/${sample}_krona.html
-   > done < ~/tutorial/samples.txt
+   while read -r sample; do
+      ktImportTaxonomy -q 2 -t 3 kraken_bracken/${sample}.kraken2 -o krona/${sample}_krona.html
+   done < ~/tutorial/samples.txt
 
    # A single chart to compare all the samples (a drop-down menu allows you to switch between samples)
    $ ktImportTaxonomy -q 2 -t 3 kraken_bracken/*.kraken2 -o krona/all_samples_krona.html
