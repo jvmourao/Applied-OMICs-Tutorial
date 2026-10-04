@@ -30,4 +30,4 @@ make html        # output in docs/build/html
 
 ## Contact
 
-joana.mourao@uc.pt or [@jvmourao](https://github.com/jvmourao)
+joam@food.dtu.dk or [@jvmourao](https://github.com/jvmourao)
