@@ -27,14 +27,14 @@ StandaloneHTMLBuilder.supported_image_types = [
 # -- Project information -----------------------------------------------------
 
 project = 'Applied OMICs Tutorial'
-copyright = '2021, Joana Mourão'
+copyright = '2021-2026, Joana Mourão'
 author = 'Joana Mourão'
 
 # The short X.Y version.
-version = "2.0"
+version = "3.0"
 
 # The full version, including alpha/beta/rc tags
-release = '2021.1.0'
+release = '2026.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -164,25 +164,32 @@ latex_show_urls = "footnote"
 
 rst_epilog = """
 .. |abricate| replace:: `ABRicate <https://github.com/tseemann/abricate>`__
-.. |anaconda| replace:: `Anaconda <https://docs.anaconda.com/anaconda/install/>`__
+.. |amrfinder| replace:: `AMRFinderPlus <https://github.com/ncbi/amr/wiki>`__
+.. |miniforge| replace:: `Miniforge <https://github.com/conda-forge/miniforge>`__
+.. |mobsuite| replace:: `MOB-suite <https://github.com/phac-nml/mob-suite>`__
+.. |plasmidfinder| replace:: `PlasmidFinder <https://bitbucket.org/genomicepidemiology/plasmidfinder/src/master/>`__
+.. |pointfinder| replace:: `PointFinder <https://bitbucket.org/genomicepidemiology/pointfinder_db/src/master/>`__
+.. |resfinder| replace:: `ResFinder <https://bitbucket.org/genomicepidemiology/resfinder/src/master/>`__
+.. |kma| replace:: `KMA <https://bitbucket.org/genomicepidemiology/kma/src/master/>`__
+.. |anaconda| replace:: `Anaconda <https://www.anaconda.com/docs/getting-started/anaconda/main>`__
 .. |bandage| replace:: `Bandage <https://rrwick.github.io/Bandage/>`__
 .. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
 .. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/>`__
-.. |bracken| replace:: `Bracken <https://ccb.jhu.edu/software/bracken/>`__
+.. |bracken| replace:: `Bracken <https://github.com/jenniferlu717/Bracken>`__
 .. |busco| replace:: `BUSCO <https://busco.ezlab.org/>`__
-.. |conda| replace:: `conda <https://conda.io/projects/conda/en/latest/index.html>`__
-.. |fastqc| replace:: `FastQC <http://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__
+.. |conda| replace:: `conda <https://docs.conda.io/projects/conda/en/stable/>`__
+.. |fastqc| replace:: `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__
 .. |go| replace:: `GO <http://geneontology.org/>`__
 .. |multiqc| replace:: `MultiQC <https://multiqc.info/>`__
 .. |kraken| replace:: `Kraken2 <https://github.com/DerrickWood/kraken2/blob/master/docs/MANUAL.markdown>`__
 .. |krona| replace:: `Krona <https://github.com/marbl/Krona/wiki>`__
-.. |miniconda| replace:: `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`__
+.. |miniconda| replace:: `Miniconda <https://www.anaconda.com/docs/getting-started/miniconda/main>`__
 .. |ncbi| replace:: `NCBI <https://www.ncbi.nlm.nih.gov/>`__
 .. |phred| replace:: `Phred <https://en.wikipedia.org/wiki/Phred_quality_score>`__
 .. |bakta| replace:: `Bakta <https://github.com/oschwengers/bakta>`__
-.. |quast| replace:: `Quast <http://quast.sourceforge.net/quast>`__
+.. |quast| replace:: `Quast <https://github.com/ablab/quast>`__
 .. |rast| replace:: `RAST <https://rast.nmpdr.org/>`__
-.. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/spades_3.14.1/README.md>`__
+.. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/main/README.md>`__
 .. |sra| replace:: `SRA <https://www.ncbi.nlm.nih.gov/sra>`__
 .. |unicycler| replace:: `Unicycler <https://github.com/rrwick/Unicycler>`__
 """

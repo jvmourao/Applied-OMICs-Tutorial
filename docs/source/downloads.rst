@@ -10,6 +10,8 @@ Downloads
 
    * All the downloads provided are for untrimmed raw reads.
 
+   * The files provided in this page were generated with the first version of this Tutorial (older software versions). The files of the sections on antimicrobial resistance and plasmids are not provided because they are produced in a few minutes by the commands of the Tutorial using the public genomes and your assemblies.
+
 
 Data acquisition
 ################
@@ -52,7 +54,7 @@ Taxonomy
 Kraken2
 .......
 
-* Minikraken2_v1_8GB database: [`MEGA <https://mega.nz/folder/p2RGlRLI#Qhngex1Qm2cbOK3-ijZwGg>`__]
+* Minikraken2_v1_8GB database (legacy database, used in the first version of this Tutorial; the current Tutorial uses the Standard-8 database): [`MEGA <https://mega.nz/folder/p2RGlRLI#Qhngex1Qm2cbOK3-ijZwGg>`__]
 
 * Untrimmed data: [`MEGA <https://mega.nz/folder/865VCTiY#tSKBYkhz7RPDBlZZmUJRcg>`__]
 

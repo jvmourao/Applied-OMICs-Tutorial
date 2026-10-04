@@ -61,13 +61,13 @@ Installation
    $ conda deactivate
 
    # Create a new environment named assembly
-   $ conda create -n assembly python=3.8
+   $ conda create -n assembly
 
    # Activate the new environment
    $ conda activate assembly
 
    # Install Unicycler and its dependencies (including SPAdes)
-   $ conda install -c bioconda unicycler
+   $ conda install unicycler
 
    # Check SPAdes installation
    $ spades.py --version
@@ -81,7 +81,7 @@ Usage
 
 **1. Input/Output files**
 
-``Input``: Accept compress or uncompress files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the paired-end Illumina raw reads.
+``Input``: Accept compress or uncompress files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the paired-end Illumina raw reads (and the trimmed reads, if you performed the trimming step).
 
 ``Output``: Several files are produced by |spades|. However, particular attention will be given to ``contigs.fasta`` (contains resulting contigs in FASTA format), ``scaffolds.fasta`` (contains resulting scaffolds in FASTA format), ``assembly_graph.gfa`` (contains SPAdes assembly graph and scaffolds paths in `GFA v1 <https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md>`_ format), and ``spades.log`` (SPAdes log).
 
@@ -99,9 +99,16 @@ Usage
    $ mkdir spades unicycler
    $ cd ~/tutorial/assembly/spades
 
-   # Run SPAdes in your untrimmed and trimmed (if applied) paired-end Illumina reads
-   $ spades.py -1 ~/tutorial/raw_data/strainA_untrimmed_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_untrimmed_R2.fastq.gz --careful -k 21,33,55,77 -t 4 --cov-cutoff auto -o strainA_untrimmed
-   $ spades.py -1 ~/tutorial/raw_data/strainA_trimmed_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_trimmed_R2.fastq.gz --careful -k 21,33,55,77 -t 4 --cov-cutoff auto -o strainA_trimmed
+   # Run SPAdes in your untrimmed paired-end Illumina reads
+   $ spades.py --isolate -1 ~/tutorial/raw_data/strainA_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_R2.fastq.gz -t 4 -o strainA_untrimmed
+
+   # Run SPAdes in your trimmed paired-end Illumina reads (if applied)
+   $ spades.py --isolate -1 ~/tutorial/qc_improvement/strainA_clean_R1.fastq.gz -2 ~/tutorial/qc_improvement/strainA_clean_R2.fastq.gz -t 4 -o strainA_trimmed
+
+   # Copy the final contigs and graph to a new file with a meaningful name
+   $ cp strainA_untrimmed/contigs.fasta strainA_spades_untrimmed.fasta
+   $ cp strainA_untrimmed/assembly_graph_with_scaffolds.gfa strainA_spades_untrimmed.gfa
+   $ cp strainA_untrimmed/spades.log strainA_spades_untrimmed.log
 
 .. csv-table:: Parameters explanation when using SPAdes
    :header: "Parameter", "Description"
@@ -109,15 +116,17 @@ Usage
 
    "``-1 <filename>``", "File with forward paired-end reads"
    "``-2 <filename>``", "File with reverse paired-end reads"
-   "``--careful``", "Tries to reduce number of mismatches and short indels"
-   "``-k <int>``", "list of k-mer sizes (must be odd and less than 128) [default: 'auto']"
+   "``-k <int>``", "list of k-mer sizes (must be odd and less than 128) [default: 'auto'], e.g., ``-k 21,33,55,77``"
    "``-t <int>``", "Number of threads [default: 16]"
+   "``-m <int>``", "Memory limit in Gb. SPAdes terminates if it reaches this limit [default: 250]; set it to the memory of your computer"
    "``-o <output_dir>``", "Directory to store all the resulting files (required)"
-   "``--isolate``", "Improves the assembly quality and running time"
+   "``--isolate``", "Recommended for high-coverage isolate (single colony) data; improves the assembly quality and running time"
+   "``--careful``", "Tries to reduce number of mismatches and short indels. Use it with low-coverage data (not compatible with ``--isolate``)"
    "``--cov-cutoff``", "Read coverage cutoff value. Must be a positive float value, or 'auto', or 'off'"
+   "``--plasmid``", "Runs the plasmidSPAdes pipeline (see the :ref:`Plasmids <ngs-plasmids>` section)"
 
 .. attention::
-   If you have high-coverage data for bacterial isolate, |spades| developers highly recommend to use the ``--isolate`` option that is not compatible with ``--careful`` option; thus, you must disable the last one.
+   If you have high-coverage data for bacterial isolate (>~50x), |spades| developers highly recommend to use the ``--isolate`` option that is not compatible with ``--careful`` option. In previous versions of this Tutorial ``--careful -k 21,33,55,77`` was used. With **low-coverage** data, use ``--careful`` instead of ``--isolate``.
 
 **3. Additional options**
 
@@ -125,6 +134,28 @@ Usage
 
    # To see a full list of available options in SPAdes
    $ spades.py --help
+
+**4. Running SPAdes in several samples**
+
+Use a loop to assemble all the samples with the same parameters. SPAdes is a heavy program: run one sample at a time with all the threads (``-t``) instead of several samples at the same time, unless you have a lot of memory.
+
+.. code-block:: bash
+
+   $ cd ~/tutorial/assembly/spades
+   $ while read -r sample; do
+   >    echo "Assembling ${sample}"
+   >    spades.py --isolate -t 4 -m 12 \
+   >       -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
+   >       -o ${sample}_untrimmed > ${sample}_untrimmed.stdout 2>&1
+   >    cp ${sample}_untrimmed/contigs.fasta ${sample}_spades_untrimmed.fasta
+   >    cp ${sample}_untrimmed/assembly_graph_with_scaffolds.gfa ${sample}_spades_untrimmed.gfa
+   > done < ~/tutorial/samples.txt
+
+   # Count the number of contigs in each assembly
+   $ grep -c '>' *_spades_untrimmed.fasta
+
+.. note::
+   If you have trimmed reads, repeat the loop above replacing the input files by ``~/tutorial/qc_improvement/${sample}_clean_R1.fastq.gz`` (and ``_R2``) and the output names ``untrimmed`` by ``trimmed``.
 
 .. todo::
    1. Run |spades| assembler in your trimmed and untrimmed paired-end Illumina reads.
@@ -183,7 +214,12 @@ Usage
    $ cd ~/tutorial/assembly/unicycler
 
    # Run Unicycler using the untrimmed paired-end Illumina and Nanopore raw reads
-   $ unicycler -1 short_reads_1.fastq.gz -2 short_reads_2.fastq.gz -l long_reads.fastq.gz --mode normal -o output_dir -t 8
+   $ unicycler -1 ~/tutorial/raw_data/strainA_R1.fastq.gz -2 ~/tutorial/raw_data/strainA_R2.fastq.gz -l ~/tutorial/raw_data/strainA_nanopore.fastq.gz --mode normal -o strainA -t 8
+
+   # Copy the final assembly and graph to a new file with a meaningful name
+   $ cp strainA/assembly.fasta strainA_unicycler.fasta
+   $ cp strainA/assembly.gfa strainA_unicycler.gfa
+   $ cp strainA/unicycler.log strainA_unicycler.log
 
 .. csv-table:: Parameters explanation when using Unicycler
    :header: "Parameter", "Description"
@@ -195,6 +231,8 @@ Usage
    "``--mode {conservative,normal,bold}``", "Bridging mode (default: normal)"
    "``-o OUT``", "Output directory (required)"
    "``-t THREADS``", "Number of threads used (default: 8)"
+   "``--min_fasta_length LENGTH``", "Exclude contigs shorter than this length from the final assembly (default: 100)"
+   "``--keep INT``", "Level of file retention: 0 = only keep final files, 1 = also save graphs at main checkpoints, 2 = also save SAM files, 3 = keep all temporary files (default: 1)"
 
 .. figure:: ./images/Unicycler_modes.png
    :figclass: align-left
@@ -207,6 +245,46 @@ Usage
 
    # To see a full list of available options in Unicycler
    $ unicycler --help
+
+**4. Understanding the final Unicycler assembly**
+
+The sequence headers of the ``assembly.fasta`` file produced by |unicycler| contain useful information:
+
+.. code-block:: bash
+
+   $ grep '>' strainA_unicycler.fasta
+   >1 length=5445618 depth=1.00x circular=true
+   >2 length=92721 depth=1.13x circular=true
+   >3 length=3365 depth=2.31x
+
+* ``length``: length of the sequence in bp.
+* ``depth``: read depth relative to the median of the chromosome (``1.00x`` is the chromosome; ``2.31x`` means that the sequence has twice the copies of the chromosome, which is common in **plasmids**).
+* ``circular=true``: Unicycler found that the sequence is circular, i.e., it is a **complete** replicon (the chromosome or a complete plasmid).
+
+.. note::
+   The example above is only illustrative. It shows how to recognize the chromosome and the plasmids of a good hybrid assembly: a very large circular sequence (chromosome) and smaller circular sequences with a different depth (plasmids). You will use this information in the :ref:`Plasmids <ngs-plasmids>` section.
+
+**5. Running Unicycler in several samples**
+
+.. code-block:: bash
+
+   $ cd ~/tutorial/assembly/unicycler
+   $ while read -r sample; do
+   >    echo "Assembling ${sample}"
+   >    unicycler -t 8 --mode normal \
+   >       -1 ~/tutorial/raw_data/${sample}_R1.fastq.gz -2 ~/tutorial/raw_data/${sample}_R2.fastq.gz \
+   >       -l ~/tutorial/raw_data/${sample}_nanopore.fastq.gz \
+   >       -o ${sample} > ${sample}_unicycler.stdout 2>&1
+   >    cp ${sample}/assembly.fasta ${sample}_unicycler.fasta
+   >    cp ${sample}/assembly.gfa ${sample}_unicycler.gfa
+   >    cp ${sample}/unicycler.log ${sample}_unicycler.log
+   > done < ~/tutorial/samples.txt
+
+   # Give a look at the sequences of all the final assemblies
+   $ grep '>' *_unicycler.fasta
+
+.. note::
+   Hybrid assemblies are slow (from 30 minutes to a few hours for each genome). If you are working on a server, run the loop in the background using ``nohup`` (see :ref:`Before we begin <before-begin>`) and check the ``*.stdout`` files.
 
 .. todo::
    2. Run |unicycler| for a hybrid assembly using the short-read paired-end Illumina and the long-read Nanopore.
@@ -259,7 +337,7 @@ Usage
 
 7. Use the mouse to zoom, pan and rotate the graphs.
 
-8. On the left panel, check the boxes ``Lenght``, ``Name``, and ``Text outline`` located on **Node Labels** section, to see information about contigs. However, if you have a lot of contigs by doing this, your graph will be overwhelmed with information.
+8. On the left panel, check the boxes ``Length``, ``Name``, and ``Text outline`` located on **Node Labels** section, to see information about contigs. However, if you have a lot of contigs by doing this, your graph will be overwhelmed with information.
 
 9. Save all the graphs as ``.png`` images using ``File`` -> ``Save image (entire scene)`` in the directory ``~/tutorial/assembly/bandage/``.
 
@@ -269,7 +347,7 @@ Usage
 .. figure:: ./images/Bandage_graph.png
    :figclass: align-left
 
-*Figure 16. Visualisation of a assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
+*Figure 16. Visualisation of an assembly graph in Bandage created using paired-end Illumina and Nanopore raw reads.*
 
 
 Assembly quality control
@@ -302,7 +380,7 @@ Installation
    $ conda activate qc
 
    # Install QUAST
-   $ conda install -c bioconda quast
+   $ conda install quast
 
    # Check QUAST installation
    $ quast.py --version
@@ -326,19 +404,20 @@ Usage
    $ mkdir quast
    $ cd quast/
 
-   # Run QUAST in your assembly FASTA files
-   $ quast.py -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
+   # Run QUAST in your assembly FASTA files (the *.fasta wildcard only selects the final assemblies that you copied)
+   $ quast.py -t 4 -o report_without_reference ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
-   # Run QUAST in your assembly FASTA files but provide a reference genome
-   $ quast.py -r ~/tutorial/raw_data/reference.fasta -g ~/tutorial/raw_data/annotation.gff -o assembly_quast ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
+   # Run QUAST in your assembly FASTA files but provide a reference genome (the complete Sakai genome, with chromosome and plasmids)
+   $ quast.py -t 4 -r ~/tutorial/raw_data/GCF_000008865.2_ASM886v2_genomic.fasta -o report_with_reference ~/tutorial/assembly/spades/*.fasta ~/tutorial/assembly/unicycler/*.fasta
 
    # Open QUAST html report in Ubuntu/WSL
-   $ sensible-browser report.html
-   $ cd
+   $ sensible-browser report_with_reference/report.html
 
    # Or open QUAST html report in macOS
-   $ open report.html
-   $ cd
+   $ open report_with_reference/report.html
+
+   # Print the main metrics directly in the terminal
+   $ column -t -s $'\t' report_with_reference/transposed_report.tsv | cut -c 1-120
 
 .. csv-table:: Parameters explanation when using QUAST
    :header: "Parameter", "Description"
@@ -346,7 +425,10 @@ Usage
 
    "``-o <output_dir>``", "Specify the output directory"
    "``-r <filename>``", "File with reference genome. Most metrics can't be evaluated without reference"
-   "``-g <filename>``", "File with genes annotations for given species (GFF, BED, NCBI or TXT)"
+   "``-g <filename>``", "File with genes annotations for given species (GFF, BED, NCBI or TXT); it must correspond to the reference used with ``-r`` (e.g., ``NC_002695.2.gff`` with ``NC_002695.2.fasta``)"
+   "``-t <int>``", "Number of threads"
+   "``--labels <list>``", "Comma-separated names of the assemblies in the report (e.g., ``--labels strainA_spades,strainA_unicycler``)"
+   "``--min-contig <int>``", "Lower threshold for contig length (default: 500)"
    "``<fasta_file(s)>``", "Full path for the assembly FASTA files"
 
 .. figure:: ./images/Quast_report.png
@@ -380,11 +462,17 @@ Usage
    # To see a full list of available options in QUAST
    $ quast.py --help
 
+.. hint::
+   |quast| does not need a loop to run in several assemblies: just list all the ``.fasta`` files in the same command, as in the previous examples. If you also have the final hybrid assemblies of **several samples** (e.g., ``strainA_unicycler.fasta`` and ``strainB_unicycler.fasta``), the report will have one column for each of them. To control the names that appear in the report use ``--labels``.
+
+.. warning::
+   If |quast| fails with the error ``No module named 'distutils'``, your environment has a Python version higher than 3.11. Create the environment with ``conda create -n qc python=3.11`` and install again all the packages.
+
 .. todo::
    3. Assess the quality of both |spades| and |unicycler| assemblies using |quast|.
-   4. How many contigs in total did the assemblies produced?
+   4. How many contigs in total did the assemblies produce?
    5. What is the N50 of the assemblies? What does this mean?
-   6. Did you noticed any difference in the assembly using trimmed and untrimmed reads? What is the main difference in terms of quality parameters?
+   6. Did you notice any difference in the assembly using trimmed and untrimmed reads? What is the main difference in terms of quality parameters?
    7. Compare |spades| and |unicycler| assemblies. What are the main differences? Did you notice any kind of improvement in genome assembly?
 
 
@@ -397,49 +485,41 @@ At the end of this section, you will have the following folder structure.
 
     tutorial
     ├── raw_data
-    │   ├── files_fastq.gz
+    │   ├── <sample>_R1.fastq.gz
+    │   ├── <sample>_R2.fastq.gz
+    │   ├── <sample>_nanopore.fastq.gz
     │   ├── files.fasta
     │   ├── files.gbk
     │   ├── files.gff
+    ├── genomes
     ├── qc_visualisation
     │   ├── trimmed
-    │   │   ├── files_clean_fastqc.html
-    │   │   ├── files_clean_fastqc.zip
-    │   │   ├── multiqc_clean_report.html
-    │   │   ├── multiqc_clean_data
     │   ├── untrimmed
-    │   │   ├── files_fastqc.html
-    │   │   ├── files_fastqc.zip
-    │   │   ├── multiqc_report.html
-    │   │   ├── multiqc_data
     ├── qc_improvement
-    │   ├── files_clean.fastq.gz
+    │   ├── <sample>_clean_R1.fastq.gz
+    │   ├── <sample>_clean_R2.fastq.gz
     ├── taxonomy
     │   ├── kraken_bracken
-    │   │   ├── files_cseqs_1.fastq
-    │   │   ├── files_cseqs_2.fastq
-    │   │   ├── output.kraken
-    │   │   ├── report.kreport
-    │   │   ├── output.bracken
     │   ├── krona
-    │   │   ├── output_krona.html
     ├── assembly
     │   ├── spades
-    │   │   ├── assembly_spades_trimmed.fasta
-    │   │   ├── assembly_spades_trimmed.gfa
-    │   │   ├── assembly_spades_trimmed.log
-    │   │   ├── assembly_spades_untrimmed.fasta
-    │   │   ├── assembly_spades_untrimmed.gfa
-    │   │   ├── assembly_spades_untrimmed.log
+    │   │   ├── <sample>_spades_trimmed.fasta
+    │   │   ├── <sample>_spades_trimmed.gfa
+    │   │   ├── <sample>_spades_trimmed.log
+    │   │   ├── <sample>_spades_untrimmed.fasta
+    │   │   ├── <sample>_spades_untrimmed.gfa
+    │   │   ├── <sample>_spades_untrimmed.log
+    │   │   ├── <sample>_untrimmed/ (SPAdes output directory)
     │   ├── unicycler
-    │   │   ├── assembly_unicycler.fasta
-    │   │   ├── assembly_unicycler.gfa
-    │   │   ├── assembly_unicycler.log
+    │   │   ├── <sample>_unicycler.fasta
+    │   │   ├── <sample>_unicycler.gfa
+    │   │   ├── <sample>_unicycler.log
+    │   │   ├── <sample>/ (Unicycler output directory)
     │   ├── bandage
     │   │   ├── graphs.png
     │   ├── quast
-    │   │   ├── report_without_reference.html
-    │   │   ├── report_with_reference.html
+    │   │   ├── report_without_reference
+    │   │   ├── report_with_reference
 
 
 References
@@ -474,11 +554,11 @@ List of Assembly tools
    :header: "Package name", "Version", "Algorithm used"
    :widths: 20, 20, 40
 
-   "`ABySS <https://github.com/bcgsc/abyss>`_", "2.2.5", "de Bruijn Graph"
-   "`Flye <https://github.com/fenderglass/Flye>`_", "2.8.1", "Repeat graph - long-read assembly"
-   "`MaSuRCA <https://github.com/alekseyzimin/masurca>`_", "3.4.2", "*super read* with Overlap–layout–consensus"
+   "`ABySS <https://github.com/bcgsc/abyss>`_", "2.3.10", "de Bruijn Graph"
+   "`Flye <https://github.com/mikolmogorov/Flye>`_", "2.9.6", "Repeat graph - long-read assembly"
+   "`MaSuRCA <https://github.com/alekseyzimin/masurca>`_", "4.1.4", "*super read* with Overlap–layout–consensus"
    "`SOAPdenovo2 <https://github.com/aquaskyline/SOAPdenovo2>`_", "2.40", "de Bruijn Graph"
-   "`SPAdes <https://github.com/ablab/spades>`_", "3.14.1", "paired de Bruijn Graph - short- and long-read assembly"
-   "`Trycycler <https://github.com/rrwick/Trycycler/wiki>`_", "0.3.1", "Multiple sequence alignment - long-read assembly"
-   "`Unicycler <https://github.com/rrwick/Unicycler>`_", "0.4.8", "de Bruijn Graph with greedy approach - long-read assembly"
+   "`SPAdes <https://github.com/ablab/spades>`_", "4.3.0", "paired de Bruijn Graph - short- and long-read assembly"
+   "`Trycycler <https://github.com/rrwick/Trycycler/wiki>`_", "0.5.6", "Multiple sequence alignment - long-read assembly"
+   "`Unicycler <https://github.com/rrwick/Unicycler>`_", "0.5.1", "de Bruijn Graph with greedy approach - long-read assembly"
    "`Velvet <https://github.com/dzerbino/velvet>`_", "1.2.10", "de Bruijn Graph"

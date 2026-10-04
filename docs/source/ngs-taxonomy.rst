@@ -42,42 +42,59 @@ Kraken2 and Bracken
 
 * Besides installing |kraken| and |bracken|, you need to download or create a **database** that will be used by both tools. To create a custom database, you will need a lot of disk space (at least 100 GB) in your computer.
 
-* So, for the purpose of this Tutorial, we will use an already pre-build standard `MiniKraken <https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads>`_ database that is already prepared to be used also by |bracken|. The **MiniKraken** v1 was built from RefSeq bacteria, archaea, and viral sequences.
+* So, for the purpose of this Tutorial, we will use an already pre-built `Standard-8 <https://benlangmead.github.io/aws-indexes/k2>`_ database (maintained by Ben Langmead) that is already prepared to be used also by |bracken|. The **Standard-8** index contains RefSeq archaea, bacteria, viral, plasmid, human and UniVec_Core sequences, and is capped at 8 GB of RAM (it needs ~8 GB of free memory and ~8 GB of disk space once extracted). The older MiniKraken2 v1/v2 databases, used in previous versions of this tutorial, are no longer updated.
 
-* A |kraken| database is a directory containing at least 3 files:
+* A |kraken| database is a directory containing at least 3 files (when it is also prepared for |bracken|, it contains additional ``database*mers.kmer_distrib`` files):
 
     1. ``hash.k2d``: Contains the minimizer to taxon mappings.
     2. ``opts.k2d``: Contains information about the options used to build the database.
     3. ``taxo.k2d``: Contains taxonomy information used to build the database.
 
 .. note::
-   To use the **MiniKraken** database you just need to provide in the command line the name of the directory in which you stored these three files.
+   To use the **Standard-8** database you just need to provide in the command line the name of the directory in which you stored these three files.
 
 
 Installation
 ............
-
-.. note::
-   One of the main dependencies of |bracken| is |kraken|, so you just need to install the first, thus avoiding dependency conflicts.
 
 .. code-block:: bash
 
     # Deactivate all current environments
     $ conda deactivate
 
-    # Activate the qc environment
-    $ conda activate qc
+    # Create a new environment named taxonomy and install Kraken2
+    $ conda create -n taxonomy kraken2
 
-    # Install Bracken with conda
-    $ conda install -c bioconda bracken
+    # Activate the taxonomy environment
+    $ conda activate taxonomy
 
-    # Check if all the packages are installed
+    # Check if Kraken2 is installed
     $ kraken2 --version
-    $ bracken --help
 
+|bracken| is installed in different ways, depending on your operating system:
 
-Usage
-.....
+.. code-block:: bash
+
+    # Linux: install Bracken with conda, in the same environment
+    $ conda install bracken
+
+    # Check if Bracken is installed
+    $ bracken -v
+
+.. warning::
+   The recent versions of Bracken (3.x) are **not available in conda for macOS** (an old and incompatible version 1.0.0 may be installed instead). In macOS, download the Bracken source code, which already includes the Python script ``est_abundance.py`` that you will use to estimate the abundances (it does not require compilation).
+
+   .. code-block:: bash
+
+      $ cd ~
+      $ git clone https://github.com/jenniferlu717/Bracken.git
+
+      # Check that the script works
+      $ python ~/Bracken/src/est_abundance.py --help
+
+.. note::
+   On Linux, you can also run the Bracken Python script directly (``est_abundance.py``) using the commands shown below for macOS.
+
 
 **1. Input/Output files**
 
@@ -100,18 +117,24 @@ Usage
     $ mkdir kraken_bracken krona
     $ cd
 
-    # Download the MiniKraken v1 database
-    $ wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/old/minikraken2_v1_8GB_201904.tgz
+    # Download the Kraken2 Standard-8 database (5.5 GB download, 7.5 GB on disk) and extract it into a new directory
+    # Check the most recent version in https://benlangmead.github.io/aws-indexes/k2
+    $ mkdir -p ~/databases/kraken2_standard_08
+    $ cd ~/databases/kraken2_standard_08
+    $ wget https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08_GB_20260626.tar.gz
+    $ tar -xvzf k2_standard_08_GB_20260626.tar.gz
 
-    # Extract the archive content to your computer
-    $ tar -xvzf ~/minikraken2_v1_8GB_201904_UPDATE.tgz
-    $ rm minikraken2_v1_8GB_201904_UPDATE.tgz
+    # Remove the compressed archive to save disk space
+    $ rm k2_standard_08_GB_20260626.tar.gz
 
-    # Go to the directory kraken_bracken where you will storage the results
+    # Check the content of the database (hash.k2d, opts.k2d, taxo.k2d, ...)
+    $ ls ~/databases/kraken2_standard_08
+
+    # Go to the directory kraken_bracken where you will store the results
     $ cd ~/tutorial/taxonomy/kraken_bracken
 
     # Run Kraken2 in your paired-end sequence reads
-    $ kraken2 --threads 4 --db ~/minikraken2_v1_8GB/ --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/seqs_strainA_1.fastq.gz ~/tutorial/raw_data/seqs_strainA_2.fastq.gz --output strainA.kraken2
+    $ kraken2 --threads 4 --db ~/databases/kraken2_standard_08 --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/strainA_R1.fastq.gz ~/tutorial/raw_data/strainA_R2.fastq.gz --output strainA.kraken2
 
 .. csv-table:: Parameters explanation when using Kraken2
    :header: "Parameter", "Description"
@@ -124,8 +147,11 @@ Usage
    "``--paired``", "The filenames provided have paired-end reads"
    "``--classified-out FILENAME``", "Print classified sequences to filename"
    "``--output FILENAME``", "Print output to filename"
-   "``seqs_1.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 1"
-   "``seqs_2.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 2"
+   "``--memory-mapping``", "Avoid loading the database into RAM (slower, but it allows to run with less memory)"
+   "``--confidence FLOAT``", "Confidence score threshold, between 0 and 1 (default: 0.0)"
+   "``--use-names``", "Print scientific names instead of taxonomy IDs in the output"
+   "``strainA_R1.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 1"
+   "``strainA_R2.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 2"
 
 If you open the **standard Kraken2 output file** with a text editor you will see that each line represents a classified sequence.
 
@@ -163,8 +189,12 @@ From left to the right you can identify 6 columns representing:
     # Go to the directory kraken_bracken where you will storage the results
     $ cd ~/tutorial/taxonomy/kraken_bracken
 
-    # Now let's run Bracken using the previous sample report from Kraken2
-    $ bracken -d ~/minikraken2_v1_8GB/ -i ~/tutorial/taxonomy/kraken_bracken/strainA.kreport -l S -o strainA.bracken
+    # Now let's run Bracken using the previous sample report from Kraken2 (Linux)
+    # -r is the read length (the database must contain the file database<READ_LEN>mers.kmer_distrib)
+    $ bracken -d ~/databases/kraken2_standard_08 -i strainA.kreport -o strainA.bracken -r 100 -l S
+
+    # Or run the Bracken Python script (macOS and Linux)
+    $ python ~/Bracken/src/est_abundance.py -i strainA.kreport -k ~/databases/kraken2_standard_08/database100mers.kmer_distrib -o strainA.bracken -l S
 
 .. csv-table:: Parameters explanation when using Bracken
    :header: "Parameter", "Description"
@@ -174,6 +204,9 @@ From left to the right you can identify 6 columns representing:
    "``-i INPUT``", "Kraken REPORT file to use for abundance estimation"
    "``-l LEVEL``", "Level to estimate abundance at [options: D,P,C,O,F,G,S] (default: S)"
    "``-o OUTPUT``", "File name for Bracken default output"
+   "``-r LENGTH``", "Read length used to build the Bracken database files (default: 100); use the one closer to your read length (e.g., 100 or 150)"
+   "``-t THRESHOLD``", "Minimum number of reads that Kraken2 needs to assign to a taxon before the re-estimation (default: 0)"
+   "``-k FILE``", "(est_abundance.py) Kmer distribution file of the database (``database<READ_LEN>mers.kmer_distrib``)"
 
 If you open the **Bracken output file** with a text editor you will see that each line represents a species.
 
@@ -186,7 +219,7 @@ From left to the right you can identify 7 columns representing:
 
    1. Name.
    2. Taxonomy ID.
-   3. Level ID (S=Species, G=Genus, O=Order, F=Family, P=Phylum, K=Kingdom).
+   3. Level ID (S=Species, G=Genus, O=Order, F=Family, P=Phylum, D=Domain).
    4. Kraken Assigned Reads.
    5. Added Reads with Abundance Reestimation.
    6. Total Reads after Abundance Reestimation.
@@ -200,7 +233,40 @@ From left to the right you can identify 7 columns representing:
     $ kraken2 --help
 
     # To see a full list of available options in Bracken
-    $ bracken --help
+    # (Bracken has no --help; running it without arguments prints the usage)
+    $ bracken
+    $ python ~/Bracken/src/est_abundance.py --help
+
+**4. Running Kraken2 and Bracken in several samples**
+
+To classify all your samples with the same parameters, use a loop over the sample names listed in ``samples.txt``. Each sample will have its own output files and log.
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   $ DB=~/databases/kraken2_standard_08
+   $ mkdir -p logs
+   $ while read -r sample; do
+   >    echo "Classifying ${sample}"
+   >    kraken2 --threads 4 --db $DB --gzip-compressed --paired \
+   >       --report taxonomy/kraken_bracken/${sample}.kreport \
+   >       --output taxonomy/kraken_bracken/${sample}.kraken2 \
+   >       raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz 2> logs/${sample}_kraken2.log
+   >    python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}.kreport \
+   >       -k $DB/database100mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}.bracken -l S
+   > done < samples.txt
+
+   # See the percentage of classified reads of each sample
+   $ grep -H "classified" logs/*_kraken2.log
+
+   # Print the 3 most abundant species of each sample (7th column = fraction of total reads)
+   $ for file in taxonomy/kraken_bracken/*.bracken; do
+   >    echo "== $(basename $file .bracken)"
+   >    tail -n +2 $file | sort -t$'\t' -k7,7nr | head -n 3 | cut -f 1,6,7
+   > done
+
+.. note::
+   If the ``--classified-out`` option is not used, Kraken2 does not save the classified reads, which saves a lot of disk space. Use it only if you want to extract the reads from a specific taxon.
 
 .. todo::
    1. Run |kraken| and |bracken| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
@@ -225,19 +291,17 @@ Installation
 
 .. code-block:: bash
 
-    # Activate the qc environment
-    $ conda activate qc
+    # Activate the taxonomy environment
+    $ conda activate taxonomy
 
     # Install Krona
-    $ conda install -c bioconda krona
+    $ conda install krona
 
-    # Update your system's repository list and install the make command
-    $ sudo apt-get update
-    $ sudo apt-get install -y make
+    # Build a taxonomy database for Krona (it needs the command line tools curl and make)
+    $ ktUpdateTaxonomy.sh $CONDA_PREFIX/opt/krona/taxonomy
 
-    # Build a taxonomy database for Krona
-    $ cd
-    $ ktUpdateTaxonomy.sh ~/miniconda3/envs/qc/opt/krona/taxonomy/
+.. note::
+   ``$CONDA_PREFIX`` is the directory of the active conda environment (e.g., ``~/miniforge3/envs/taxonomy``). If ``make`` is not installed, in Ubuntu/WSL use ``sudo apt-get install -y make`` and in macOS run ``xcode-select --install``.
 
 
 Usage
@@ -256,12 +320,16 @@ Usage
     # Run Krona using the Kraken2 output
     $ ktImportTaxonomy -q 2 -t 3 ~/tutorial/taxonomy/kraken_bracken/strainA.kraken2 -o ~/tutorial/taxonomy/krona/strainA_krona.html
 
+    # Or run Krona using the Kraken2 report (smaller and faster; -m is the column with the number of reads, and -t the taxonomy ID)
+    $ ktImportTaxonomy -m 3 -t 5 ~/tutorial/taxonomy/kraken_bracken/strainA.kreport -o ~/tutorial/taxonomy/krona/strainA_krona.html
+
 .. csv-table:: Parameters explanation when using Krona
    :header: "Parameter", "Description"
    :widths: 20, 60
 
-   "``-q VALUE``", "Extract the second column (**sequence ID**) from the Kraken2 results"
-   "``-t VALUE``", "Extract the third column (**taxonomy ID**) from the Kraken2 results"
+   "``-q VALUE``", "Column of the input file with the query (**sequence ID**); 2 for the Kraken2 results"
+   "``-t VALUE``", "Column of the input file with the **taxonomy ID**; 3 for the Kraken2 results and 5 for the Kraken2 report"
+   "``-m VALUE``", "Column of the input file with the magnitude (**number of reads**); 3 for the Kraken2 report"
    "``-o NAME``", "File name for Krona default output"
 
 .. code-block:: bash
@@ -269,11 +337,25 @@ Usage
     # Let's go to the directory where the HTML files produced by Krona are
     $ cd ~/tutorial/taxonomy/krona/
 
-    # Open FastQC html report in Ubuntu/WSL
+    # Open Krona html report in Ubuntu/WSL
     $ sensible-browser <filename>_krona.html
 
-    # Or open FastQC html report in macOS
+    # Or open Krona html report in macOS
     $ open <filename>_krona.html
+
+**3. Running Krona in several samples**
+
+.. code-block:: bash
+
+   $ cd ~/tutorial/taxonomy
+
+   # One chart for each sample (loop)
+   $ while read -r sample; do
+   >    ktImportTaxonomy -q 2 -t 3 kraken_bracken/${sample}.kraken2 -o krona/${sample}_krona.html
+   > done < ~/tutorial/samples.txt
+
+   # A single chart to compare all the samples (a drop-down menu allows you to switch between samples)
+   $ ktImportTaxonomy -q 2 -t 3 kraken_bracken/*.kraken2 -o krona/all_samples_krona.html
 
 .. figure:: ./images/Krona_result.png
    :figclass: align-left
@@ -295,31 +377,35 @@ At the end of this section, you will have the following folder structure.
 
     tutorial
     ├── raw_data
-    │   ├── files_fastq.gz
+    │   ├── <sample>_R1.fastq.gz
+    │   ├── <sample>_R2.fastq.gz
+    │   ├── <sample>_nanopore.fastq.gz
     │   ├── files.fasta
+    │   ├── files.gff
     │   ├── files.gbk
+    ├── genomes
     ├── qc_visualisation
     │   ├── trimmed
-    │   │   ├── files_clean_fastqc.html
-    │   │   ├── files_clean_fastqc.zip
+    │   │   ├── <sample>_clean_R1_fastqc.html
+    │   │   ├── <sample>_clean_R1_fastqc.zip
     │   │   ├── multiqc_clean_report.html
     │   │   ├── multiqc_clean_data
     │   ├── untrimmed
-    │   │   ├── files_fastqc.html
-    │   │   ├── files_fastqc.zip
+    │   │   ├── <sample>_R1_fastqc.html
+    │   │   ├── <sample>_R1_fastqc.zip
     │   │   ├── multiqc_report.html
     │   │   ├── multiqc_data
     ├── qc_improvement
-    │   ├── files_clean.fastq.gz
+    │   ├── <sample>_clean_R1.fastq.gz
+    │   ├── <sample>_clean_R2.fastq.gz
     ├── taxonomy
     │   ├── kraken_bracken
-    │   │   ├── files_cseqs_1.fastq
-    │   │   ├── files_cseqs_2.fastq
-    │   │   ├── output.kraken2
-    │   │   ├── report.kreport
-    │   │   ├── output.bracken
+    │   │   ├── <sample>.kraken2
+    │   │   ├── <sample>.kreport
+    │   │   ├── <sample>.bracken
     │   ├── krona
-    │   │   ├── output_krona.html
+    │   │   ├── <sample>_krona.html
+    │   │   ├── all_samples_krona.html
 
 
 References
