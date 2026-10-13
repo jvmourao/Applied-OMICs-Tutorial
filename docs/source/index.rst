@@ -50,6 +50,7 @@ If you are not used to using the terminal you can find a small tutorial in the :
    :maxdepth: 4
    :caption: Resources
 
+   quality-thresholds
    downloads
 
 .. only:: latex

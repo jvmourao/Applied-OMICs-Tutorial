@@ -41,9 +41,13 @@ Coverage
 
 2. The number of ``x`` times a genome has been sequenced (depth of sequencing) is expressed by a **coverage metric**.
 
-3. There are no strict recommendations for ideal sequencing coverage. Most researchers determine the necessary coverage based on the type of study and available literature.
+3. The necessary coverage depends on the type of study. In this Tutorial, the following minimum **depths of coverage** of the Illumina reads are used (see the :ref:`Quality thresholds <quality-thresholds>` page):
 
-4. Ideal coverage for a genome assembly should be **50x or above** [ALBERT2019]_. It means that each base on average is sequenced 50 times.
+   * **30x** for routine analyses (assembly, AMR genes, typing).
+   * **50x** for SNP-based analyses (e.g., outbreak investigation).
+   * **80x** for *Campylobacter* sequenced with the Nextera XT library preparation kit.
+
+4. A coverage of 30x means that each base, on average, is sequenced 30 times [ALBERT2019]_.
 
 .. hint::
    The coverage can be calculated using the following equations.
@@ -104,7 +108,7 @@ Now, repeat the same calculation for **all the samples** using a loop and save t
    1. Open the file with the command line or with the text editor to get an idea about the structure.
    2. What is the unique identifier of each read in the fastq files? What is the read length?
    3. How many raw sequence reads are in the files?
-   4. Calculate the coverage of strainA and strainB, assuming a genome size of ~5.5 Mb. Is it higher than 50x?
+   4. Calculate the coverage of strainA and strainB, assuming a genome size of ~5.5 Mb. Is it higher than 30x? Could you use these samples for a SNP-based analysis (50x)?
    5. Calculate the coverage of the Nanopore reads of both strains using the same equation and the second one (variable read length).
 
 
@@ -441,6 +445,120 @@ In practice, you need to run fastp in all the samples of your project with the *
    If you want to use less disk space in your computer, you can delete the raw files after confirming that the clean files are correct, or keep only compressed ``.fastq.gz`` files.
 
 
+Does your sample pass? (reads)
+******************************
+
+Check if the **clean** Illumina reads of each sample are within the :ref:`quality thresholds <quality-thresholds>`. A sample that **fails** should not be used (e.g., it should be sequenced again); a **warning** means that you should look at the results more carefully.
+
+.. csv-table:: Quality thresholds of the Illumina reads
+   :header: "Metric", "Threshold", "Type"
+   :widths: 30, 40, 15
+
+   "Bases with quality ≥ Q30 (after cleaning)", "≥ 80% (reads ≤ 150 bp); ≥ 75% (≤ 250 bp); ≥ 70% (> 250 bp)", "Fail"
+   "GC content of the reads (ΔGC)", "Deviation from the expected GC content of the species < 4% (e.g., *E. coli* 50.6%: 46.6–54.6%; *Salmonella* 52.1%: 48.1–56.1%)", "Fail"
+   "Bases with quality ≥ Q20", "≥ 95%", "Warning"
+   "Per base sequence quality (FastQC)", "> 20 in all positions", "Warning"
+
+The values are in the ``.json`` report of |fastp|. The following commands print them for all the samples, with the result of the check:
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+
+   # Expected GC content of the species (E. coli; use 52.1 for Salmonella)
+   $ GC_EXPECTED=50.6
+
+   # Q30, Q20, GC content and mean read length of the clean reads (after_filtering section of the fastp report)
+   $ echo -e "sample\tQ30\tQ20\tGC\tread_length\tQ30_check\tQ20_check\tGC_check" > qc_improvement/reads_quality_check.tsv
+   while read -r sample; do
+      python3 -c "import json; a=json.load(open('qc_improvement/${sample}_fastp.json'))['summary']['after_filtering']; print('${sample}', round(a['q30_rate']*100,1), round(a['q20_rate']*100,1), round(a['gc_content']*100,1), a['read1_mean_length'], sep='\t')"
+   done < samples.txt | awk -F'\t' -v OFS='\t' -v gc=$GC_EXPECTED '{
+         min30 = ($5<=150) ? 80 : (($5<=250) ? 75 : 70)
+         dgc = $4 - gc; if (dgc < 0) dgc = -dgc
+         print $0, ($2>=min30 ? "PASS" : "FAIL"), ($3>=95 ? "PASS" : "WARNING"), (dgc<4 ? "PASS" : "FAIL") }' >> qc_improvement/reads_quality_check.tsv
+   $ column -t qc_improvement/reads_quality_check.tsv
+
+.. note::
+   The difference between the GC content of the reads and the expected GC content of the species (**ΔGC**) must be lower than 4%: for *E. coli* (50.6%), the reads should be between 46.6% and 54.6%. A GC content outside this range can indicate a **contamination** with another species, or a sample of another species. The expected GC content of each species is available, for example, on the `QualiBact <https://qualibact.org/species/>`_ website (median GC content).
+
+
+Depth and breadth of coverage
+*****************************
+
+The coverage that you calculated at the beginning of this section is the **average depth**. But the reads can be unevenly distributed, leaving regions of the genome with few or no reads. To check this, the reads are **mapped** (aligned) to a reference genome of the same species, and two more metrics are calculated:
+
+* **Breadth of coverage**: the percentage of the reference genome covered by at least **10 reads** (10x).
+* **Coverage uniformity**: the coefficient of variation (CV = standard deviation / mean) of the depth along the genome. A low CV means that the reads are evenly distributed.
+
+.. csv-table:: Coverage thresholds
+   :header: "Metric", "Threshold", "Type"
+   :widths: 30, 40, 15
+
+   "Depth of coverage", "≥ 30x (routine); ≥ 50x (SNP-based analyses); ≥ 80x (*Campylobacter* with Nextera XT)", "Fail"
+   "Breadth of coverage (10x)", "≥ 95% of the reference genome", "Fail"
+   "Coverage uniformity (CV)", "< 0.25", "Warning"
+
+.. code-block:: bash
+
+   # Install BWA (to map the reads) and SAMtools (to work with the alignments) in the qc environment
+   $ conda activate qc
+   $ mamba install bwa samtools
+
+   # Create a directory and index the reference genome (E. coli O157:H7 Sakai)
+   $ mkdir -p ~/tutorial/qc_improvement/mapping
+   $ cd ~/tutorial/qc_improvement/mapping
+   $ cp ~/tutorial/genomes/Sakai.fasta reference.fasta
+   $ bwa index reference.fasta
+
+   # Map the clean reads of strainA to the reference, and sort and index the alignments (BAM file)
+   $ bwa mem -t 4 reference.fasta ~/tutorial/qc_improvement/strainA_clean_R1.fastq.gz ~/tutorial/qc_improvement/strainA_clean_R2.fastq.gz | samtools sort -@ 4 -o strainA.bam
+   $ samtools index strainA.bam
+
+   # Summary per sequence of the reference (chromosome and plasmids): mean depth and % of bases covered
+   $ samtools coverage strainA.bam
+
+   # Mean depth, breadth of coverage at 10x and coefficient of variation, for the whole reference
+   $ samtools depth -a strainA.bam | awk '{n++; s+=$3; ss+=$3*$3; if ($3>=10) c++}
+        END {m=s/n; sd=sqrt(ss/n-m*m); printf "depth=%.1fx breadth10x=%.1f%% CV=%.2f\n", m, 100*c/n, sd/m}'
+
+.. csv-table:: Parameters explanation
+   :header: "Command", "Description"
+   :widths: 20, 60
+
+   "``bwa index``", "Indexes the reference genome (only needed once)"
+   "``bwa mem -t NUM``", "Maps the paired-end reads to the reference, with NUM threads"
+   "``samtools sort -o``", "Sorts the alignments by position and saves them in a BAM file"
+   "``samtools index``", "Indexes the BAM file"
+   "``samtools coverage``", "Coverage summary for each sequence of the reference"
+   "``samtools depth -a``", "Depth of each position of the reference, including the positions with 0 reads"
+
+**Running the coverage check in several samples**
+
+.. code-block:: bash
+
+   $ cd ~/tutorial/qc_improvement/mapping
+   $ echo -e "sample\tdepth\tbreadth10x\tCV\tdepth_check\tbreadth_check\tCV_check" > coverage_check.tsv
+   while read -r sample; do
+      bwa mem -t 4 reference.fasta ~/tutorial/qc_improvement/${sample}_clean_R1.fastq.gz ~/tutorial/qc_improvement/${sample}_clean_R2.fastq.gz 2> /dev/null | samtools sort -@ 4 -o ${sample}.bam
+      samtools index ${sample}.bam
+      samtools depth -a ${sample}.bam | awk -v s=$sample -v OFS='\t' '{n++; t+=$3; ss+=$3*$3; if ($3>=10) c++}
+         END {m=t/n; sd=sqrt(ss/n-m*m); b=100*c/n; cv=sd/m
+              print s, sprintf("%.1f",m), sprintf("%.1f",b), sprintf("%.2f",cv), (m>=30 ? "PASS" : "FAIL"), (b>=95 ? "PASS" : "FAIL"), (cv<0.25 ? "PASS" : "WARNING")}' >> coverage_check.tsv
+   done < ~/tutorial/samples.txt
+   $ column -t coverage_check.tsv
+
+   # The BAM files are large: remove them when you do not need them anymore
+   $ rm *.bam *.bai
+
+.. attention::
+   The breadth of coverage depends on how similar your isolate is to the **reference**. A low breadth can mean low quality, but also that your isolate has regions (e.g., prophages, plasmids, genomic islands) that the reference does not have, or vice versa. Use a reference of the same species and, if possible, of the same lineage (e.g., serotype or sequence type). Also, the reference used here includes the plasmids of Sakai: if your isolate does not have them, the breadth decreases.
+
+.. todo::
+   18. Check if the clean reads of all your samples pass the thresholds of Q30, Q20 and GC content.
+   19. Map the clean reads of strainA and strainB to the Sakai genome. What are the depth, breadth (10x) and CV of each sample? Do they pass the thresholds?
+   20. Look at the result of ``samtools coverage``. Are the plasmids of Sakai (pO157 and pOSAK1) covered by the reads of your samples? What does it mean?
+
+
 Oxford Nanopore reads
 #####################
 
@@ -605,10 +723,10 @@ Filtlong
    done < samples.txt
 
 .. todo::
-   18. Run |nanoplot| in the raw Nanopore reads of all the samples. What are the number of reads, the N50 and the mean read quality?
-   19. Clean the Nanopore reads of all the samples with |chopper|, |porechop| and |filtlong|.
-   20. Run |nanoplot| again in the filtered reads. Compare the reports (before and after). What changed in the read length distribution and in the read quality?
-   21. How many bases did you lose in the filtering? Calculate the coverage before and after the cleaning, as you did for the Illumina reads.
+   21. Run |nanoplot| in the raw Nanopore reads of all the samples. What are the number of reads, the N50 and the mean read quality?
+   22. Clean the Nanopore reads of all the samples with |chopper|, |porechop| and |filtlong|.
+   23. Run |nanoplot| again in the filtered reads. Compare the reports (before and after). What changed in the read length distribution and in the read quality?
+   24. How many bases did you lose in the filtering? Calculate the coverage before and after the cleaning, as you did for the Illumina reads.
 
 
 Folder structure
@@ -647,6 +765,10 @@ At the end of this section, you will have the following folder structure.
     │   ├── <sample>_clean_R2.fastq.gz
     │   ├── <sample>_fastp.html
     │   ├── <sample>_fastp.json
+    │   ├── reads_quality_check.tsv
+    │   ├── mapping
+    │   │   ├── reference.fasta
+    │   │   ├── coverage_check.tsv
     │   ├── <sample>_nanopore_nodcs.fastq.gz
     │   ├── <sample>_nanopore_nodcs_noadapt.fastq.gz
     │   ├── <sample>_nanopore_filtered.fastq.gz

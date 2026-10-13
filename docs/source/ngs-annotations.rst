@@ -224,6 +224,14 @@ Usage
    2. How many coding sequences (CDS) were predicted in each genome? And how many tRNAs and rRNAs?
    3. Open the ``.tsv`` (or ``.gff3``) file of strainA. Which gene is at the start of the chromosome? Why? (Remember the reorientation with |dnaapler|.)
 
+.. note::
+   The number of **coding sequences (CDS)** is also a quality metric of the assembly: an assembly with too few CDS may be incomplete, and one with too many may be contaminated or have many errors (e.g., frameshifts that split the genes). Compare the number of CDS with the expected values of the species in the :ref:`Quality thresholds <quality-thresholds>` page (e.g., *E. coli*: 3,900–6,500).
+
+   .. code-block:: bash
+
+      # Number of CDS of each genome, and check against the FAIL range of E. coli
+      $ grep -H "^CDSs" ~/tutorial/annotation/bakta/*/*.txt | awk -F'[/:]' '{n=$NF+0; print $(NF-3)"\t"n"\t"((n>=3900 && n<=6500) ? "PASS" : "FAIL")}' | column -t
+
 
 Multilocus Sequence Typing
 ##########################

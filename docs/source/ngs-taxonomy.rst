@@ -294,6 +294,45 @@ To classify all your samples with the same parameters, use a loop over the sampl
    1. Run |kraken| and |bracken| on the clean Illumina reads and on the filtered Nanopore reads of all the samples, and save a copy of the reports.
    2. Do the Illumina and the Nanopore reads of the same sample give the same species? If not, what could explain it?
 
+**5. Does your sample pass? (species and contamination)**
+
+The result of |bracken| in the **Illumina** reads is used to check if the sample is **pure** (see the :ref:`Quality thresholds <quality-thresholds>` page). The sample passes if one of the following conditions is met (the percentages are of the **classified** reads):
+
+.. csv-table:: Thresholds of inter-species contamination (Bracken)
+   :header: "Option", "Condition", "Type"
+   :widths: 15, 55, 15
+
+   "1", "The most abundant species has ≥ 90% of the reads", "Fail if neither option is met"
+   "2", "The genus of the most abundant species has ≥ 90% of the reads **and** the species has ≥ 75%", "Fail if neither option is met"
+
+.. note::
+   *Escherichia* and *Shigella* are counted together as **one genus**, since *Shigella* is, genetically, a lineage of *E. coli*. Kraken2 often assigns some *E. coli* reads to *Shigella*, which does not mean a contamination.
+
+To check option 2, run |bracken| also at the **genus** level (``-l G``):
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   $ DB=~/databases/kraken2_standard_08
+   while read -r sample; do
+      python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}.kreport \
+         -k $DB/database100mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}.bracken_genus -l G
+   done < samples.txt
+
+   # Most abundant species and genus of each sample (Escherichia + Shigella together), and the result of the check
+   $ echo -e "sample\tspecies\tspecies_%\tgenus\tgenus_%\tcheck" > taxonomy/contamination_check.tsv
+   while read -r sample; do
+      sp=$(tail -n +2 taxonomy/kraken_bracken/${sample}.bracken | sort -t$'\t' -k7,7nr | head -n 1 | awk -F'\t' '{printf "%s\t%.1f", $1, $7*100}')
+      ge=$(tail -n +2 taxonomy/kraken_bracken/${sample}.bracken_genus | awk -F'\t' '{g=$1; if (g=="Escherichia" || g=="Shigella") g="Escherichia/Shigella"; f[g]+=$7}
+           END {for (g in f) printf "%s\t%.1f\n", g, f[g]*100}' | sort -t$'\t' -k2,2nr | head -n 1)
+      echo -e "${sample}\t${sp}\t${ge}"
+   done < samples.txt | awk -F'\t' -v OFS='\t' '{print $0, (($3>=90 || ($5>=90 && $3>=75)) ? "PASS" : "FAIL")}' >> taxonomy/contamination_check.tsv
+   $ column -t -s $'\t' taxonomy/contamination_check.tsv
+
+.. todo::
+   3. Do all your samples pass the contamination check? Which option (1 or 2) was met by each sample?
+   4. Is the most abundant species the one that you expected?
+
 
 Taxonomy visualisation
 ######################
@@ -387,9 +426,9 @@ Usage
 *Figure 14. Example of a Krona HTML report on a macOS.*
 
 .. todo::
-   3. Visualize the |kraken| results using |krona| for strainA and strainB (Illumina and Nanopore) and save the final charts to your computer.
-   4. What is the primary taxonomy ID present in your samples? And the genus?
-   5. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
+   5. Visualize the |kraken| results using |krona| for strainA and strainB (Illumina and Nanopore) and save the final charts to your computer.
+   6. What is the primary taxonomy ID present in your samples? And the genus?
+   7. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
 
 
 Contamination
@@ -492,8 +531,26 @@ ConFindr already analyses all the samples of the input directory, so you just ne
    $ rm taxonomy/confindr/input/*.fastq
 
 .. todo::
-   6. Run |confindr| on the clean Illumina reads of all the samples.
-   7. Are any of your samples contaminated? Compare the results with the ones of |kraken| and |bracken|. Which kind of contamination can each tool detect?
+   8. Run |confindr| on the clean Illumina reads of all the samples.
+   9. Are any of your samples contaminated? Compare the results with the ones of |kraken| and |bracken|. Which kind of contamination can each tool detect?
+
+**4. Does your sample pass? (intraspecies contamination)**
+
+.. csv-table:: Thresholds of ConFindr
+   :header: "Metric", "Threshold", "Type"
+   :widths: 30, 40, 15
+
+   "Genus detected by ConFindr", "The same as the expected species (and as the result of |bracken|)", "Fail"
+   "Intraspecies contamination (``ContamStatus``)", "``False``", "Warning"
+
+.. code-block:: bash
+
+   # Print the sample, the genus, the contamination status and the % of contamination
+   $ awk -F',' 'NR==1 {for (i=1; i<=NF; i++) c[$i]=i; next}
+        {print $c["Sample"]"\t"$c["Genus"]"\t"$c["ContamStatus"]"\t"$c["PercentContam"]}' taxonomy/confindr/results/confindr_report.csv | column -t
+
+.. attention::
+   A sample with intraspecies contamination (two strains of the same species) can still produce an assembly, but the results (e.g., AMR genes, MLST alleles, SNPs) may be a **mixture** of the two strains. Look carefully at the results of these samples (e.g., multiple alleles in MLST).
 
 
 Folder structure
@@ -542,6 +599,7 @@ At the end of this section, you will have the following folder structure.
     │   │   ├── <sample>_krona.html
     │   │   ├── <sample>_nanopore_krona.html
     │   │   ├── all_samples_krona.html
+    │   ├── contamination_check.tsv
     │   ├── confindr
     │   │   ├── input
     │   │   ├── results
