@@ -10,7 +10,7 @@ Downloads
 
    * All the downloads provided are for untrimmed raw reads.
 
-   * The files provided in this page were generated with the first version of this Tutorial (older software versions). The files of the sections on antimicrobial resistance and plasmids are not provided because they are produced in a few minutes by the commands of the Tutorial using the public genomes and your assemblies.
+   * The files provided in this page were generated with the first version of this Tutorial (older software versions and a different pipeline: SPAdes and Unicycler). The outputs of the current tools (e.g., fastp, Shovill, Autocycler, CheckM2) are not provided yet, so your results will be different. The files of the sections on antimicrobial resistance, virulence and plasmids are not provided because they are produced in a few minutes by the commands of the Tutorial using the public genomes and your assemblies.
 
 
 Data acquisition
@@ -75,28 +75,16 @@ De novo assembly
 ################
 
 
-SPAdes
-......
-
-* Final Illumina assembly: [`MEGA <https://mega.nz/folder/ZzxXnI7Z#dz6yaWpqYEp8dltK1tz3MA>`__]
-
-
 Unicycler
 .........
 
-* Final Hybrid assembly: [`MEGA <https://mega.nz/folder/du5DnCgL#UTgfvuksgI66oiRz3ZO2NA>`__]
-
-
-Bandage
-.......
-
-* All data: [`MEGA <https://mega.nz/folder/J74EFbQB#M8EVNE7PTMW3RwZrbxn-Pg>`__]
+* Hybrid assembly (first version of the Tutorial; it can be used instead of the final assembly): [`MEGA <https://mega.nz/folder/du5DnCgL#UTgfvuksgI66oiRz3ZO2NA>`__]
 
 
 QUAST
 .....
 
-* SPAdes vs Hybrid assembly: [`MEGA <https://mega.nz/folder/4rQ0AKZT#J1cl0S6k-ewvaoQrsDSHxA>`__]
+* Short-read (SPAdes) vs hybrid assembly (first version of the Tutorial): [`MEGA <https://mega.nz/folder/4rQ0AKZT#J1cl0S6k-ewvaoQrsDSHxA>`__]
 
 
 Genome annotation
@@ -106,16 +94,4 @@ Genome annotation
 Bakta
 .....
 
-* Final Hybrid assembly: [`MEGA <https://mega.nz/folder/4uZymaKb#xL9gxvv7gDFqMXMTu5J63g>`__]
-
-
-ABRicate
-........
-
-* Final Hybrid assembly: [`MEGA <https://mega.nz/folder/hzRHTCIB#1HudBQrjsNB5c-RHysasDQ>`__]
-
-
-BUSCO
-.....
-
-* Final Hybrid assembly: [`MEGA <https://mega.nz/folder/8zwSyLYb#Z7fzrOCNg8lEvWKwfkTIGA>`__]
+* Hybrid assembly (first version of the Tutorial): [`MEGA <https://mega.nz/folder/4uZymaKb#xL9gxvv7gDFqMXMTu5J63g>`__]

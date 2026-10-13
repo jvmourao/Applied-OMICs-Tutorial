@@ -163,24 +163,28 @@ latex_show_urls = "footnote"
 #  dir menu entry, description, category)
 
 rst_epilog = """
-.. |abricate| replace:: `ABRicate <https://github.com/tseemann/abricate>`__
 .. |amrfinder| replace:: `AMRFinderPlus <https://github.com/ncbi/amr/wiki>`__
 .. |mamba| replace:: `mamba <https://mamba.readthedocs.io/>`__
 .. |miniforge| replace:: `Miniforge <https://github.com/conda-forge/miniforge>`__
 .. |mobsuite| replace:: `MOB-suite <https://github.com/phac-nml/mob-suite>`__
+.. |plasgraph2| replace:: `plASgraph2 <https://github.com/cchauve/plASgraph2>`__
 .. |plasmidfinder| replace:: `PlasmidFinder <https://bitbucket.org/genomicepidemiology/plasmidfinder/src/master/>`__
 .. |pointfinder| replace:: `PointFinder <https://bitbucket.org/genomicepidemiology/pointfinder_db/src/master/>`__
 .. |resfinder| replace:: `ResFinder <https://bitbucket.org/genomicepidemiology/resfinder/src/master/>`__
+.. |virulencefinder| replace:: `VirulenceFinder <https://bitbucket.org/genomicepidemiology/virulencefinder/src/master/>`__
 .. |kma| replace:: `KMA <https://bitbucket.org/genomicepidemiology/kma/src/master/>`__
 .. |anaconda| replace:: `Anaconda <https://www.anaconda.com/docs/getting-started/anaconda/main>`__
-.. |bandage| replace:: `Bandage <https://rrwick.github.io/Bandage/>`__
-.. |bbduk| replace:: `BBDuk <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/bb-tools-user-guide/bbduk-guide/>`__
-.. |bbtools| replace:: `BBTools <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/>`__
+.. |fastp| replace:: `fastp <https://github.com/OpenGene/fastp>`__
+.. |nanoplot| replace:: `NanoPlot <https://github.com/wdecoster/NanoPlot>`__
+.. |chopper| replace:: `Chopper <https://github.com/wdecoster/chopper>`__
+.. |porechop| replace:: `Porechop <https://github.com/rrwick/Porechop>`__
+.. |filtlong| replace:: `Filtlong <https://github.com/rrwick/Filtlong>`__
 .. |bracken| replace:: `Bracken <https://github.com/jenniferlu717/Bracken>`__
-.. |busco| replace:: `BUSCO <https://busco.ezlab.org/>`__
+.. |confindr| replace:: `ConFindr <https://github.com/OLC-Bioinformatics/ConFindr>`__
 .. |conda| replace:: `conda <https://docs.conda.io/projects/conda/en/stable/>`__
 .. |fastqc| replace:: `FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`__
 .. |go| replace:: `GO <http://geneontology.org/>`__
+.. |mlst| replace:: `mlst <https://github.com/tseemann/mlst>`__
 .. |multiqc| replace:: `MultiQC <https://multiqc.info/>`__
 .. |kraken| replace:: `Kraken2 <https://github.com/DerrickWood/kraken2/blob/master/docs/MANUAL.markdown>`__
 .. |krona| replace:: `Krona <https://github.com/marbl/Krona/wiki>`__
@@ -191,6 +195,12 @@ rst_epilog = """
 .. |quast| replace:: `Quast <https://github.com/ablab/quast>`__
 .. |rast| replace:: `RAST <https://rast.nmpdr.org/>`__
 .. |spades| replace:: `SPAdes <https://github.com/ablab/spades/blob/main/README.md>`__
+.. |shovill| replace:: `Shovill <https://github.com/tseemann/shovill>`__
+.. |autocycler| replace:: `Autocycler <https://github.com/rrwick/Autocycler>`__
+.. |polypolish| replace:: `Polypolish <https://github.com/rrwick/Polypolish>`__
+.. |pypolca| replace:: `Pypolca <https://github.com/gbouras13/pypolca>`__
+.. |dnaapler| replace:: `Dnaapler <https://github.com/gbouras13/dnaapler>`__
+.. |checkm2| replace:: `CheckM2 <https://github.com/chklovski/CheckM2>`__
 .. |sra| replace:: `SRA <https://www.ncbi.nlm.nih.gov/sra>`__
 .. |unicycler| replace:: `Unicycler <https://github.com/rrwick/Unicycler>`__
 """

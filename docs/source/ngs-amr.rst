@@ -1,8 +1,8 @@
 .. _ngs-amr:
 
-****************************************
-Antimicrobial resistance genes/mutations
-****************************************
+**************************************
+Antimicrobial resistance and virulence
+**************************************
 
 
 Introduction
@@ -15,14 +15,16 @@ Introduction
    * **Acquired genes**: genes that are obtained by horizontal gene transfer, usually located in mobile genetic elements such as **plasmids**, transposons, or integrons (e.g., ``blaCTX-M-15``, ``tet(A)``, ``mcr-1``).
    * **Chromosomal point mutations**: single nucleotide changes, small insertions/deletions, or premature stop codons in genes that are intrinsically present in the genome, such as the genes that encode the antibiotic targets (e.g., *gyrA*, *parC*) or regulators of efflux pumps (e.g., *acrR*).
 
-3. In the previous section, you used |abricate|, which detects the presence of genes using BLAST. However, specialised tools are needed to detect point mutations and to **predict the resistance phenotype** from the genotype.
+3. Specialised tools are needed to detect point mutations and to **predict the resistance phenotype** from the genotype.
 
-4. In this section, you will use two complementary approaches:
+4. In this section, you will use two complementary approaches to detect AMR:
 
    * |resfinder| and |pointfinder| (Center for Genomic Epidemiology, Technical University of Denmark), to detect **acquired genes** and **chromosomal mutations**, respectively [BORTOLAIA2020]_ [FLORENSA2022]_ [ZANKARI2017]_.
    * |amrfinder| (National Center for Biotechnology Information), to detect acquired genes, point mutations, and also stress (biocide, metal, heat) and virulence genes [FELDGARDEN2021]_.
 
-5. You will run both tools in the **several genomes** that you prepared in the previous sections and compare the results.
+5. You will run both tools in the **several genomes** that you prepared in the previous sections and compare the results. |resfinder| will also be run in the **Illumina reads**, while |pointfinder| and |amrfinder| are only run in the assemblies.
+
+6. Finally, you will use |virulencefinder| (Center for Genomic Epidemiology) to detect **virulence genes** [JOENSEN2014]_.
 
 .. attention::
    * The genotype does **not** always predict the phenotype. The presence of a gene does not mean that it is being expressed, and some resistance mechanisms are still unknown.
@@ -37,9 +39,12 @@ After finishing this Tutorial section, you will be able to:
 
 * Distinguish between acquired resistance genes and chromosomal resistance mutations.
 * Detect acquired resistance genes and point mutations in assembled genomes using ResFinder/PointFinder and AMRFinderPlus.
+* Detect acquired resistance genes directly in the Illumina reads using ResFinder.
+* Detect virulence genes using VirulenceFinder.
 * Choose the correct **species/organism** option for each genome.
 * Run the same analysis in several genomes and **combine the results** into a single table.
 * Interpret the identity and coverage values, and compare the results of different tools.
+* Evaluate the results of several tools and inputs together, and decide which AMR genes and mutations are confirmed.
 
 
 Detection of AMR genes and mutations
@@ -116,7 +121,10 @@ Usage
 
 **1. Input/Output files**
 
-``Input``: A genome assembly in ``.fasta`` format (option ``-ifa``) or raw reads in ``.fastq`` format (option ``-ifq``). For this part of the Tutorial, we will use the assembled genomes in ``~/tutorial/genomes``.
+``Input``: A genome assembly in ``.fasta`` format (option ``-ifa``) or raw reads in ``.fastq`` format (option ``-ifq``). We will use the Illumina raw reads (acquired genes only) and the assembled genomes in ``~/tutorial/genomes`` (acquired genes and point mutations).
+
+.. note::
+   In this Tutorial, |resfinder| is run with a minimum of **80% identity** (``-t 0.80``) and **60% coverage** (``-l 0.60``). These are also the default values, but it is good practice to write them in the command, so that the thresholds are always reported.
 
 ``Output``: A directory with several files. The most important ones are:
 
@@ -137,16 +145,10 @@ Usage
 
    # Run ResFinder (acquired genes) and PointFinder (point mutations) in the strainA genome
    # The species of the genome must be provided to run PointFinder
-   $ run_resfinder.py -ifa ~/tutorial/genomes/strainA.fasta -o strainA -s "Escherichia coli" --acquired --point
+   $ run_resfinder.py -ifa ~/tutorial/genomes/strainA.fasta -o strainA -s "Escherichia coli" --acquired --point -t 0.80 -l 0.60
 
-   # Run only ResFinder (acquired genes), i.e., without the species
-   $ run_resfinder.py -ifa ~/tutorial/genomes/strainA.fasta -o strainA_acquired --acquired
-
-   # Run ResFinder with different thresholds (minimum 90% identity and 80% coverage) and also DisinFinder
-   $ run_resfinder.py -ifa ~/tutorial/genomes/strainA.fasta -o strainA_strict -s "Escherichia coli" --acquired --point --disinfectant -t 0.90 -l 0.80
-
-   # Run ResFinder directly in the raw reads (it uses KMA)
-   $ run_resfinder.py -ifq ~/tutorial/raw_data/strainA_R1.fastq.gz ~/tutorial/raw_data/strainA_R2.fastq.gz -o strainA_reads -s "Escherichia coli" --acquired --point
+   # Run ResFinder (acquired genes only) directly in the Illumina raw reads (it uses KMA)
+   $ run_resfinder.py -ifq ~/tutorial/raw_data/strainA_R1.fastq.gz ~/tutorial/raw_data/strainA_R2.fastq.gz -o strainA_reads --acquired -t 0.80 -l 0.60
 
 .. csv-table:: Parameters explanation when using ResFinder/PointFinder
    :header: "Parameter", "Description"
@@ -160,8 +162,8 @@ Usage
    "``-acq`` or ``--acquired``", "Run ResFinder for acquired resistance genes"
    "``-c`` or ``--point``", "Run PointFinder for chromosomal mutations"
    "``-d`` or ``--disinfectant``", "Run DisinFinder for disinfectant resistance genes"
-   "``-t NUM``", "Minimum identity threshold, between 0 and 1 (default: 0.8)"
-   "``-l NUM``", "Minimum coverage (length of the hit / length of the gene) between 0 and 1 (default: 0.6)"
+   "``-t NUM``", "Minimum identity threshold, between 0 and 1 (default: 0.8; used in this Tutorial: 0.80)"
+   "``-l NUM``", "Minimum coverage (length of the hit / length of the gene) between 0 and 1 (default: 0.6; used in this Tutorial: 0.60)"
    "``--ignore_missing_species``", "Do not stop with an error if PointFinder does not have a database for the species provided in ``-s``"
    "``-db_res``, ``-db_point``, ``-db_disinf``", "Directories of the databases (not needed if the environment variables were exported)"
 
@@ -204,8 +206,15 @@ Each genome may belong to a **different species**, so the species must be adjust
    $ mkdir -p logs
    while IFS=$'\t' read -r genome species; do
       echo "Running ResFinder in ${genome} (${species})"
-      run_resfinder.py -ifa genomes/${genome}.fasta -o amr/resfinder/${genome} -s "${species}" --acquired --point > logs/${genome}_resfinder.log 2>&1
+      run_resfinder.py -ifa genomes/${genome}.fasta -o amr/resfinder/${genome} -s "${species}" --acquired --point -t 0.80 -l 0.60 > logs/${genome}_resfinder.log 2>&1
    done < species.tsv
+
+   # Run ResFinder (acquired genes only) in the Illumina raw reads of your samples
+   $ mkdir -p amr/resfinder_reads
+   while read -r sample; do
+      echo "Running ResFinder in the reads of ${sample}"
+      run_resfinder.py -ifq raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz -o amr/resfinder_reads/${sample} --acquired -t 0.80 -l 0.60 > logs/${sample}_resfinder_reads.log 2>&1
+   done < samples.txt
 
 .. warning::
    The species must be correct! PointFinder looks for mutations in the genes of the species that you provide. If you run a *Salmonella* genome as if it was *E. coli*, it may find false mutations because the reference sequences are different.
@@ -243,7 +252,7 @@ Now you have one directory for each genome. To compare them it is useful to **co
    2. Run the loop in all the genomes. Which genome has more resistance genes? Which genomes do not have any acquired gene?
    3. Is the *Salmonella* LT2 genome truly free of resistance mutations? What happens if you run it with ``-s "Escherichia coli"``?
    4. In which sequence (chromosome or plasmid) are the acquired genes of EC958 located? What does it mean?
-   5. Run ResFinder in the **raw reads** of strainA and compare the results with the ones obtained with the assembled genome.
+   5. Run ResFinder in the **raw reads** of strainA and strainB and compare the results with the ones obtained with the assembled genomes. Are there genes found only in the reads? Why can this happen (e.g., low copy genes that were not assembled)?
 
 
 AMRFinderPlus
@@ -256,6 +265,8 @@ AMRFinderPlus
 * With the option ``--plus``, |amrfinder| also reports genes related to **stress response** (biocides, metals, acid, heat) and **virulence**, and other genes not directly related to antibiotic resistance.
 
 * It is also the AMR tool included in the Bakta annotation and the one used by NCBI in the Pathogen Detection browser.
+
+* In this Tutorial, |amrfinder| is run in the **assemblies** with its **default thresholds**: the curated identity threshold of each gene (or **90%** identity when there is none) and **50%** coverage of the reference protein.
 
 
 Installation
@@ -400,19 +411,20 @@ As in ResFinder, each genome may need a different organism option. Note that the
 Comparing the tools
 ###################
 
-Now that you have the results of |abricate|, |resfinder| and |amrfinder|, compare them.
+Now that you have the results of |resfinder| and |amrfinder|, compare them.
 
 .. csv-table:: Main differences between the tools used to detect AMR
-   :header: "Feature", "ABRicate", "ResFinder/PointFinder", "AMRFinderPlus"
-   :widths: 20, 20, 25, 25
+   :header: "Feature", "ResFinder/PointFinder", "AMRFinderPlus"
+   :widths: 20, 30, 30
 
-   "Method", "BLAST (nucleotide)", "BLAST or KMA (nucleotide)", "BLAST (translated) and HMMs"
-   "Input", "Assembled genomes", "Assembled genomes or reads", "Assembled genomes or proteins"
-   "Acquired genes", "Yes", "Yes (ResFinder)", "Yes"
-   "Point mutations", "No", "Yes (PointFinder; for 11 species)", "Yes (for some organisms)"
-   "Phenotype prediction", "No", "Yes", "Class/subclass of the gene (not a phenotype)"
-   "Database", "Several (including ResFinder and NCBI)", "ResFinder, PointFinder, DisinFinder", "NCBI Reference Gene Catalog"
-   "Other genes", "Virulence, plasmids", "Disinfectants", "Stress (biocide, metal) and virulence (``--plus``)"
+   "Method", "BLAST or KMA (nucleotide)", "BLAST (translated) and HMMs"
+   "Input", "Assembled genomes or reads", "Assembled genomes or proteins"
+   "Acquired genes", "Yes (ResFinder)", "Yes"
+   "Point mutations", "Yes (PointFinder; for 11 species)", "Yes (for some organisms)"
+   "Phenotype prediction", "Yes", "Class/subclass of the gene (not a phenotype)"
+   "Database", "ResFinder, PointFinder, DisinFinder", "NCBI Reference Gene Catalog"
+   "Thresholds used in this Tutorial", "80% identity, 60% coverage", "Default: curated per gene (or 90% identity), 50% coverage"
+   "Other genes", "Disinfectants", "Stress (biocide, metal) and virulence (``--plus``)"
 
 For example, in the EC958 genome (*E. coli* ST131 with an extended-spectrum β-lactamase plasmid) you should find, among others:
 
@@ -429,10 +441,203 @@ For example, in the EC958 genome (*E. coli* ST131 with an extended-spectrum β-l
 The strains Sakai and K-12 do not have any acquired resistance gene, and the *Salmonella* LT2 only has the cryptic aminoglycoside acetyltransferase ``aac(6')-Iaa``.
 
 .. todo::
-   10. Compare the results of |abricate| (``resfinder`` and ``ncbi`` databases), |resfinder| and |amrfinder| in the EC958 genome. Which genes are found by all the tools? Which genes are only found by one of them? Why?
-   11. Which tools detected the mutations in *gyrA* and *parC*? Why did |abricate| not detect them?
+   10. Compare the results of |resfinder| and |amrfinder| in the EC958 genome. Which genes are found by both tools? Which genes are only found by one of them? Why?
+   11. Do both tools detect the same mutations in *gyrA* and *parC*?
    12. In your strains (strainA and strainB), are there any resistance genes located in plasmids? In the next section, you will learn how to confirm this.
    13. Why is the gene ``catB3`` found with only 70% coverage by ResFinder, but it is reported as ``PARTIALP`` by AMRFinderPlus when using the Bakta annotation?
+
+
+Evaluating the AMR results together
+###################################
+
+You now have **three** AMR results for each of your samples: |resfinder| in the reads, |resfinder| in the assembly, and |amrfinder| in the assembly (and two for the point mutations: |pointfinder| and |amrfinder|). They will not always agree. Instead of choosing one tool, the results are **evaluated together**, following a few simple rules:
+
+1. **Primary result**: |amrfinder| in the assembly (it compares proteins, and reports if a gene is complete, partial or interrupted).
+2. **Validation**: the gene is also found by |resfinder| in the assembly.
+3. **Rescue**: a gene that is partial in the assembly (e.g., split at the end of a contig) is accepted if |resfinder| finds it complete in the **reads**.
+4. **Mutations**: the point mutations of |pointfinder| and |amrfinder| are combined.
+
+**1. Combining the results of the three methods**
+
+The following commands create a table with one line per gene and genome, and one column per method. For |amrfinder| the column shows the **method** (e.g., ``EXACTX``, ``PARTIALX``), and for |resfinder| the **coverage** (%) of the gene; ``-`` means that the gene was not found.
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   $ echo -e "genome\tgene\tAMRFinderPlus_assembly\tResFinder_assembly\tResFinder_reads" > amr/amr_evaluation_all.tsv
+   for genome in genomes/*.fasta; do
+      g=$(basename $genome .fasta)
+      {
+         # AMRFinderPlus: acquired AMR genes (scope core, type AMR, subtype AMR) and the method
+         awk -F'\t' 'NR>1 && $9=="core" && $10=="AMR" && $11=="AMR" {print $7"\tamrfinder\t"$14}' amr/amrfinder/${g}.tsv
+         # ResFinder in the assembly: gene and coverage
+         tail -n +2 amr/resfinder/${g}/ResFinder_results_tab.txt | awk -F'\t' '{print $1"\tres_assembly\t"$4}'
+         # ResFinder in the reads (only for your samples)
+         [ -s amr/resfinder_reads/${g}/ResFinder_results_tab.txt ] && \
+            tail -n +2 amr/resfinder_reads/${g}/ResFinder_results_tab.txt | awk -F'\t' '{print $1"\tres_reads\t"$4}'
+      } | awk -F'\t' -v g=$g '{gene[$1]=1; hit[$1 SUBSEP $2]=$3}
+            END {for (x in gene) {
+                    a = ((x SUBSEP "amrfinder") in hit) ? hit[x SUBSEP "amrfinder"] : "-"
+                    r = ((x SUBSEP "res_assembly") in hit) ? hit[x SUBSEP "res_assembly"] : "-"
+                    q = ((x SUBSEP "res_reads") in hit) ? hit[x SUBSEP "res_reads"] : "-"
+                    print g"\t"x"\t"a"\t"r"\t"q}}' | sort >> amr/amr_evaluation_all.tsv
+   done
+
+   # Visualise the table
+   $ column -t -s $'\t' amr/amr_evaluation_all.tsv
+
+   # Point mutations: PointFinder ("gyrA p.S83L") is converted to the AMRFinderPlus format ("gyrA_S83L")
+   $ echo -e "genome\tmutation\tAMRFinderPlus\tPointFinder" > amr/mutations_evaluation_all.tsv
+   for genome in genomes/*.fasta; do
+      g=$(basename $genome .fasta)
+      {
+         awk -F'\t' 'NR>1 && $10=="AMR" && $11 ~ /^POINT/ {print $7"\tamrfinder"}' amr/amrfinder/${g}.tsv
+         tail -n +2 amr/resfinder/${g}/PointFinder_results.txt | awk -F'\t' '{m=$1; sub(/ p\./, "_", m); print m"\tpointfinder"}'
+      } | awk -F'\t' -v g=$g '{mut[$1]=1; hit[$1 SUBSEP $2]=1}
+            END {for (x in mut) print g"\t"x"\t"(((x SUBSEP "amrfinder") in hit) ? "yes" : "-")"\t"(((x SUBSEP "pointfinder") in hit) ? "yes" : "-")}' | sort >> amr/mutations_evaluation_all.tsv
+   done
+   $ column -t -s $'\t' amr/mutations_evaluation_all.tsv
+
+.. attention::
+   The same gene can have **different names** in the two databases (e.g., ``aac(6')-Ib-cr`` in |resfinder| and ``aac(6')-Ib-cr5`` in |amrfinder|), and |resfinder| can report the same gene in several lines (similar entries of the database). In these cases the gene appears in two lines of the table, each one found by only one tool. Before deciding that the tools disagree, check if they are the **same gene** (e.g., the same contig and position).
+
+**2. Decision table**
+
+Use the following table to classify each gene of ``amr_evaluation_all.tsv``. A **complete** hit by |amrfinder| is one found with the methods ``EXACT``, ``ALLELE`` or ``BLAST``; a **partial or interrupted** hit is one found with ``PARTIAL``, ``PARTIAL_CONTIG_END``, ``INTERNAL_STOP`` or only by ``HMM``. A hit of |resfinder| is accepted with at least **60% coverage** (and 80% identity).
+
+.. csv-table:: Decision table for the AMR genes
+   :header: "AMRFinderPlus (assembly)", "ResFinder (assembly)", "ResFinder (reads)", "Decision", "Interpretation"
+   :widths: 18, 15, 15, 12, 40
+
+   "Complete", "Found", "Any", "**Confirmed**", "Both tools agree in the assembly."
+   "Complete", "Not found", "Any", "**Confirmed**", "The primary tool found a complete gene. Check if |resfinder| reports it with another name, or if the gene is not in the ResFinder database."
+   "Partial or interrupted", "Any", "Found (complete)", "**Confirmed** (rescued)", "The gene is complete in the reads, so it was probably split at the end of a contig or has an assembly error."
+   "Partial or interrupted", "Any", "Not found or not run", "**Check**", "The gene may be truncated, interrupted (frameshift, internal stop) or at the end of a contig. Look at its position and coverage; it may not be functional."
+   "Not found", "Found", "Any", "**Check**", "Only |resfinder| found it: check the name, the identity and the coverage, and if it is the same gene as another hit of |amrfinder|."
+   "Not found", "Not found", "Found", "**Reads only**", "The gene is in the reads but not in the assembly: low copy number (e.g., a small plasmid that was not assembled), a contamination, or a false positive. Check the assembly and the contamination results."
+
+.. csv-table:: Decision table for the point mutations
+   :header: "AMRFinderPlus", "PointFinder", "Decision"
+   :widths: 20, 20, 60
+
+   "Found", "Found", "**Confirmed**"
+   "Found", "Not found", "**Check**: the mutation may not be in the PointFinder database, or the species option (``-s``/``-O``) may be wrong"
+   "Not found", "Found", "**Check**: the mutation may not be in the AMRFinderPlus database, or the species option may be wrong"
+
+.. note::
+   Some genes need a special interpretation, even when they are **confirmed**:
+
+   * **Intrinsic genes**: genes that are naturally present in all the isolates of a species and do not confer acquired resistance (e.g., ``blaEC`` in *E. coli*). |amrfinder| removes most of them when you use the ``-O`` option.
+   * **Low-level resistance**: genes that only increase the MIC a little, so the isolate may still be classified as susceptible (e.g., ``qnrS1`` for fluoroquinolones).
+   * **Variants that are not ESBL**: some β-lactamase variants are not extended-spectrum β-lactamases, although they belong to a family with ESBL variants (e.g., ``blaTEM-135``). Always check the exact variant.
+
+.. todo::
+   14. Build the tables ``amr_evaluation_all.tsv`` and ``mutations_evaluation_all.tsv``. Classify each gene and mutation of strainA, strainB and EC958 using the decision tables.
+   15. Is there any gene found only in the reads of strainA or strainB? What could be the reason?
+   16. Which genes of EC958 need to be checked (e.g., ``catB3``)? Why can the public genomes not be rescued with the reads?
+   17. Write the final list of confirmed AMR genes and mutations of each genome.
+
+
+Detection of virulence genes
+############################
+
+
+VirulenceFinder
+***************
+
+* |virulencefinder| identifies **virulence genes** by comparing the genome (or the reads) with the VirulenceFinder database of the Center for Genomic Epidemiology [JOENSEN2014]_ [MALBERGTETZSCHNER2020]_.
+
+* The database is divided by species groups (e.g., *E. coli*, *Enterococcus*, *Listeria*, *Staphylococcus aureus*). For *E. coli*, it includes the **Shiga toxin** genes (*stx*), used for the subtyping of Shiga toxin-producing *E. coli* (STEC), such as strainA and strainB.
+
+* In this Tutorial, |virulencefinder| (version 2.0.4) is used for the detection of virulence genes (instead of the ``--plus`` option of |amrfinder|), with a minimum of **90% identity** and **60% coverage**.
+
+
+Installation
+............
+
+.. code-block:: bash
+
+   # Deactivate all the current environments
+   $ conda deactivate
+
+   # Create a new environment named virulencefinder and install VirulenceFinder
+   $ mamba create -n virulencefinder virulencefinder=2.0.4
+
+   # Activate the new environment
+   $ conda activate virulencefinder
+
+   # Download the database and index it with KMA (as for ResFinder)
+   $ cd ~/databases/cge
+   $ git clone https://bitbucket.org/genomicepidemiology/virulencefinder_db.git
+   $ cd virulencefinder_db
+   $ python INSTALL.py
+
+   # Check the version of the database
+   $ cat VERSION
+
+   # See the databases available (one per species group)
+   $ cat config
+
+
+Usage
+.....
+
+**1. Input/Output files**
+
+``Input``: A genome assembly in ``.fasta`` format, or the raw reads in ``.fastq`` format.
+
+``Output``: A directory with several files. The most important ones are ``results_tab.tsv`` (table with the virulence genes found), ``results.txt`` (results and alignments) and ``data.json`` (all the results in a machine-readable format).
+
+**2. Basic commands**
+
+.. code-block:: bash
+
+   $ mkdir -p ~/tutorial/amr/virulencefinder/strainA
+   $ cd ~/tutorial/amr/virulencefinder
+
+   # Run VirulenceFinder in the strainA genome, using all the databases
+   $ virulencefinder.py -i ~/tutorial/genomes/strainA.fasta -o strainA -p ~/databases/cge/virulencefinder_db -t 0.90 -l 0.60 -x
+
+   # See the results
+   $ column -t -s $'\t' strainA/results_tab.tsv | cut -c 1-150
+
+.. csv-table:: Parameters explanation when using VirulenceFinder
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-i FILE``", "Input genome (``.fasta``) or reads (``.fastq``)"
+   "``-o DIR``", "Output directory (it must already exist)"
+   "``-p DIR``", "Path to the VirulenceFinder database"
+   "``-d NAMES``", "Databases to use, separated by commas (see the ``config`` file of the database; default: all)"
+   "``-t NUM``", "Minimum identity, between 0 and 1 (default: 0.90; used in this Tutorial: 0.90)"
+   "``-l NUM``", "Minimum coverage, between 0 and 1 (default: 0.60; used in this Tutorial: 0.60)"
+   "``-x``", "Extended output: also write the tables and the alignments"
+
+The ``results_tab.tsv`` file has the following main columns: the **database**, the **virulence factor** (gene), the **identity**, the **query/template length** (coverage), the **contig** and **position** where the gene was found, the **protein function** and the **accession number**.
+
+**3. Running VirulenceFinder in several genomes**
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   for genome in genomes/*.fasta; do
+      name=$(basename $genome .fasta)
+      mkdir -p amr/virulencefinder/${name}
+      virulencefinder.py -i $genome -o amr/virulencefinder/${name} -p ~/databases/cge/virulencefinder_db -t 0.90 -l 0.60 -x > logs/${name}_virulencefinder.log 2>&1
+   done
+
+   # Combine the results of all the genomes in a single table
+   $ echo -e "genome\tdatabase\tgene\tidentity\tcontig" > amr/virulencefinder_all.tsv
+   for dir in amr/virulencefinder/*/; do
+      genome=$(basename $dir)
+      tail -n +2 $dir/results_tab.tsv | awk -F'\t' -v g=$genome '{print g"\t"$1"\t"$2"\t"$3"\t"$5}' >> amr/virulencefinder_all.tsv
+   done
+   $ column -t -s $'\t' amr/virulencefinder_all.tsv
+
+.. todo::
+   18. Run |virulencefinder| in all the genomes. Which genomes carry Shiga toxin genes (*stx*)? Which subtypes?
+   19. Compare the virulence genes of strainA and strainB with the ones of Sakai (STEC O157:H7) and K12 (laboratory strain). What do you notice?
+   20. In which sequences (chromosome or plasmids) are the virulence genes located?
 
 
 Folder structure
@@ -465,11 +670,19 @@ At the end of this section, you will have the following folder structure (only t
     │   │   │   ├── PointFinder_results.txt
     │   │   │   ├── pheno_table.txt
     │   │   │   ├── <genome>.json
+    │   ├── resfinder_reads
+    │   │   ├── <sample>
     │   ├── amrfinder
     │   │   ├── <genome>.tsv
+    │   ├── virulencefinder
+    │   │   ├── <genome>
+    │   │   │   ├── results_tab.tsv
     │   ├── resfinder_acquired_all.tsv
     │   ├── pointfinder_all.tsv
     │   ├── amrfinder_all.tsv
+    │   ├── amr_evaluation_all.tsv
+    │   ├── mutations_evaluation_all.tsv
+    │   ├── virulencefinder_all.tsv
     ├── logs
 
 
@@ -477,6 +690,9 @@ References
 ##########
 
 .. [BORTOLAIA2020] Bortolaia V, et al. 2020. ResFinder 4.0 for predictions of phenotypes from genotypes. J Antimicrob Chemother. 75(12):3491-3500. `DOI: 10.1093/jac/dkaa345 <https://dx.doi.org/10.1093/jac/dkaa345>`_.
+.. [FELDGARDEN2019] Feldgarden M, et al. 2019. Validating the AMRFinder Tool and Resistance Gene Database by Using Antimicrobial Resistance Genotype-Phenotype Correlations in a Collection of Isolates. Antimicrob Agents Chemother. 63(11):e00483-19. `DOI: 10.1128/AAC.00483-19 <https://dx.doi.org/10.1128/AAC.00483-19>`_.
 .. [FELDGARDEN2021] Feldgarden M, et al. 2021. AMRFinderPlus and the Reference Gene Catalog facilitate examination of the genomic links among antimicrobial resistance, stress response, and virulence. Sci Rep. 11:12728. `DOI: 10.1038/s41598-021-91456-0 <https://dx.doi.org/10.1038/s41598-021-91456-0>`_.
 .. [FLORENSA2022] Florensa AF, Kaas RS, Clausen PTLC, Aytan-Aktug D, Aarestrup FM. 2022. ResFinder - an open online resource for identification of antimicrobial resistance genes in next-generation sequencing data and prediction of phenotypes from genotypes. Microb Genom. 8(1):000748. `DOI: 10.1099/mgen.0.000748 <https://dx.doi.org/10.1099/mgen.0.000748>`_.
+.. [JOENSEN2014] Joensen KG, Scheutz F, Lund O, Hasman H, Kaas RS, Nielsen EM, Aarestrup FM. 2014. Real-time whole-genome sequencing for routine typing, surveillance, and outbreak detection of verotoxigenic Escherichia coli. J Clin Microbiol. 52(5):1501-1510. `DOI: 10.1128/JCM.03617-13 <https://dx.doi.org/10.1128/JCM.03617-13>`_.
+.. [MALBERGTETZSCHNER2020] Malberg Tetzschner AM, Johnson JR, Johnston BD, Lund O, Scheutz F. 2020. In Silico Genotyping of Escherichia coli Isolates for Extraintestinal Virulence Genes by Use of Whole-Genome Sequencing Data. J Clin Microbiol. 58(10):e01269-20. `DOI: 10.1128/JCM.01269-20 <https://dx.doi.org/10.1128/JCM.01269-20>`_.
 .. [ZANKARI2017] Zankari E, et al. 2017. PointFinder: a novel web tool for WGS-based detection of antimicrobial resistance associated with chromosomal point mutations in bacterial pathogens. J Antimicrob Chemother. 72(10):2764-2768. `DOI: 10.1093/jac/dkx217 <https://dx.doi.org/10.1093/jac/dkx217>`_.

@@ -12,11 +12,13 @@ Introduction
 
 2. Therefore, it is of utmost importance to **identify** the errors that may influence further data analysis and interpretation.
 
-3. In this section, you will first learn how to visualize the quality of the data using |fastqc| and |multiqc|.
+3. In this section, you will first learn how to visualize the quality of the Illumina data using |fastqc| and |multiqc|.
 
-4. After that, we will **trim** and **filter** low quality or uninformative reads/bases through |bbduk|.
+4. After that, we will **trim** and **filter** the low quality or uninformative Illumina reads/bases through |fastp|.
 
-5. You will be working only with the paired-end raw data acquired through the **Illumina HiSeq 2500** Platform [GREIG2019]_.
+5. Finally, you will evaluate (|nanoplot|), clean (|chopper|, |porechop|) and filter (|filtlong|) the Oxford Nanopore reads.
+
+6. You will be working with the paired-end raw data acquired through the **Illumina HiSeq 2500** Platform and with the Oxford Nanopore reads of the same isolates [GREIG2019]_.
 
 
 Learning objectives
@@ -27,7 +29,9 @@ After finishing this Tutorial section, you will be able to:
 * Calculate the sequencing coverage.
 * Generate a full combined quality report.
 * Assess and interpret the general quality of raw reads.
-* Improve the quality of raw reads by trimming, masking and filtering.
+* Improve the quality of Illumina raw reads by trimming and filtering.
+* Evaluate the quality of Oxford Nanopore reads and decide how to clean and filter them.
+* Compare the quality of the reads before and after cleaning.
 
 
 Coverage
@@ -332,32 +336,28 @@ Quality control
    Only perform QC if your data need it. Whether you should quality-trim, and what the threshold should be, depends on your **data quality** and their **intended use**. Often a threshold of **~10** is pretty good for most of the cases.
 
 
-BBDuk
+fastp
 *****
 
-If your data needs QC you can use |bbduk| to trim adapters and filter other low-quality data. |bbduk| can run in trimming mode or filtering mode.
+If your data needs QC you can use |fastp| to remove adapters and filter low-quality reads. It is an all-in-one tool that performs the trimming and filtering and also writes its own ``.html`` and ``.json`` quality reports (before and after filtering).
 
 
 Installation
 ............
-
-.. note::
-   |bbtools| is written in Java, but mamba will install the required Java version automatically together with the package ``bbmap``. In previous versions of this Tutorial, BBTools was manually downloaded from SourceForge; this is no longer necessary.
 
 .. code-block:: bash
 
     # Activate the qc environment
     $ conda activate qc
 
-    # Install BBTools (BBMap package) through conda
-    $ mamba install bbmap
+    # Install fastp
+    $ mamba install fastp
+
+    # Check if fastp is installed
+    $ fastp --version
 
     # Let's also create a new directory to keep the clean raw sequence reads
     $ mkdir ~/tutorial/qc_improvement
-
-    # To test the installation, run stats.sh against the PhiX reference genome that is included in BBTools
-    # At the end you should see some statistics in your shell
-    $ stats.sh in=$(ls $CONDA_PREFIX/opt/bbmap-*/resources/phix174_ill.ref.fa.gz)
 
 
 Usage
@@ -367,110 +367,249 @@ Usage
 
 ``Input``: You will use the Illumina raw sequence data contained in the ``.fastq.gz`` files.
 
-``Output``: BBDuk will generate ``.fastq`` files containing your sequence data trimmed and filtered according to the input parameters.
+``Output``: fastp will generate the clean ``.fastq.gz`` files, an ``.html`` report and a ``.json`` report (that can be read by |multiqc|).
 
 **2. Basic commands**
 
 .. note::
 
-   * When you have the **paired-end reads** in 2 files you should **always processed them together**, not one at a time.
+   * When you have the **paired-end reads** in 2 files you should **always process them together**, not one at a time.
 
    * In the commands provided below don't forget to add the full path of your ``fastq.gz`` files.
 
-   * With the mamba installation, the BBTools scripts are available directly in the command line (e.g., ``bbduk.sh``), without any path.
+   * In this Tutorial, |fastp| is run with the **standard parameters**: it automatically detects and removes the adapters, and it filters the reads with low quality, too many unknown bases or too short. Change the parameters only if your quality reports show that it is necessary.
 
 .. code-block:: bash
 
     # Go to the directory where you want to keep the trimmed data
     $ cd ~/tutorial/qc_improvement/
 
-    # Trim adapters when present in the raw sequence reads
-    # ref=adapters uses the file with all the adapters (adapters.fa) that is included in BBTools
-    $ bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq.gz out2=clean2.fastq.gz ref=adapters ktrim=r k=23 mink=11 hdist=1 tpe tbo
+    # Run fastp with the standard parameters
+    $ fastp -i read1.fastq.gz -I read2.fastq.gz -o clean_R1.fastq.gz -O clean_R2.fastq.gz -h fastp_report.html -j fastp_report.json
 
-    # Trim regions with an average quality below 10 in both ends of the reads
-    $ bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq.gz out2=clean2.fastq.gz qtrim=rl trimq=10
-
-    # Discard raw sequence reads with average quality below 10
-    $ bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq.gz out2=clean2.fastq.gz maq=10
-
-    # Trim regions with an average quality below 10 and discard reads with average quality below 5 after trimming
-    # (trimq only works if you also say which side of the reads must be trimmed, using qtrim)
-    $ bbduk.sh -Xmx1g in1=read1.fastq.gz in2=read2.fastq.gz out1=clean1.fastq.gz out2=clean2.fastq.gz qtrim=rl trimq=10 maq=5
-
-    # Optionally you can also evaluate all raw reads length and display basic statistics
-    $ readlength.sh in=reads.fastq.gz out=histogram.txt
-
-.. csv-table:: Parameters explanation when using BBDuk
+.. csv-table:: Parameters explanation when using fastp
    :header: "Parameter", "Description"
    :widths: 20, 60
 
-   "``hdist``", "Hamming distance (e.g., hdist=1, this allows one mismatch)"
-   "``ktrim=r``", "Once a reference kmer is matched in a read, that kmer and all the bases to the right will be trimmed (3' adapters)"
-   "``ktrim=l``", "Once a reference kmer is matched in a read, that kmer and all the bases to the left will be trimmed (5' adapters)"
-   "``ktrim=N``", "Rather than trimming, it masks all bases covered by reference kmers to *N*"
-   "``k``", "Kmer size to use. It can have a length between 1-31. Usually the longer a kmer, the greater the specificity"
-   "``maq``", "Discard reads with average quality below a specified value (e.g., maq=10, means average quality BELOW 10)"
-   "``mink``", "Allows to use shorter kmers at the ends of the read (e.g., k=11 for the last 11 bases)"
-   "``out``", "Catch reads that don't match a reference kmers (the cleaned reads); ``out1``/``out2`` for paired-end reads"
-   "``outm``", "Catch reads that match a reference kmers"
-   "``qtrim=rl``", "It will trim the left and right sides"
-   "``qtrim=l``", "It will trim the left side"
-   "``qtrim=r``", "It will trim the right side"
-   "``ref=file.fa``", "Fasta file containing adapters sequence or other contamination"
-   "``stats``", "Produce a report with the contaminant sequences and how many reads of them were seen"
-   "``tbo``", "Also trim adapters based on pair overlap detection using BBMerge"
-   "``tpe``", "Trim both reads to the same length"
-   "``trimq``", "Quality-trim using the Phred algorithm (e.g., trimq=10, it will trim regions with an average quality BELOW 10). Requires ``qtrim``"
-   "``-Xmx1g``", "It forces BBDuk to use 1 GB of memory (use more for large files)"
-   "``in1/in2``", "Input forward and reverse reads. For interleaved or single-end reads use ``in=``"
-   "``minlength=50``", "Reads shorter than this after trimming will be discarded (default: 10)"
-   "``stats=FILE``", "Write a report of the contaminants/adapters found to this file"
+   "``-i`` / ``-I``", "Input forward (read1) and reverse (read2) reads"
+   "``-o`` / ``-O``", "Output forward and reverse clean reads (if the name ends with ``.gz`` the files are compressed)"
+   "``-h FILE``", "Name of the ``.html`` report (default: ``fastp.html``)"
+   "``-j FILE``", "Name of the ``.json`` report (default: ``fastp.json``)"
+   "``-w NUM``", "Number of threads (default: 3)"
+   "``-q NUM``", "Phred quality value to consider a base as qualified (default: 15)"
+   "``-l NUM``", "Reads shorter than this length are discarded (default: 15)"
+   "``--detect_adapter_for_pe``", "Extra adapter detection for paired-end reads (the adapters of paired-end reads are already trimmed by overlap analysis by default)"
+   "``-A``", "Disable the adapter trimming"
 
+**3. Running fastp in several samples**
 
-**3. Running BBDuk in several samples**
-
-In practice, you need to run BBDuk in all the samples of your project with the **same parameters**. Use a loop with the sample names (``samples.txt``) and keep one log file per sample:
+In practice, you need to run fastp in all the samples of your project with the **same parameters**. Use a loop with the sample names (``samples.txt``) and keep one log file per sample:
 
 .. code-block:: bash
 
    $ cd ~/tutorial
    $ mkdir -p logs
    while read -r sample; do
-      echo "Trimming ${sample}"
-      bbduk.sh -Xmx2g \
-         in1=raw_data/${sample}_R1.fastq.gz in2=raw_data/${sample}_R2.fastq.gz \
-         out1=qc_improvement/${sample}_clean_R1.fastq.gz out2=qc_improvement/${sample}_clean_R2.fastq.gz \
-         ref=adapters ktrim=r k=23 mink=11 hdist=1 tpe tbo \
-         qtrim=rl trimq=10 minlength=50 \
-         stats=qc_improvement/${sample}_bbduk_stats.txt 2> logs/${sample}_bbduk.log
+      echo "Cleaning ${sample}"
+      fastp -i raw_data/${sample}_R1.fastq.gz -I raw_data/${sample}_R2.fastq.gz \
+         -o qc_improvement/${sample}_clean_R1.fastq.gz -O qc_improvement/${sample}_clean_R2.fastq.gz \
+         -h qc_improvement/${sample}_fastp.html -j qc_improvement/${sample}_fastp.json \
+         -w 4 &> logs/${sample}_fastp.log
    done < samples.txt
 
    # Check how many reads were kept in each sample
-   $ grep -H "Result:" logs/*_bbduk.log
+   $ grep -H "reads passed filter" logs/*_fastp.log
 
 .. note::
-   Compare the number of reads before and after the trimming. If more than ~10% of the reads were removed, check your quality reports, since something may be wrong with your data.
+   Compare the number of reads before and after the cleaning. If more than ~10% of the reads were removed, check your quality reports, since something may be wrong with your data.
 
 **4. Additional options**
 
 .. code-block:: bash
 
-   # To see all the parameters available on BBDuk
-   $ bbduk.sh --help
+   # To see all the parameters available on fastp
+   $ fastp --help
 
 .. todo::
-   13. Run |bbduk| on all the downloaded raw paired-end Illumina reads if needed.
-   14. Run |fastqc| in the trimmed files, saving the reports in ``~/tutorial/qc_visualisation/trimmed``.
-   15. Aggregate all the reports of trimmed and untrimmed files with |multiqc|.
-   16. Did you notice any kind of improvement in quality after the trimming and filtering process? Which parameters are now better?
-   17. Compare the number of reads and the coverage before and after trimming.
+   13. Run |fastp| on all the downloaded raw paired-end Illumina reads.
+   14. Open the ``.html`` report of fastp and compare the quality **before** and **after** filtering. Which parameters are now better?
+   15. Run |fastqc| in the clean files, saving the reports in ``~/tutorial/qc_visualisation/trimmed``.
+   16. Aggregate all the reports of clean and raw files with |multiqc|. Did you notice any kind of improvement in quality after the cleaning process?
+   17. Compare the number of reads and the coverage before and after the cleaning.
 
 .. hint::
-   If you want to use less disk space in your computer, you can compress all the previous ``.fastq`` files by using the ``gzip`` command (BBDuk can already write compressed ``.fastq.gz`` files if the output name ends with ``.gz``).
+   If you want to use less disk space in your computer, you can delete the raw files after confirming that the clean files are correct, or keep only compressed ``.fastq.gz`` files.
 
-.. seealso::
-   `fastp <https://github.com/OpenGene/fastp>`_ is a fast all-in-one alternative to perform adapter trimming, quality filtering and reporting in a single command (e.g., ``fastp -i R1.fastq.gz -I R2.fastq.gz -o clean_R1.fastq.gz -O clean_R2.fastq.gz --detect_adapter_for_pe``).
+
+Oxford Nanopore reads
+#####################
+
+1. The quality of Oxford Nanopore reads is evaluated differently from the Illumina reads. The reads have **variable length** and a lower per-base accuracy, so what matters most are the **read length distribution** and the **read quality (Q score)**.
+
+2. The Nanopore data is also cleaned in several steps, each one with a specific tool:
+
+   * |nanoplot|: quality plots and statistics of the reads.
+   * |chopper|: removes the DNA Control Sample (DCS, a spike-in control of the library preparation kit) and the reads with a low Q score.
+   * |porechop|: removes the sequencing adapters.
+   * |filtlong|: filters the remaining low-quality reads, using the clean Illumina reads as a reference.
+
+3. Run |nanoplot| **before** and **after** the cleaning steps to assess the overall improvement.
+
+.. attention::
+   Filtering by size (|filtlong|) can remove **small plasmids**. For that reason, the reads that are used to look for missing small plasmids (see the :ref:`assembly <ngs-assembly>` section) are the ones that were only cleaned with |chopper| and |porechop|, **without** the |filtlong| step.
+
+
+Installation
+************
+
+.. code-block:: bash
+
+    # Deactivate all current environments
+    $ conda deactivate
+
+    # Create a new environment named nanopore and install the tools
+    $ mamba create -n nanopore nanoplot chopper porechop filtlong
+
+    # Activate the nanopore environment
+    $ conda activate nanopore
+
+    # Check if the tools are installed
+    $ NanoPlot --version
+    $ chopper --version
+    $ porechop --version
+    $ filtlong --version
+
+    # Let's also create the directories to keep the reports
+    $ mkdir -p ~/tutorial/qc_visualisation/nanoplot_raw ~/tutorial/qc_visualisation/nanoplot_clean
+
+
+NanoPlot
+********
+
+``Input``: Oxford Nanopore reads (``.fastq`` or ``.fastq.gz``).
+
+``Output``: A ``NanoPlot-report.html`` file with the plots, and a ``NanoStats.txt`` file with the statistics (number of reads, total bases, N50, mean read length and mean read quality).
+
+.. code-block:: bash
+
+    # Run NanoPlot in the raw Nanopore reads of strainA, using the standard parameters
+    $ NanoPlot --fastq ~/tutorial/raw_data/strainA_nanopore.fastq.gz -o ~/tutorial/qc_visualisation/nanoplot_raw/strainA -t 4
+
+    # Check the statistics of the reads
+    $ cat ~/tutorial/qc_visualisation/nanoplot_raw/strainA/NanoStats.txt
+
+.. csv-table:: Parameters explanation when using NanoPlot
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``--fastq FILE``", "Input Nanopore reads in fastq format (can be compressed)"
+   "``-o DIR``", "Output directory"
+   "``-t NUM``", "Number of threads"
+   "``-p PREFIX``", "Prefix of the output files (e.g., ``-p strainA_``)"
+   "``--raw``", "Store the extracted data in tab separated file"
+
+
+Chopper
+*******
+
+|chopper| filters the reads by Q score and length and, optionally, removes the reads that match a contaminant sequence such as the DCS.
+
+``Input``: Oxford Nanopore reads (``.fastq`` or ``.fastq.gz``), read through the standard input.
+
+``Output``: The filtered reads, written to the standard output.
+
+.. code-block:: bash
+
+    $ cd ~/tutorial/qc_improvement
+
+    # Remove the reads with a Q score below 10
+    $ gunzip -c ~/tutorial/raw_data/strainA_nanopore.fastq.gz | chopper -q 10 -t 4 | gzip > strainA_nanopore_nodcs.fastq.gz
+
+    # If your sequencing run included the DNA Control Sample (DCS), also remove it using the DCS fasta file
+    # (the public data of this Tutorial does not need it)
+    $ gunzip -c ~/tutorial/raw_data/strainA_nanopore.fastq.gz | chopper -q 10 -t 4 --contam DCS_MinION.fasta | gzip > strainA_nanopore_nodcs.fastq.gz
+
+.. csv-table:: Parameters explanation when using Chopper
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-q NUM``", "Minimum average read quality (Q score). Reads below this value are discarded"
+   "``-l NUM``", "Minimum read length (default: 1)"
+   "``--contam FILE``", "Fasta file with the contaminant sequences (e.g., the DCS) to remove"
+   "``-t NUM``", "Number of threads"
+
+.. note::
+   The file name ``_nodcs`` is used to keep track of the cleaning step that was already done.
+
+
+Porechop
+********
+
+|porechop| finds and removes the adapters from the ends of the reads (and splits the reads that have an adapter in the middle).
+
+.. code-block:: bash
+
+    # Remove the adapters
+    $ porechop -i strainA_nanopore_nodcs.fastq.gz -o strainA_nanopore_nodcs_noadapt.fastq.gz -t 4
+
+.. csv-table:: Parameters explanation when using Porechop
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-i FILE``", "Input Nanopore reads"
+   "``-o FILE``", "Output clean reads (if the name ends with ``.gz`` the file is compressed)"
+   "``-t NUM``", "Number of threads"
+
+.. note::
+   The reads ``_nodcs_noadapt`` are the ones that will be used later to look for small plasmids that are missing in the assembly.
+
+
+Filtlong
+********
+
+|filtlong| removes the low-quality reads and trims the low-quality regions. The Illumina reads can be used as a **reference** to identify which parts of the Nanopore reads are more reliable.
+
+.. code-block:: bash
+
+    # Filter the reads using the clean Illumina reads as reference
+    $ filtlong -1 strainA_clean_R1.fastq.gz -2 strainA_clean_R2.fastq.gz \
+         --min_length 1000 --keep_percent 90 --trim --split 500 \
+         strainA_nanopore_nodcs_noadapt.fastq.gz | gzip > strainA_nanopore_filtered.fastq.gz
+
+.. csv-table:: Parameters explanation when using Filtlong
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-1`` / ``-2``", "Illumina reads (clean) used as reference"
+   "``--min_length NUM``", "Discard the reads shorter than this length (in bp)"
+   "``--keep_percent NUM``", "Keep only the best percentage of the reads (e.g., 90 discards the worst 10%)"
+   "``--trim``", "Trim the reads to remove the bases that do not match the Illumina reference"
+   "``--split NUM``", "Split the reads at regions with this length (in bp) of low-quality bases"
+
+.. note::
+   |filtlong| needs the clean Illumina reads, so run |fastp| before this step. The reads ``_filtered`` are the ones that will be used for the long-read assembly.
+
+**Running the Nanopore cleaning in several samples**
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   while read -r sample; do
+      echo "Cleaning the Nanopore reads of ${sample}"
+      gunzip -c raw_data/${sample}_nanopore.fastq.gz | chopper -q 10 -t 4 | gzip > qc_improvement/${sample}_nanopore_nodcs.fastq.gz
+      porechop -i qc_improvement/${sample}_nanopore_nodcs.fastq.gz -o qc_improvement/${sample}_nanopore_nodcs_noadapt.fastq.gz -t 4
+      filtlong -1 qc_improvement/${sample}_clean_R1.fastq.gz -2 qc_improvement/${sample}_clean_R2.fastq.gz \
+         --min_length 1000 --keep_percent 90 --trim --split 500 \
+         qc_improvement/${sample}_nanopore_nodcs_noadapt.fastq.gz | gzip > qc_improvement/${sample}_nanopore_filtered.fastq.gz
+      NanoPlot --fastq qc_improvement/${sample}_nanopore_filtered.fastq.gz -o qc_visualisation/nanoplot_clean/${sample} -t 4
+   done < samples.txt
+
+.. todo::
+   18. Run |nanoplot| in the raw Nanopore reads of all the samples. What are the number of reads, the N50 and the mean read quality?
+   19. Clean the Nanopore reads of all the samples with |chopper|, |porechop| and |filtlong|.
+   20. Run |nanoplot| again in the filtered reads. Compare the reports (before and after). What changed in the read length distribution and in the read quality?
+   21. How many bases did you lose in the filtering? Calculate the coverage before and after the cleaning, as you did for the Illumina reads.
+
 
 Folder structure
 ################
@@ -489,6 +628,10 @@ At the end of this section, you will have the following folder structure.
     │   ├── files.gbk
     ├── genomes
     ├── qc_visualisation
+    │   ├── nanoplot_raw
+    │   │   ├── <sample>
+    │   ├── nanoplot_clean
+    │   │   ├── <sample>
     │   ├── trimmed
     │   │   ├── <sample>_clean_R1_fastqc.html
     │   │   ├── <sample>_clean_R1_fastqc.zip
@@ -502,7 +645,11 @@ At the end of this section, you will have the following folder structure.
     ├── qc_improvement
     │   ├── <sample>_clean_R1.fastq.gz
     │   ├── <sample>_clean_R2.fastq.gz
-    │   ├── <sample>_bbduk_stats.txt
+    │   ├── <sample>_fastp.html
+    │   ├── <sample>_fastp.json
+    │   ├── <sample>_nanopore_nodcs.fastq.gz
+    │   ├── <sample>_nanopore_nodcs_noadapt.fastq.gz
+    │   ├── <sample>_nanopore_filtered.fastq.gz
     ├── logs
 
 
@@ -519,21 +666,17 @@ List of QC tools
 
    * The tools used in this Tutorial section are not the only ones available for the purpose of quality control.
 
-   * Other tools can also be used to perform this task (**some examples are provided in table below**).
+   * Other tools can also be used to perform this task.
 
 .. csv-table::
-   Table with other available Software installed by conda.
+   Table with the tools used in this Tutorial section (installed by conda).
    :header: "Package name", "Version", "Main objective"
    :widths: 20, 20, 40
 
-   "`BBTools <https://jgi.doe.gov/data-and-tools/software-tools/bbtools/>`_", "40.02", "Quality control tools (contains BBMap, BBDuk)"
-   "`Cutadapt <https://cutadapt.readthedocs.io/en/stable/>`_", "5.2", "Quality control tool"
-   "`FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_", "0.13.0", "Quality control visualisation"
-   "`MultiQC <https://multiqc.info/>`_", "1.35", "Quality control visualisation"
-   "`fastp <https://github.com/OpenGene/fastp>`_", "1.3.7", "Quality control visualisation and improvement (all-in-one)"
-   "`PRINSEQ <http://prinseq.sourceforge.net>`_", "0.20.4", "Quality control visualisation and improvement"
-   "`Trimmomatic <http://www.usadellab.org/cms/?page=trimmomatic>`_", "0.36", "Quality control tool"
-   "`Trim Galore <http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/>`_", "0.6.2", "Quality control tool"
-   "`NanoPlot <https://github.com/wdecoster/NanoPlot>`_", "1.20.0", "Quality control visualisation for Oxford Nanopore reads"
-   "`Porechop <https://github.com/rrwick/Porechop>`_", "0.2.4", "Quality control improvement for Oxford Nanopore reads"
-   "`Nanofilt <https://github.com/wdecoster/nanofilt>`_", "2.3.0", "Quality control visualisation and improvement for Oxford Nanopore reads"
+   "`FastQC <https://www.bioinformatics.babraham.ac.uk/projects/fastqc/>`_", "0.13.0", "Quality control visualisation (Illumina)"
+   "`MultiQC <https://multiqc.info/>`_", "1.35", "Aggregation of quality control reports"
+   "`fastp <https://github.com/OpenGene/fastp>`_", "1.3.7", "Quality control improvement (Illumina): adapter removal and filtering"
+   "`NanoPlot <https://github.com/wdecoster/NanoPlot>`_", "1.47.1", "Quality control visualisation (Oxford Nanopore)"
+   "`Chopper <https://github.com/wdecoster/chopper>`_", "0.13.0", "Removal of the DCS and low Q score reads (Oxford Nanopore)"
+   "`Porechop <https://github.com/rrwick/Porechop>`_", "0.2.4", "Adapter removal (Oxford Nanopore)"
+   "`Filtlong <https://github.com/rrwick/Filtlong>`_", "0.3.1", "Quality filtering of the long reads using the Illumina reads as reference"

@@ -14,7 +14,11 @@ Introduction
 
 3. In this section, we will use |kraken| for taxonomic classification of our sequenced samples and input these results to |bracken| for estimation of species-level or genus-level abundances.
 
-4. Finally, we will use |krona| to generate interactive plots of the previous taxonomic labels.
+4. Then, we will use |krona| to generate interactive plots of the previous taxonomic labels.
+
+5. The taxonomic classification is performed with the **clean reads** (after the :ref:`quality control <ngs-qc>`), with the **Illumina** and the **Nanopore** reads analysed **separately**.
+
+6. Finally, we will use |confindr| to detect **intraspecies contamination** (e.g., two different *E. coli* strains in the same sample), that cannot be detected by |kraken|.
 
 
 Learning objectives
@@ -25,6 +29,7 @@ After finishing this Tutorial section, you will be able to:
 * Perform a complete taxonomic classification of raw sequence data.
 * Estimate the abundance of species or genera using the taxonomy labels.
 * Visualise and interpret taxonomic classification in samples.
+* Detect intraspecies and cross-species contamination in Illumina reads.
 
 
 Taxonomy assignment
@@ -98,7 +103,7 @@ Installation
 
 **1. Input/Output files**
 
-``Input_kraken2``: Accept compress or uncompress files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the paired-end Illumina raw reads.
+``Input_kraken2``: Accept compress or uncompress files such as ``.fastq`` or ``.fastq.gz``. For this part of the Tutorial, we will use the clean paired-end Illumina reads and the filtered Nanopore reads (see :ref:`quality control <ngs-qc>`).
 
 ``Output_kraken2``: A standard tab-delimited file is produced containing the classification for each sequence. You can also obtain additional output files such a |kraken| sample report (change the output into different formats) using the ``--report`` option or the classified sequences in a single file using the ``--classified-out`` flag.
 
@@ -133,8 +138,11 @@ Installation
     # Go to the directory kraken_bracken where you will store the results
     $ cd ~/tutorial/taxonomy/kraken_bracken
 
-    # Run Kraken2 in your paired-end sequence reads
-    $ kraken2 --threads 4 --db ~/databases/kraken2_standard_08 --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/raw_data/strainA_R1.fastq.gz ~/tutorial/raw_data/strainA_R2.fastq.gz --output strainA.kraken2
+    # Run Kraken2 in your clean paired-end Illumina reads
+    $ kraken2 --threads 4 --db ~/databases/kraken2_standard_08 --report strainA.kreport --gzip-compressed --paired --classified-out cseqs_strainA#.fastq ~/tutorial/qc_improvement/strainA_clean_R1.fastq.gz ~/tutorial/qc_improvement/strainA_clean_R2.fastq.gz --output strainA.kraken2
+
+    # Run Kraken2 in your filtered Nanopore reads (separately, without --paired)
+    $ kraken2 --threads 4 --db ~/databases/kraken2_standard_08 --report strainA_nanopore.kreport --gzip-compressed ~/tutorial/qc_improvement/strainA_nanopore_filtered.fastq.gz --output strainA_nanopore.kraken2
 
 .. csv-table:: Parameters explanation when using Kraken2
    :header: "Parameter", "Description"
@@ -150,8 +158,8 @@ Installation
    "``--memory-mapping``", "Avoid loading the database into RAM (slower, but it allows to run with less memory)"
    "``--confidence FLOAT``", "Confidence score threshold, between 0 and 1 (default: 0.0)"
    "``--use-names``", "Print scientific names instead of taxonomy IDs in the output"
-   "``strainA_R1.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 1"
-   "``strainA_R2.fastq.gz``", "Full path to paired-end Illumina raw sequence reads 2"
+   "``strainA_clean_R1.fastq.gz``", "Full path to the clean paired-end Illumina reads 1"
+   "``strainA_clean_R2.fastq.gz``", "Full path to the clean paired-end Illumina reads 2"
 
 If you open the **standard Kraken2 output file** with a text editor you will see that each line represents a classified sequence.
 
@@ -196,6 +204,9 @@ From left to the right you can identify 6 columns representing:
     # Or run the Bracken Python script (macOS and Linux)
     $ python ~/Bracken/src/est_abundance.py -i strainA.kreport -k ~/databases/kraken2_standard_08/database100mers.kmer_distrib -o strainA.bracken -l S
 
+    # For the Nanopore reads, use the kmer distribution file of the longest read length available in the database
+    $ python ~/Bracken/src/est_abundance.py -i strainA_nanopore.kreport -k ~/databases/kraken2_standard_08/database300mers.kmer_distrib -o strainA_nanopore.bracken -l S
+
 .. csv-table:: Parameters explanation when using Bracken
    :header: "Parameter", "Description"
    :widths: 20, 60
@@ -207,6 +218,9 @@ From left to the right you can identify 6 columns representing:
    "``-r LENGTH``", "Read length used to build the Bracken database files (default: 100); use the one closer to your read length (e.g., 100 or 150)"
    "``-t THRESHOLD``", "Minimum number of reads that Kraken2 needs to assign to a taxon before the re-estimation (default: 0)"
    "``-k FILE``", "(est_abundance.py) Kmer distribution file of the database (``database<READ_LEN>mers.kmer_distrib``)"
+
+.. note::
+   |bracken| was developed for short reads. The pre-built databases include kmer distribution files for read lengths up to 300 bp (check with ``ls ~/databases/kraken2_standard_08/*kmer_distrib``). For the Nanopore reads, use the longest one, and interpret the abundances as an approximation.
 
 If you open the **Bracken output file** with a text editor you will see that each line represents a species.
 
@@ -239,7 +253,7 @@ From left to the right you can identify 7 columns representing:
 
 **4. Running Kraken2 and Bracken in several samples**
 
-To classify all your samples with the same parameters, use a loop over the sample names listed in ``samples.txt``. Each sample will have its own output files and log.
+To classify all your samples with the same parameters, use a loop over the sample names listed in ``samples.txt``. Each sample will have its own output files and log. The Illumina and the Nanopore reads are classified separately.
 
 .. code-block:: bash
 
@@ -248,12 +262,20 @@ To classify all your samples with the same parameters, use a loop over the sampl
    $ mkdir -p logs
    while read -r sample; do
       echo "Classifying ${sample}"
+      # Illumina (clean reads)
       kraken2 --threads 4 --db $DB --gzip-compressed --paired \
          --report taxonomy/kraken_bracken/${sample}.kreport \
          --output taxonomy/kraken_bracken/${sample}.kraken2 \
-         raw_data/${sample}_R1.fastq.gz raw_data/${sample}_R2.fastq.gz 2> logs/${sample}_kraken2.log
+         qc_improvement/${sample}_clean_R1.fastq.gz qc_improvement/${sample}_clean_R2.fastq.gz 2> logs/${sample}_kraken2.log
       python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}.kreport \
          -k $DB/database100mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}.bracken -l S
+      # Nanopore (filtered reads)
+      kraken2 --threads 4 --db $DB --gzip-compressed \
+         --report taxonomy/kraken_bracken/${sample}_nanopore.kreport \
+         --output taxonomy/kraken_bracken/${sample}_nanopore.kraken2 \
+         qc_improvement/${sample}_nanopore_filtered.fastq.gz 2> logs/${sample}_nanopore_kraken2.log
+      python ~/Bracken/src/est_abundance.py -i taxonomy/kraken_bracken/${sample}_nanopore.kreport \
+         -k $DB/database300mers.kmer_distrib -o taxonomy/kraken_bracken/${sample}_nanopore.bracken -l S
    done < samples.txt
 
    # See the percentage of classified reads of each sample
@@ -269,7 +291,8 @@ To classify all your samples with the same parameters, use a loop over the sampl
    If the ``--classified-out`` option is not used, Kraken2 does not save the classified reads, which saves a lot of disk space. Use it only if you want to extract the reads from a specific taxon.
 
 .. todo::
-   1. Run |kraken| and |bracken| on all the downloaded raw paired-end Illumina reads and save a copy of the report.
+   1. Run |kraken| and |bracken| on the clean Illumina reads and on the filtered Nanopore reads of all the samples, and save a copy of the reports.
+   2. Do the Illumina and the Nanopore reads of the same sample give the same species? If not, what could explain it?
 
 
 Taxonomy visualisation
@@ -352,6 +375,7 @@ Usage
    # One chart for each sample (loop)
    while read -r sample; do
       ktImportTaxonomy -q 2 -t 3 kraken_bracken/${sample}.kraken2 -o krona/${sample}_krona.html
+      ktImportTaxonomy -q 2 -t 3 kraken_bracken/${sample}_nanopore.kraken2 -o krona/${sample}_nanopore_krona.html
    done < ~/tutorial/samples.txt
 
    # A single chart to compare all the samples (a drop-down menu allows you to switch between samples)
@@ -363,9 +387,113 @@ Usage
 *Figure 14. Example of a Krona HTML report on a macOS.*
 
 .. todo::
-   2. Visualize the |kraken| results using |krona| for strainA and strainB and save the final charts to your computer.
-   3. What is the primary taxonomy ID present in your samples? And the genus?
-   4. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
+   3. Visualize the |kraken| results using |krona| for strainA and strainB (Illumina and Nanopore) and save the final charts to your computer.
+   4. What is the primary taxonomy ID present in your samples? And the genus?
+   5. Did you notice any kind of contamination in your samples? Belonging to each taxonomy ID and genus?
+
+
+Contamination
+#############
+
+
+ConFindr
+********
+
+* |kraken| detects contamination from **other species** (e.g., *Salmonella* reads in an *E. coli* sample), but it cannot detect a mixture of two strains of the **same species**.
+
+* |confindr| detects **intraspecies** and **cross-species contamination** in Illumina reads, by looking for **multiple alleles** of core, single-copy genes (in a pure isolate each of these genes has only one allele) [LOW2019]_.
+
+* |confindr| already includes the databases of core genes for *Escherichia*, *Salmonella* and *Listeria*. For the other genera it needs the rMLST database, which requires a license.
+
+* In this Tutorial, |confindr| is run on the **clean Illumina reads**.
+
+
+Installation
+............
+
+.. code-block:: bash
+
+    # Deactivate all current environments
+    $ conda deactivate
+
+    # Create a new environment named confindr and install ConFindr
+    $ mamba create -n confindr confindr
+
+    # Activate the confindr environment
+    $ conda activate confindr
+
+    # Check if ConFindr is installed
+    $ confindr --version
+
+
+Usage
+.....
+
+**1. Input/Output files**
+
+``Input``: A **directory** with the paired-end Illumina reads (``.fastq`` or ``.fastq.gz``). The forward and reverse files are recognised by ``_R1`` and ``_R2`` in their names.
+
+``Output``: A ``confindr_report.csv`` file with one line per sample, and a log file.
+
+**2. Basic commands**
+
+.. code-block:: bash
+
+    # Create the directories for ConFindr
+    $ mkdir -p ~/tutorial/taxonomy/confindr/input
+
+    # Copy (or link) the clean Illumina reads to the input directory
+    # Unzip the reads before running ConFindr
+    $ cd ~/tutorial/taxonomy/confindr/input
+    $ gunzip -c ~/tutorial/qc_improvement/strainA_clean_R1.fastq.gz > strainA_R1.fastq
+    $ gunzip -c ~/tutorial/qc_improvement/strainA_clean_R2.fastq.gz > strainA_R2.fastq
+
+    # Run ConFindr in all the samples of the input directory
+    $ cd ~/tutorial/taxonomy/confindr
+    $ confindr -i input -o results -t 4
+
+    # See the results
+    $ column -t -s, results/confindr_report.csv
+
+.. csv-table:: Parameters explanation when using ConFindr
+   :header: "Parameter", "Description"
+   :widths: 20, 60
+
+   "``-i DIR``", "Input directory with the reads"
+   "``-o DIR``", "Output directory"
+   "``-t NUM``", "Number of threads"
+   "``-fid STR``", "Identifier of the forward reads (default: ``_R1``)"
+   "``-rid STR``", "Identifier of the reverse reads (default: ``_R2``)"
+   "``-d DIR``", "Directory with the databases (e.g., rMLST, for other genera)"
+
+The most important columns of the ``confindr_report.csv`` file are:
+
+   1. **Sample**: the sample name.
+   2. **Genus**: the genus detected (if more than one genus is found, all of them are listed, which indicates cross-species contamination).
+   3. **NumContamSNVs**: number of positions with more than one allele (multiple alleles indicate contamination).
+   4. **ContamStatus**: ``True`` if the sample is contaminated and ``False`` if it is not.
+   5. **PercentContam**: estimated percentage of contamination.
+
+**3. Running ConFindr in several samples**
+
+ConFindr already analyses all the samples of the input directory, so you just need to prepare the input directory with a loop:
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   while read -r sample; do
+      gunzip -c qc_improvement/${sample}_clean_R1.fastq.gz > taxonomy/confindr/input/${sample}_R1.fastq
+      gunzip -c qc_improvement/${sample}_clean_R2.fastq.gz > taxonomy/confindr/input/${sample}_R2.fastq
+   done < samples.txt
+
+   $ confindr -i taxonomy/confindr/input -o taxonomy/confindr/results -t 4
+
+   # Remove the unzipped reads to save disk space
+   $ rm taxonomy/confindr/input/*.fastq
+
+.. todo::
+   6. Run |confindr| on the clean Illumina reads of all the samples.
+   7. Are any of your samples contaminated? Compare the results with the ones of |kraken| and |bracken|. Which kind of contamination can each tool detect?
 
 
 Folder structure
@@ -385,6 +513,8 @@ At the end of this section, you will have the following folder structure.
     │   ├── files.gbk
     ├── genomes
     ├── qc_visualisation
+    │   ├── nanoplot_raw
+    │   ├── nanoplot_clean
     │   ├── trimmed
     │   │   ├── <sample>_clean_R1_fastqc.html
     │   │   ├── <sample>_clean_R1_fastqc.zip
@@ -398,19 +528,30 @@ At the end of this section, you will have the following folder structure.
     ├── qc_improvement
     │   ├── <sample>_clean_R1.fastq.gz
     │   ├── <sample>_clean_R2.fastq.gz
+    │   ├── <sample>_nanopore_nodcs_noadapt.fastq.gz
+    │   ├── <sample>_nanopore_filtered.fastq.gz
     ├── taxonomy
     │   ├── kraken_bracken
     │   │   ├── <sample>.kraken2
     │   │   ├── <sample>.kreport
     │   │   ├── <sample>.bracken
+    │   │   ├── <sample>_nanopore.kraken2
+    │   │   ├── <sample>_nanopore.kreport
+    │   │   ├── <sample>_nanopore.bracken
     │   ├── krona
     │   │   ├── <sample>_krona.html
+    │   │   ├── <sample>_nanopore_krona.html
     │   │   ├── all_samples_krona.html
+    │   ├── confindr
+    │   │   ├── input
+    │   │   ├── results
+    │   │   │   ├── confindr_report.csv
 
 
 References
 ##########
 
+.. [LOW2019] Low AJ, Koziol AG, Manninger PA, Blais B, Carrillo CD. 2019. ConFindr: rapid detection of intraspecies and cross-species contamination in bacterial whole-genome sequence data. PeerJ. 7:e6995. `DOI: 10.7717/peerj.6995 <https://dx.doi.org/10.7717/peerj.6995>`_.
 .. [LU2017] Lu J, Breitwieser FP, Thielen P, Salzberg SL. 2017. Bracken: estimating species abundance in metagenomics data. PeerJ Computer Science. 3:e104. `DOI: 10.7717/peerj-cs.104 <https://dx.doi.org/10.7717/peerj-cs.104>`_.
 .. [ONDOV2011] Ondov BD, Bergman NH, Phillippy AM. 2011. Interactive metagenomic visualization in a Web browser. BMC Bioinformatics. 12:385. `DOI: 10.1186/1471-2105-12-385 <https://dx.doi.org/10.1186/1471-2105-12-385>`_.
 .. [WOOD2019] Wood DE, Lu J, Langmead B. 2019. Improved metagenomic analysis with Kraken 2. Genome Biol. 20:257. `DOI: 10.1186/s13059-019-1891-0 <https://dx.doi.org/10.1186%2Fs13059-019-1891-0>`_.

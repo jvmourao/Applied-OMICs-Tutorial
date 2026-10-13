@@ -172,8 +172,8 @@ In this Tutorial you will use two channels, **conda-forge** and **bioconda**. Th
     # Replace PKGNAME by the name of your package
     $ mamba install PKGNAME
 
-    # For example, this will install two packages called abricate and bwa
-    $ mamba install abricate bwa
+    # For example, this will install two packages called fastp and bwa
+    $ mamba install fastp bwa
 
 * You can also install packages without activating your environment although in this case, you need to specify the environment name in the command line as:
 
@@ -185,8 +185,8 @@ In this Tutorial you will use two channels, **conda-forge** and **bioconda**. Th
     # Create an environment and install a package at the same time
     $ mamba create -n ENVNAME PKGNAME
 
-    # In this case, it will install in the environment "annotation" the package "abricate"
-    $ mamba install -n annotation abricate
+    # In this case, it will install in the environment "annotation" the package "mlst"
+    $ mamba install -n annotation mlst
 
 .. seealso::
    You can find in this `link <https://anaconda.org/bioconda/repo?access=all>`_ a full list of all available bioconda packages.
@@ -204,22 +204,35 @@ Here is a list of all packages that you will install throughout the Tutorial. Th
    "ncbi-acc-download", "0.2.8", "Data acquisition", "data", "``mamba install ncbi-acc-download``"
    "fastqc", "0.13.0", "Quality control", "qc", "``mamba install fastqc``"
    "multiqc", "1.35", "Quality control", "multiqc", "``mamba install multiqc``"
-   "bbmap (BBTools)", "40.02", "Quality control", "qc", "``mamba install bbmap``"
+   "fastp", "1.3.7", "Quality control", "qc", "``mamba install fastp``"
+   "nanoplot", "1.47.1", "Quality control", "nanopore", "``mamba create -n nanopore nanoplot chopper porechop filtlong``"
+   "chopper", "0.13.0", "Quality control", "nanopore", "This package is installed together with NanoPlot"
+   "porechop", "0.2.4", "Quality control", "nanopore", "This package is installed together with NanoPlot"
+   "filtlong", "0.3.1", "Quality control", "nanopore", "This package is installed together with NanoPlot"
    "kraken2", "2.17.2", "Taxonomy", "taxonomy", "``mamba install kraken2 bracken``"
    "bracken", "3.1", "Taxonomy", "taxonomy", "This package is installed together with Kraken2"
    "krona", "2.8.1", "Taxonomy", "taxonomy", "``mamba install krona``"
-   "unicycler", "0.5.1", "De novo genome assembly", "assembly", "``mamba install unicycler``"
-   "spades", "4.3.0", "De novo genome assembly", "assembly", "This package will be installed with Unicycler"
-   "bandage", "0.9.0", "De novo genome assembly", "home directory", "https://rrwick.github.io/Bandage/"
+   "confindr", "0.8.2", "Taxonomy (contamination)", "confindr", "``mamba create -n confindr confindr``"
+   "shovill", "1.1.0", "De novo genome assembly", "shovill", "``mamba create -n shovill shovill`` (SPAdes is installed together)"
+   "autocycler", "0.6.2", "De novo genome assembly", "autocycler", "``conda env create --file environment.yml --name autocycler`` (environment file of the developer, with all the assemblers; see the assembly section)"
+   "polypolish", "0.6.1", "De novo genome assembly", "polish", "``mamba create -n polish polypolish bwa``"
+   "pypolca (optional)", "0.4.0", "De novo genome assembly", "polish", "``mamba install pypolca``"
+   "dnaapler", "-", "De novo genome assembly", "autocycler", "``mamba install -n autocycler dnaapler``"
+   "unicycler", "0.5.1", "De novo genome assembly", "unicycler", "``mamba create -n unicycler unicycler``"
    "quast", "5.3.0", "De novo genome assembly", "qc", "``mamba install quast``"
+   "checkm2", "1.0.2", "De novo genome assembly", "checkm2", "``mamba create -n checkm2 checkm2``"
    "bakta", "1.12.1", "Genome annotation", "bakta", "``mamba install bakta``"
-   "abricate", "1.4.0", "Genome annotation", "abricate", "``mamba install abricate``"
-   "busco", "6.1.0", "Genome annotation", "busco", "``mamba install busco``"
+   "mlst", "2.33.1", "Genome annotation", "mlst", "``mamba create -n mlst mlst``"
    "resfinder", "4.7.2", "Antimicrobial resistance", "amr", "``mamba install resfinder ncbi-amrfinderplus``"
    "ncbi-amrfinderplus", "4.2.7", "Antimicrobial resistance", "amr", "This package is installed together with ResFinder"
-   "kma", "1.6.17", "Antimicrobial resistance and plasmids", "amr, plasmidfinder", "This package is installed together with ResFinder and PlasmidFinder"
+   "kma", "1.6.17", "Antimicrobial resistance, virulence and plasmids", "amr, virulencefinder, plasmidfinder", "This package is installed together with ResFinder, VirulenceFinder and PlasmidFinder"
+   "virulencefinder", "2.0.4", "Virulence", "virulencefinder", "``mamba create -n virulencefinder virulencefinder``"
    "plasmidfinder", "2.1.6", "Plasmids", "plasmidfinder", "``mamba install plasmidfinder``"
    "mob_suite", "3.1.9", "Plasmids", "mobsuite", "``mamba install mob_suite``"
+   "plASgraph2", "-", "Plasmids", "plasgraph2", "Installed from `GitHub <https://github.com/cchauve/plASgraph2>`_ with ``pip`` (not available in conda)"
+
+.. note::
+   A version shown as ``-`` was not fixed when this Tutorial was written: use the latest one, and always report the versions of the tools and databases that you used (``mamba list -n ENVNAME``).
 
 
 Conda cheat sheet

@@ -9,21 +9,20 @@ Using the Linux/macOS command line, you will go from raw sequencing reads to a c
 - **Before we begin**: Bash commands (files, pipes, tables, variables, loops, scripts)
 - **Tools installation**: Miniforge3 (mamba), environments, channels
 - **Data acquisition**: SRA reads and NCBI genomes (SRA Toolkit, ncbi-genome-download)
-- **Quality control**: coverage, FastQC, MultiQC, BBDuk
-- **Taxonomy**: Kraken2, Bracken, Krona
-- **De novo assembly**: SPAdes, Unicycler, Bandage, QUAST
-- **Genome annotation**: Bakta, ABRicate, IGV, BUSCO
-- **Antimicrobial resistance genes/mutations**: ResFinder/PointFinder, AMRFinderPlus
-- **Plasmid detection and reconstruction**: PlasmidFinder, MOB-suite, plasmidSPAdes
+- **Quality control**: coverage, FastQC, MultiQC, fastp (Illumina); NanoPlot, Chopper, Porechop, Filtlong (Nanopore)
+- **Taxonomy and contamination**: Kraken2, Bracken, Krona, ConFindr
+- **De novo assembly**: Shovill, Autocycler, Dnaapler, Polypolish, Unicycler, QUAST, CheckM2
+- **Genome annotation**: Bakta, MLST
+- **Antimicrobial resistance and virulence**: ResFinder/PointFinder, AMRFinderPlus, VirulenceFinder
+- **Plasmid detection and reconstruction**: PlasmidFinder, MOB-suite, plASgraph2
 
 ## Building the documentation
 
 The tutorial is written in reStructuredText and built with [Sphinx](https://www.sphinx-doc.org/).
 
 ```bash
-python3 -m venv tutorialenv
-source tutorialenv/bin/activate
-pip install sphinx sphinx_rtd_theme
+mamba create -n sphinx -c conda-forge sphinx sphinx_rtd_theme
+conda activate sphinx
 cd docs
 make html        # output in docs/build/html
 ```

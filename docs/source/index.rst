@@ -4,7 +4,7 @@ Welcome to Applied OMICs Tutorial's documentation!
 
 Welcome to the introductory tutorial for the curricular unit of Applied OMICs where you will learn fundamental bioinformatics analysis using mainly Linux command-line.
 
-During this tutorial, we will use real next-generation sequencing (NGS) data retrieved from the Sequence Read Archive (SRA). In the end, you will be able to assemble and analyze bacterial genomes, to detect antimicrobial resistance genes and mutations, and to detect and reconstruct plasmids, running all the analyses in several genomes.
+During this tutorial, we will use real next-generation sequencing (NGS) data retrieved from the Sequence Read Archive (SRA). In the end, you will be able to assemble and analyze bacterial genomes, to detect antimicrobial resistance genes and mutations and virulence genes, and to detect and reconstruct plasmids, running all the analyses in several genomes.
 
 If you have any doubts about this tutorial, you can contact me through my email **joam@food.dtu.dk** or **GitHub** account `@jvmourao <https://github.com/jvmourao>`_.
 
