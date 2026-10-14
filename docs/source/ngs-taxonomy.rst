@@ -296,14 +296,14 @@ To classify all your samples with the same parameters, use a loop over the sampl
 
 **5. Does your sample pass? (species and contamination)**
 
-The result of |bracken| in the **Illumina** reads is used to check if the sample is **pure** (see the :ref:`Quality thresholds <quality-thresholds>` page). The sample passes if one of the following conditions is met (the percentages are of the **classified** reads):
+The result of |bracken| in the **Illumina** reads is used to confirm the **species** and to check if the sample is **pure** (see the :ref:`Quality thresholds <quality-thresholds>` page). This is a **critical** metric: the sample passes if the most abundant species is the **expected** one and one of the following conditions is met (the percentages are of the **classified** reads):
 
-.. csv-table:: Thresholds of inter-species contamination (Bracken)
-   :header: "Option", "Condition", "Type"
-   :widths: 15, 55, 15
+.. csv-table:: Thresholds of inter-species contamination and species confirmation (Bracken; critical)
+   :header: "Check", "Condition"
+   :widths: 15, 70
 
-   "1", "The most abundant species has ≥ 90% of the reads", "Fail if neither option is met"
-   "2", "The genus of the most abundant species has ≥ 90% of the reads **and** the species has ≥ 75%", "Fail if neither option is met"
+   "1st check", "≥ 90% of the reads identified as the target species"
+   "2nd check (if the 1st fails)", "≥ 90% of the reads identified as the target genus **and** ≥ 75% as the target species"
 
 .. note::
    *Escherichia* and *Shigella* are counted together as **one genus**, since *Shigella* is, genetically, a lineage of *E. coli*. Kraken2 often assigns some *E. coli* reads to *Shigella*, which does not mean a contamination.
@@ -330,8 +330,11 @@ To check option 2, run |bracken| also at the **genus** level (``-l G``):
    $ column -t -s $'\t' taxonomy/contamination_check.tsv
 
 .. todo::
-   3. Do all your samples pass the contamination check? Which option (1 or 2) was met by each sample?
+   3. Do all your samples pass the contamination check? Which check (1st or 2nd) was passed by each sample?
    4. Is the most abundant species the one that you expected?
+
+.. seealso::
+   The species can also be confirmed in the **assembly**, for example with `GTDB-Tk <https://github.com/Ecogenomics/GTDBTk>`_, which compares the genome with the Genome Taxonomy Database. It is not used in this Tutorial, since it needs more than 100 GB of RAM.
 
 
 Taxonomy visualisation
@@ -536,12 +539,11 @@ ConFindr already analyses all the samples of the input directory, so you just ne
 
 **4. Does your sample pass? (intraspecies contamination)**
 
-.. csv-table:: Thresholds of ConFindr
-   :header: "Metric", "Threshold", "Type"
+.. csv-table:: Threshold of ConFindr
+   :header: "Metric", "Threshold", "Criticality"
    :widths: 30, 40, 15
 
-   "Genus detected by ConFindr", "The same as the expected species (and as the result of |bracken|)", "Fail"
-   "Intraspecies contamination (``ContamStatus``)", "``False``", "Warning"
+   "Intraspecies mixture (multiple alleles in single-copy core genes)", "No multiple-allele calls (``ContamStatus = False``); flag the sample if any", "Non-critical"
 
 .. code-block:: bash
 

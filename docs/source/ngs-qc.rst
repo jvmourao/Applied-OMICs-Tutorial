@@ -448,55 +448,89 @@ In practice, you need to run fastp in all the samples of your project with the *
 Does your sample pass? (reads)
 ******************************
 
-Check if the **clean** Illumina reads of each sample are within the :ref:`quality thresholds <quality-thresholds>`. A sample that **fails** should not be used (e.g., it should be sequenced again); a **warning** means that you should look at the results more carefully.
+Check if the Illumina reads of each sample are within the :ref:`quality thresholds <quality-thresholds>` (based on the ISO 23418:2022 standard [ISO23418]_). There are two types of metrics:
+
+* **Critical**: if the sample does not pass (**FAIL**), it should not be used (e.g., it should be sequenced again).
+* **Non-critical**: if the sample does not pass (**WARNING**), it can be used, but look at its results more carefully.
 
 .. csv-table:: Quality thresholds of the Illumina reads
-   :header: "Metric", "Threshold", "Type"
-   :widths: 30, 40, 15
+   :header: "Metric", "Reads", "Threshold", "Criticality"
+   :widths: 22, 15, 45, 13
 
-   "Bases with quality ≥ Q30 (after cleaning)", "≥ 80% (reads ≤ 150 bp); ≥ 75% (≤ 250 bp); ≥ 70% (> 250 bp)", "Fail"
-   "GC content of the reads (ΔGC)", "Deviation from the expected GC content of the species < 4% (e.g., *E. coli* 50.6%: 46.6–54.6%; *Salmonella* 52.1%: 48.1–56.1%)", "Fail"
-   "Bases with quality ≥ Q20", "≥ 95%", "Warning"
-   "Per base sequence quality (FastQC)", "> 20 in all positions", "Warning"
+   "Bases with quality ≥ Q30 (%Q≥30)", "Raw (before trimming)", "≥ 80% (2x150 bp and shorter); ≥ 75% (2x250 bp and shorter); ≥ 70% (2x300 bp and shorter)", "Critical"
+   "GC content deviation (ΔGC)", "Clean (after trimming)", "< 4% deviation from the expected GC content of the species (e.g., *E. coli* 50.6%: 46.6–54.6%)", "Critical"
+   "Read-length distribution", "Raw (before trimming)", "2x150 bp: > 95% of the reads with 150 bp; 2x250 bp: > 90% with 250 bp; 2x300 bp: < 5% shorter than 120 bp and > 50% longer than 150 bp, **or** > 90% with 300 bp", "Non-critical"
+   "Residual adapters", "Clean (after trimming)", "≤ 0.1% of the reads", "Non-critical"
+   "Ambiguous bases (%N)", "Clean (after trimming)", "< 0.1% of the bases", "Non-critical"
 
-The values are in the ``.json`` report of |fastp|. The following commands print them for all the samples, with the result of the check:
+**1. Critical metrics (fastp report)**
+
+The Q30 of the raw reads (``before_filtering``) and the GC content of the clean reads (``after_filtering``) are in the ``.json`` report of |fastp|:
 
 .. code-block:: bash
 
    $ cd ~/tutorial
 
-   # Expected GC content of the species (E. coli; use 52.1 for Salmonella)
+   # Expected GC content of the species (E. coli; use 52.1 for Salmonella). See the QualiBact website for other species
    $ GC_EXPECTED=50.6
 
-   # Q30, Q20, GC content and mean read length of the clean reads (after_filtering section of the fastp report)
-   $ echo -e "sample\tQ30\tQ20\tGC\tread_length\tQ30_check\tQ20_check\tGC_check" > qc_improvement/reads_quality_check.tsv
+   $ echo -e "sample\tQ30_raw\tread_length\tGC_clean\tQ30_check\tGC_check" > qc_improvement/reads_critical_check.tsv
    while read -r sample; do
-      python3 -c "import json; a=json.load(open('qc_improvement/${sample}_fastp.json'))['summary']['after_filtering']; print('${sample}', round(a['q30_rate']*100,1), round(a['q20_rate']*100,1), round(a['gc_content']*100,1), a['read1_mean_length'], sep='\t')"
+      python3 -c "import json; d=json.load(open('qc_improvement/${sample}_fastp.json'))['summary']; b=d['before_filtering']; a=d['after_filtering']; print('${sample}', round(b['q30_rate']*100,1), b['read1_mean_length'], round(a['gc_content']*100,1), sep='\t')"
    done < samples.txt | awk -F'\t' -v OFS='\t' -v gc=$GC_EXPECTED '{
-         min30 = ($5<=150) ? 80 : (($5<=250) ? 75 : 70)
+         min30 = ($3<=150) ? 80 : (($3<=250) ? 75 : 70)
          dgc = $4 - gc; if (dgc < 0) dgc = -dgc
-         print $0, ($2>=min30 ? "PASS" : "FAIL"), ($3>=95 ? "PASS" : "WARNING"), (dgc<4 ? "PASS" : "FAIL") }' >> qc_improvement/reads_quality_check.tsv
-   $ column -t qc_improvement/reads_quality_check.tsv
+         print $0, ($2>=min30 ? "PASS" : "FAIL"), (dgc<4 ? "PASS" : "FAIL") }' >> qc_improvement/reads_critical_check.tsv
+   $ column -t qc_improvement/reads_critical_check.tsv
 
 .. note::
-   The difference between the GC content of the reads and the expected GC content of the species (**ΔGC**) must be lower than 4%: for *E. coli* (50.6%), the reads should be between 46.6% and 54.6%. A GC content outside this range can indicate a **contamination** with another species, or a sample of another species. The expected GC content of each species is available, for example, on the `QualiBact <https://qualibact.org/species/>`_ website (median GC content).
+   The difference between the GC content of the reads and the expected GC content of the species (**ΔGC**) must be lower than 4%: for *E. coli* (50.6%), the reads should be between 46.6% and 54.6%. A GC content outside this range can indicate a **contamination** with another species, or a sample of another species. The expected GC content of each species is available on the `QualiBact <https://qualibact.org/species/>`_ website (median GC content).
+
+**2. Non-critical metrics**
+
+The read-length distribution is calculated from the raw reads, the residual adapters from the |fastqc| report of the clean reads (run |fastqc| in the clean reads first, see above), and the ambiguous bases (N) from the clean reads:
+
+.. code-block:: bash
+
+   $ cd ~/tutorial
+   $ echo -e "sample\tread_length\tpct_full_length\tlength_check\tadapters_pct\tadapters_check\tN_pct\tN_check" > qc_improvement/reads_noncritical_check.tsv
+   while read -r sample; do
+      # Read-length distribution of the raw forward reads: % of reads with the full length, shorter than 120 bp and longer than 150 bp
+      len=$(gunzip -c raw_data/${sample}_R1.fastq.gz | awk 'NR%4==2 {n++; h[length($0)]++}
+           END {for (l in h) if (l+0>m) m=l+0
+                for (l in h) {if (l+0==m) a+=h[l]; if (l+0<120) s+=h[l]; if (l+0>150) b+=h[l]}
+                a=100*a/n; s=100*s/n; b=100*b/n
+                ok = (m<=150) ? (a>95) : ((m<=250) ? (a>90) : ((s<5 && b>50) || a>90))
+                printf "%d\t%.1f\t%s", m, a, (ok ? "PASS" : "WARNING")}')
+      # Residual adapters: maximum % of reads with adapters in the FastQC report of the clean reads (R1 and R2)
+      adapt=$(for r in R1 R2; do unzip -p qc_visualisation/trimmed/${sample}_clean_${r}_fastqc.zip '*/fastqc_data.txt'; done |
+           awk '/^>>Adapter Content/ {f=1; next} /^>>END_MODULE/ {f=0} f && !/^#/ {for (i=2; i<=NF; i++) if ($i+0>m) m=$i+0}
+                END {printf "%.2f\t%s", m, (m<=0.1 ? "PASS" : "WARNING")}')
+      # Ambiguous bases (N) in the clean reads
+      npct=$(gunzip -c qc_improvement/${sample}_clean_R1.fastq.gz qc_improvement/${sample}_clean_R2.fastq.gz |
+           awk 'NR%4==2 {t+=length($0); n+=gsub(/N/,"")} END {p=100*n/t; printf "%.3f\t%s", p, (p<0.1 ? "PASS" : "WARNING")}')
+      echo -e "${sample}\t${len}\t${adapt}\t${npct}"
+   done < samples.txt >> qc_improvement/reads_noncritical_check.tsv
+   $ column -t qc_improvement/reads_noncritical_check.tsv
 
 
 Depth and breadth of coverage
 *****************************
 
-The coverage that you calculated at the beginning of this section is the **average depth**. But the reads can be unevenly distributed, leaving regions of the genome with few or no reads. To check this, the reads are **mapped** (aligned) to a reference genome of the same species, and two more metrics are calculated:
+The coverage that you calculated at the beginning of this section is the **average depth**. But the reads can be unevenly distributed, leaving regions of the genome with few or no reads. To check this, the reads are **mapped** (aligned) to a reference genome of the same species, and two metrics are calculated:
 
+* **Depth of coverage**: the **median** number of reads that cover each base of the reference genome.
 * **Breadth of coverage**: the percentage of the reference genome covered by at least **10 reads** (10x).
-* **Coverage uniformity**: the coefficient of variation (CV = standard deviation / mean) of the depth along the genome. A low CV means that the reads are evenly distributed.
 
 .. csv-table:: Coverage thresholds
-   :header: "Metric", "Threshold", "Type"
-   :widths: 30, 40, 15
+   :header: "Metric", "Threshold", "Criticality"
+   :widths: 30, 50, 15
 
-   "Depth of coverage", "≥ 30x (routine); ≥ 50x (SNP-based analyses); ≥ 80x (*Campylobacter* with Nextera XT)", "Fail"
-   "Breadth of coverage (10x)", "≥ 95% of the reference genome", "Fail"
-   "Coverage uniformity (CV)", "< 0.25", "Warning"
+   "Depth of coverage (median)", "≥ 30x (routine analyses); ≥ 50x (outbreak SNP analysis); ≥ 80x (*Campylobacter* sequenced with the Nextera XT kit)", "Critical"
+   "Breadth of coverage (10x)", "≥ 95% (routine analyses); ≥ 95–98% (outbreak SNP analysis)", "Critical"
+
+.. note::
+   The ISO 23418:2022 standard [ISO23418]_ recommends a depth of at least 20x, depending on the application and on the microorganism. For the detection of variants, the ISO 20397-2:2021 standard [ISO20397]_ indicates higher depths: 15x for homozygous SNVs, 33x for heterozygous SNVs and 60x for insertions and deletions (indels).
 
 .. code-block:: bash
 
@@ -517,9 +551,10 @@ The coverage that you calculated at the beginning of this section is the **avera
    # Summary per sequence of the reference (chromosome and plasmids): mean depth and % of bases covered
    $ samtools coverage strainA.bam
 
-   # Mean depth, breadth of coverage at 10x and coefficient of variation, for the whole reference
-   $ samtools depth -a strainA.bam | awk '{n++; s+=$3; ss+=$3*$3; if ($3>=10) c++}
-        END {m=s/n; sd=sqrt(ss/n-m*m); printf "depth=%.1fx breadth10x=%.1f%% CV=%.2f\n", m, 100*c/n, sd/m}'
+   # Median depth and breadth of coverage at 10x, for the whole reference
+   # (the depths are counted in a histogram, h, to find the median without keeping all the values in memory)
+   $ samtools depth -a strainA.bam | awk '{n++; h[$3]++; if ($3>=10) c++}
+        END {for (d=0; cum<n/2; d++) cum+=h[d]; printf "median_depth=%dx breadth10x=%.1f%%\n", d-1, 100*c/n}'
 
 .. csv-table:: Parameters explanation
    :header: "Command", "Description"
@@ -532,18 +567,25 @@ The coverage that you calculated at the beginning of this section is the **avera
    "``samtools coverage``", "Coverage summary for each sequence of the reference"
    "``samtools depth -a``", "Depth of each position of the reference, including the positions with 0 reads"
 
+.. seealso::
+   `mosdepth <https://github.com/brentp/mosdepth>`_ is a faster alternative to calculate the depth and breadth of coverage from a BAM file (e.g., ``mosdepth --thresholds 10 strainA strainA.bam``).
+
 **Running the coverage check in several samples**
 
 .. code-block:: bash
 
    $ cd ~/tutorial/qc_improvement/mapping
-   $ echo -e "sample\tdepth\tbreadth10x\tCV\tdepth_check\tbreadth_check\tCV_check" > coverage_check.tsv
+
+   # Minimum median depth: 30 (routine), 50 (outbreak SNP analysis) or 80 (Campylobacter with Nextera XT)
+   $ MIN_DEPTH=30
+
+   $ echo -e "sample\tmedian_depth\tbreadth10x\tdepth_check\tbreadth_check" > coverage_check.tsv
    while read -r sample; do
       bwa mem -t 4 reference.fasta ~/tutorial/qc_improvement/${sample}_clean_R1.fastq.gz ~/tutorial/qc_improvement/${sample}_clean_R2.fastq.gz 2> /dev/null | samtools sort -@ 4 -o ${sample}.bam
       samtools index ${sample}.bam
-      samtools depth -a ${sample}.bam | awk -v s=$sample -v OFS='\t' '{n++; t+=$3; ss+=$3*$3; if ($3>=10) c++}
-         END {m=t/n; sd=sqrt(ss/n-m*m); b=100*c/n; cv=sd/m
-              print s, sprintf("%.1f",m), sprintf("%.1f",b), sprintf("%.2f",cv), (m>=30 ? "PASS" : "FAIL"), (b>=95 ? "PASS" : "FAIL"), (cv<0.25 ? "PASS" : "WARNING")}' >> coverage_check.tsv
+      samtools depth -a ${sample}.bam | awk -v s=$sample -v md=$MIN_DEPTH -v OFS='\t' '{n++; h[$3]++; if ($3>=10) c++}
+         END {for (d=0; cum<n/2; d++) cum+=h[d]; med=d-1; b=100*c/n
+              print s, med, sprintf("%.1f",b), (med>=md ? "PASS" : "FAIL"), (b>=95 ? "PASS" : "FAIL")}' >> coverage_check.tsv
    done < ~/tutorial/samples.txt
    $ column -t coverage_check.tsv
 
@@ -554,8 +596,8 @@ The coverage that you calculated at the beginning of this section is the **avera
    The breadth of coverage depends on how similar your isolate is to the **reference**. A low breadth can mean low quality, but also that your isolate has regions (e.g., prophages, plasmids, genomic islands) that the reference does not have, or vice versa. Use a reference of the same species and, if possible, of the same lineage (e.g., serotype or sequence type). Also, the reference used here includes the plasmids of Sakai: if your isolate does not have them, the breadth decreases.
 
 .. todo::
-   18. Check if the clean reads of all your samples pass the thresholds of Q30, Q20 and GC content.
-   19. Map the clean reads of strainA and strainB to the Sakai genome. What are the depth, breadth (10x) and CV of each sample? Do they pass the thresholds?
+   18. Check if the reads of all your samples pass the critical (Q30, ΔGC) and non-critical (read length, adapters, Ns) thresholds.
+   19. Map the clean reads of strainA and strainB to the Sakai genome. What are the median depth and the breadth (10x) of each sample? Do they pass the thresholds for routine analyses? And for an outbreak SNP analysis?
    20. Look at the result of ``samtools coverage``. Are the plasmids of Sakai (pO157 and pOSAK1) covered by the reads of your samples? What does it mean?
 
 
@@ -765,7 +807,8 @@ At the end of this section, you will have the following folder structure.
     │   ├── <sample>_clean_R2.fastq.gz
     │   ├── <sample>_fastp.html
     │   ├── <sample>_fastp.json
-    │   ├── reads_quality_check.tsv
+    │   ├── reads_critical_check.tsv
+    │   ├── reads_noncritical_check.tsv
     │   ├── mapping
     │   │   ├── reference.fasta
     │   │   ├── coverage_check.tsv

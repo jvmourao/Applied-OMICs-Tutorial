@@ -716,7 +716,7 @@ CheckM2
 
 * **Contamination**: the percentage of extra (duplicated) genes, that usually come from another organism in the same sample.
 
-* In this Tutorial, genomes with less than **90% completeness** or more than **5% contamination** are removed from further analysis.
+* In this Tutorial, genomes with less than **95% completeness** or more than **5% contamination** are removed from further analysis (critical metrics).
 
 
 Installation
@@ -761,8 +761,8 @@ Usage
    # See the results
    $ column -t -s $'\t' final/quality_report.tsv | cut -c 1-120
 
-   # Keep only the genomes with >= 90% completeness and <= 5% contamination
-   $ awk -F'\t' 'NR==1 || ($2>=90 && $3<=5)' final/quality_report.tsv
+   # Keep only the genomes with >= 95% completeness and <= 5% contamination
+   $ awk -F'\t' 'NR==1 || ($2>=95 && $3<=5)' final/quality_report.tsv
 
 .. csv-table:: Parameters explanation when using CheckM2
    :header: "Parameter", "Description"
@@ -779,47 +779,58 @@ Usage
 
 .. todo::
    13. Run |checkm2| in the final assemblies and in the |shovill| assemblies.
-   14. What is the completeness and contamination of each genome? Do they pass the thresholds of 90% completeness and 5% contamination?
+   14. What is the completeness and contamination of each genome? Do they pass the thresholds of 95% completeness and 5% contamination?
 
 
 Does your assembly pass?
 ************************
 
-Besides the completeness and contamination (|checkm2|), the main metrics of the assembly (|quast|) must be within the **expected values for the species**. In this Tutorial, the species-specific values are taken from `QualiBact <https://qualibact.org/>`_ (version qualibact-v1.0), which calculated them from hundreds of thousands of public genomes of each species. For each metric, QualiBact gives two limits:
+Besides the completeness and contamination (|checkm2|), the main metrics of the assembly (|quast|) must be within the **expected values for the species**. In this Tutorial, the species-specific values are taken from `QualiBact <https://qualibact.org/>`_ (version qualibact-v1.0), which calculated them from hundreds of thousands of public genomes of each species.
 
-* **FAIL**: values outside this range are very unusual for the species (0.5th and 99.5th percentiles). The assembly should not be used.
-* **WARNING**: values outside this range are uncommon (2.5th and 97.5th percentiles). Look at the assembly more carefully.
+.. csv-table:: Assembly thresholds
+   :header: "Metric", "Tool", "Threshold", "Criticality"
+   :widths: 25, 20, 40, 15
 
-.. csv-table:: Assembly thresholds of QualiBact for *Escherichia coli* and *Salmonella enterica* (FAIL range / WARNING range)
-   :header: "Metric", "Tool", "*E. coli*", "*S. enterica*"
-   :widths: 25, 15, 30, 30
+   "Completeness", "CheckM2", "≥ 95%", "Critical"
+   "Contamination", "CheckM2", "≤ 5%", "Critical"
+   "Genome size (assembly length)", "QUAST (``Total length``)", "Within the range of the species (QualiBact)", "Critical"
+   "N50 and number of contigs", "QUAST (``N50``, ``# contigs``)", "Within the range of the species (QualiBact)", "Non-critical"
+   "GC content", "QUAST (``GC (%)``)", "Within the range of the species (QualiBact)", "Non-critical"
+   "Ambiguous bases (Ns per 100 kb)", "QUAST (``# N's per 100 kbp``)", "≤ 100 (preferably close to 0)", "Non-critical"
 
-   "Genome size (bp)", "QUAST (``Total length``)", "4,100,000–6,300,000 / 4,400,000–5,700,000", "4,400,000–5,900,000 / 4,500,000–5,100,000"
-   "GC content (%)", "QUAST (``GC (%)``)", "50.0–51.2 / 50.2–50.9", "51.1–52.4 / 51.9–52.3"
-   "N50 (bp)", "QUAST (``N50``)", "≥ 20,000 / ≥ 23,000", "≥ 64,000 / ≥ 90,000"
-   "Number of contigs", "QUAST (``# contigs``)", "≤ 670 / ≤ 600", "≤ 190 / ≤ 160"
-   "Coding sequences (CDS)", "Bakta (see the annotation section)", "3,900–6,500 / 4,200–5,800", "4,100–6,000 / 4,200–4,900"
+.. csv-table:: Species ranges of QualiBact (qualibact-v1.0) for *Escherichia coli* and *Salmonella enterica*
+   :header: "Metric", "*E. coli*", "*S. enterica*"
+   :widths: 30, 35, 35
+
+   "Genome size (bp)", "4,100,000–6,300,000", "4,400,000–5,900,000"
+   "GC content (%)", "50.0–51.2", "51.1–52.4"
+   "N50 (bp)", "≥ 20,000", "≥ 64,000"
+   "Number of contigs", "≤ 670", "≤ 190"
 
 .. note::
-   * The thresholds of other species are available on the `QualiBact <https://qualibact.org/species/>`_ website. Always check the latest version.
+   * The ranges of other species are available on the `QualiBact <https://qualibact.org/species/>`_ website. Always check the latest version. QualiBact gives two ranges for each metric: the ones in the table above (0.5th and 99.5th percentiles of the public genomes of the species), and a narrower range (2.5th and 97.5th percentiles) for values that are uncommon but not unusual.
    * The N50 and the number of contigs are mostly relevant for **draft** assemblies (|shovill|). A complete assembly has only a few sequences (chromosome and plasmids), so it easily passes these thresholds.
-   * The completeness and contamination are always evaluated with |checkm2| (≥ 90% and ≤ 5%, described above). QualiBact also gives completeness and contamination ranges, but they were calculated with CheckM, so they are not used in this Tutorial.
+   * The completeness and contamination are always evaluated with |checkm2|. QualiBact also gives completeness and contamination ranges, but they were calculated with CheckM, so they are not used in this Tutorial.
 
 .. code-block:: bash
 
    $ cd ~/tutorial/assembly/quast
 
    # Extract the main metrics of each assembly from the QUAST report (the columns are found by their name)
-   # and check them against the FAIL range of E. coli
-   $ awk -F'\t' -v OFS='\t' 'NR==1 {for (i=1; i<=NF; i++) c[$i]=i; print "assembly", "length", "GC", "N50", "contigs", "check"; next}
-        {len=$c["Total length"]; gc=$c["GC (%)"]; n50=$c["N50"]; nc=$c["# contigs"]
-         ok = (len>=4100000 && len<=6300000 && gc>=50.0 && gc<=51.2 && n50>=20000 && nc<=670)
-         print $c["Assembly"], len, gc, n50, nc, (ok ? "PASS" : "FAIL")}' report_without_reference/transposed_report.tsv | column -t
+   # and check them against the ranges of E. coli: genome size (critical), and N50, contigs, GC and Ns (non-critical)
+   $ awk -F'\t' -v OFS='\t' 'NR==1 {for (i=1; i<=NF; i++) c[$i]=i
+            print "assembly", "length", "N50", "contigs", "GC", "Ns_100kb", "size_check", "N50_contigs_check", "GC_check", "Ns_check"; next}
+        {len=$c["Total length"]; n50=$c["N50"]; nc=$c["# contigs"]; gc=$c["GC (%)"]; ns=$c["# N'"'"'s per 100 kbp"]
+         print $c["Assembly"], len, n50, nc, gc, ns,
+               ((len>=4100000 && len<=6300000) ? "PASS" : "FAIL"),
+               ((n50>=20000 && nc<=670) ? "PASS" : "WARNING"),
+               ((gc>=50.0 && gc<=51.2) ? "PASS" : "WARNING"),
+               ((ns<=100) ? "PASS" : "WARNING")}' report_without_reference/transposed_report.tsv | column -t
 
 .. todo::
-   15. Do the final assemblies of strainA and strainB pass the QualiBact thresholds of *E. coli*? And the |shovill| assemblies?
-   16. Change the command to use the WARNING range. Does any assembly get a warning? Why?
-   17. Which thresholds would you use for the *Salmonella* LT2 genome?
+   15. Do the final assemblies of strainA and strainB pass all the thresholds? And the |shovill| assemblies?
+   16. Which metrics are different between the final and the |shovill| assemblies? Why?
+   17. Which ranges would you use for the *Salmonella* LT2 genome?
 
 
 Folder structure
@@ -894,4 +905,4 @@ List of Assembly tools
    "`Dnaapler <https://github.com/gbouras13/dnaapler>`_", "-", "Reorientation of circular replicons"
    "`Unicycler <https://github.com/rrwick/Unicycler>`_", "0.5.1", "Hybrid assembly (detection of small plasmids)"
    "`QUAST <https://github.com/ablab/quast>`_", "5.3.0", "Assembly quality control"
-   "`CheckM2 <https://github.com/chklovski/CheckM2>`_", "1.0.2", "Assembly completeness and contamination"
+   "`CheckM2 <https://github.com/chklovski/CheckM2>`_", "1.1.0", "Assembly completeness and contamination"

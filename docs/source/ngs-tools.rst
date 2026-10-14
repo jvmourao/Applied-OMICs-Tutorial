@@ -220,7 +220,7 @@ Here is a list of all packages that you will install throughout the Tutorial. Th
    "dnaapler", "-", "De novo genome assembly", "autocycler", "``mamba install -n autocycler dnaapler``"
    "unicycler", "0.5.1", "De novo genome assembly", "unicycler", "``mamba create -n unicycler unicycler``"
    "quast", "5.3.0", "De novo genome assembly", "qc", "``mamba install quast``"
-   "checkm2", "1.0.2", "De novo genome assembly", "checkm2", "``mamba create -n checkm2 checkm2``"
+   "checkm2", "1.1.0", "De novo genome assembly", "checkm2", "``mamba create -n checkm2 checkm2``"
    "bakta", "1.12.1", "Genome annotation", "bakta", "``mamba install bakta``"
    "mlst", "2.33.1", "Genome annotation", "mlst", "``mamba create -n mlst mlst``"
    "resfinder", "4.7.2", "Antimicrobial resistance", "amr", "``mamba install resfinder ncbi-amrfinderplus``"
