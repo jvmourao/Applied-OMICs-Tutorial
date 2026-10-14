@@ -104,7 +104,7 @@ Usage
 ``Input``: A genome assembly in ``.fasta`` format (complete or draft), or raw reads in ``.fastq`` format. We will use the final assemblies in ``~/tutorial/genomes`` and also the Illumina-only assemblies (|shovill|).
 
 .. attention::
-   * In this Tutorial, |plasmidfinder| is run with a minimum of **80% identity** and **60% coverage** (``-t 0.80 -l 0.60``), as recommended by the authors to detect both the large plasmids and the small Col plasmids [CARATTOLI2014]_. The default of the program is 90% identity.
+   * In this Tutorial, |plasmidfinder| is run with a minimum of **80% identity** and **60% coverage** (``-t 0.80 -l 0.60``), as recommended by the authors to detect both the large plasmids and the small Col plasmids [CARATTOLI2014]_. The default of the command-line program is 90% identity (and the CGE web server may show other values, e.g., 95%), so always write the thresholds in the command and report them.
    * |plasmidfinder| is also run on the **Illumina-only assembly** (|shovill|). After the reorientation of the final assembly with |dnaapler|, the replicon (*rep*) sequence of a plasmid can be split between the end and the start of the sequence, and it may not be detected.
 
 ``Output``: Several files are produced, but the most important are:

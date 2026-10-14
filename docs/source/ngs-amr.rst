@@ -516,6 +516,9 @@ Use the following table to classify each gene of ``amr_evaluation_all.tsv``. A *
    "Not found", "Found", "Any", "**Check**", "Only |resfinder| found it: check the name, the identity and the coverage, and if it is the same gene as another hit of |amrfinder|."
    "Not found", "Not found", "Found", "**Reads only**", "The gene is in the reads but not in the assembly: low copy number (e.g., a small plasmid that was not assembled), a contamination, or a false positive. Check the assembly and the contamination results."
 
+.. attention::
+   **None ≠ absent**: if a gene is not detected, it does not mean that it is absent. Genes can be missed because of a poor sequence or assembly quality, a low coverage (e.g., GC/AT bias), the limitations of the detection method, or gaps and errors in the database. The **reads only** category is an example: the gene is in the sample, but not in the assembly. If the result is critical, try another assembly, tool or database, or sequence the sample again.
+
 .. csv-table:: Decision table for the point mutations
    :header: "AMRFinderPlus", "PointFinder", "Decision"
    :widths: 20, 20, 60
@@ -524,12 +527,29 @@ Use the following table to classify each gene of ``amr_evaluation_all.tsv``. A *
    "Found", "Not found", "**Check**: the mutation may not be in the PointFinder database, or the species option (``-s``/``-O``) may be wrong"
    "Not found", "Found", "**Check**: the mutation may not be in the AMRFinderPlus database, or the species option may be wrong"
 
+**3. How confident are we about a gene?**
+
+The decision table tells you if a gene is detected. To know how confident you can be that the gene is present **and functional**, look at both the **% identity** of the alignment and the **% coverage** of the reference gene:
+
+.. csv-table:: Confidence in the presence of a gene
+   :header: "Identity", "Coverage", "Interpretation"
+   :widths: 20, 20, 60
+
+   "High (> 98%)", "Full or close to full", "**High confidence** in the presence of a functional gene."
+   "High", "Partial", "The gene may be **truncated**, or split at the end of a contig (contig break): its function may be reduced. Check it in the reads (rescue)."
+   "Low", "Any, or very short", "A **novel variant** or a **false positive**. Needs a careful interpretation."
+
+Always interpret the hits in the context of the read depth, the assembly quality, the species and, when available, the phenotypic data (antimicrobial susceptibility testing).
+
 .. note::
    Some genes need a special interpretation, even when they are **confirmed**:
 
    * **Intrinsic genes**: genes that are naturally present in all the isolates of a species and do not confer acquired resistance (e.g., ``blaEC`` in *E. coli*). |amrfinder| removes most of them when you use the ``-O`` option.
    * **Low-level resistance**: genes that only increase the MIC a little, so the isolate may still be classified as susceptible (e.g., ``qnrS1`` for fluoroquinolones).
    * **Variants that are not ESBL**: some β-lactamase variants are not extended-spectrum β-lactamases, although they belong to a family with ESBL variants (e.g., ``blaTEM-135``). Always check the exact variant.
+   * **Context-dependent genes**: the effect of some genes depends on their genetic context (expression level, regulatory region, other genes). For example, ``mph(A)`` (macrolides) is part of the operon *mph(A)*-*mrx*-*mphR(A)*. Isolates of *E. coli* and *Salmonella* with ``mph(A)`` can be **susceptible** to azithromycin when the operon or its regulatory region is disrupted (e.g., by the insertion of an IS\ *Ecp1*-*bla*\ :sub:`CTX-M-1` transposition unit) [MIRENA2024]_.
+
+   **Detection ≠ resistance**: the detection of a gene or mutation suggests resistance, but it does not guarantee it. Phenotypic antimicrobial susceptibility testing remains the reference for clinical decisions.
 
 .. todo::
    14. Build the tables ``amr_evaluation_all.tsv`` and ``mutations_evaluation_all.tsv``. Classify each gene and mutation of strainA, strainB and EC958 using the decision tables.
@@ -695,4 +715,5 @@ References
 .. [FLORENSA2022] Florensa AF, Kaas RS, Clausen PTLC, Aytan-Aktug D, Aarestrup FM. 2022. ResFinder - an open online resource for identification of antimicrobial resistance genes in next-generation sequencing data and prediction of phenotypes from genotypes. Microb Genom. 8(1):000748. `DOI: 10.1099/mgen.0.000748 <https://dx.doi.org/10.1099/mgen.0.000748>`_.
 .. [JOENSEN2014] Joensen KG, Scheutz F, Lund O, Hasman H, Kaas RS, Nielsen EM, Aarestrup FM. 2014. Real-time whole-genome sequencing for routine typing, surveillance, and outbreak detection of verotoxigenic Escherichia coli. J Clin Microbiol. 52(5):1501-1510. `DOI: 10.1128/JCM.03617-13 <https://dx.doi.org/10.1128/JCM.03617-13>`_.
 .. [MALBERGTETZSCHNER2020] Malberg Tetzschner AM, Johnson JR, Johnston BD, Lund O, Scheutz F. 2020. In Silico Genotyping of Escherichia coli Isolates for Extraintestinal Virulence Genes by Use of Whole-Genome Sequencing Data. J Clin Microbiol. 58(10):e01269-20. `DOI: 10.1128/JCM.01269-20 <https://dx.doi.org/10.1128/JCM.01269-20>`_.
+.. [MIRENA2024] Azithromycin resistance in Escherichia coli and Salmonella from food-producing animals and meat in Europe. 2024. J Antimicrob Chemother. 79:1657–1667. `DOI: 10.1093/jac/dkae161 <https://dx.doi.org/10.1093/jac/dkae161>`_.
 .. [ZANKARI2017] Zankari E, et al. 2017. PointFinder: a novel web tool for WGS-based detection of antimicrobial resistance associated with chromosomal point mutations in bacterial pathogens. J Antimicrob Chemother. 72(10):2764-2768. `DOI: 10.1093/jac/dkx217 <https://dx.doi.org/10.1093/jac/dkx217>`_.
